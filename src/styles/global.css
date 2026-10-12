@@ -8,3 +8,12 @@
 @media(max-width:390px){.site-header nav{gap:13px}.brand-symbol{display:none}.intro h1{font-size:40px}.article-header h1{font-size:37px}.site-footer{flex-direction:column;gap:10px}.contents ol{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media print{.site-header,.site-footer,.contents,.back-link,.article-end{display:none}.frame{width:100%}.article-header{margin-left:0}.reading-layout{display:block}.prose{font-size:11pt}.prose table{display:table}body,html{background:white}.article-header h1{font-size:28pt}a{color:inherit!important}}
+
+/* Sunlit paper palette. */
+:root{--paper:#fffbf5;--ink:#362e29;--muted:#70635b;--line:#e6d7c8;--accent:#a34e34}
+::selection{background:#f2d9c5}
+.featured-art{border-color:#dfcbb9}
+.post-number{background:#f6e9dc}
+.prose a{text-decoration-color:#c9937d}
+.prose th{background:#f7ebde}
+.prose tbody tr:nth-child(even){background:#fcf3e9}
