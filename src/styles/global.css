@@ -17,3 +17,5 @@
 .prose a{text-decoration-color:#c9937d}
 .prose th{background:#f7ebde}
 .prose tbody tr:nth-child(even){background:#fcf3e9}
+.prose table{display:table;overflow-x:visible}
+@media(max-width:480px){.prose table{display:block;overflow-x:auto}}
