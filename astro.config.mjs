@@ -3,8 +3,8 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://attilakulik.com',
-  base: process.env.NODE_ENV === 'production' ? '/history-of-computer-science' : '/',
+  site: 'https://tech.attilakulik.com',
+  base: '/',
   output: 'static',
   trailingSlash: 'always',
   integrations: [mdx(), sitemap()],
