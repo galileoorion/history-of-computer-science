@@ -23,7 +23,7 @@ The algorithm records a **tentative distance** for each node: the shortest route
 
 ## Who devised it
 
-Dijkstra's surname is pronounced roughly “DIKE-strah” in Dutch ([hear a native speaker](https://commons.wikimedia.org/wiki/File:Dijkstra.ogg)). He worked out the method in 1956 as a programmer at Amsterdam's Mathematical Centre. For the inauguration of its ARMAC computer, he wanted a demonstration a general audience could understand. In a [2001 interview](https://conservancy.umn.edu/bitstreams/7a97387c-e045-4647-925c-d6d94a312f6e/download), he recalled choosing 64 Dutch cities, each identifiable with six bits (2⁶ = 64), and devising the method in about twenty minutes, without pencil and paper, at an Amsterdam café with his fiancée.
+Edsger W. Dijkstra ([/ˈdɛi̯k.straː/](https://en.wiktionary.org/wiki/Dijkstra#Dutch), “DIKE-strah”) worked out the method in 1956 as a programmer at Amsterdam's Mathematical Centre. For the inauguration of its ARMAC computer, he wanted a demonstration a general audience could understand. In a [2001 interview](https://conservancy.umn.edu/bitstreams/7a97387c-e045-4647-925c-d6d94a312f6e/download), he recalled choosing 64 Dutch cities, each identifiable with six bits (2⁶ = 64), and devising the method in about twenty minutes, without pencil and paper, at an Amsterdam café with his fiancée.
 
 His accounts differ on the demonstration's details. The 2001 interview uses Rotterdam to Groningen as an example. A [1982 recollection](https://garfield.library.upenn.edu/classics1983/A1983QA19900001.pdf) describes a railway map, gives Harlingen to Maastricht as the example, and links the café scene to his *other* graph algorithm. The road atlas below is a new teaching example, not a reconstruction of the demonstration.
 
