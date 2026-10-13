@@ -4,6 +4,8 @@ subtitle: "The 1950s IBM idea behind fast lookups, and why a crowded parking lot
 description: "The 1950s IBM idea behind fast lookups, and why a crowded parking lot slows it down"
 sequence: 1
 category: "Data structures"
+listingImage: "/images/parking-lot-linear-probing.svg"
+listingImageAlt: "Two license plates start at parking space 37; the second car moves to space 38"
 historicalPeriod: "1953–1954"
 author: "Attila Kulik"
 pubDate: 2026-10-12
@@ -60,6 +62,8 @@ Now another car arrives with plate 8137. Its starting position is also 37, but t
 You try space 38. If that is occupied, you try 39, and continue until you find an empty space. After space 99, you wrap around to 00.
 
 That one-step-at-a-time search is linear probing. Keeping every car inside the numbered parking lot, rather than in an overflow area, illustrates open addressing.
+
+![Two cars with plates 4237 and 8137 both start at space 37; the second car moves to space 38.](/images/parking-lot-linear-probing.svg)
 
 Taking the last two digits makes the example easy to follow, but it is not automatically a good rule for real data. If many plates end in the same digits, collisions will be frequent.
 
