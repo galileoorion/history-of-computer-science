@@ -1,10 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import Page from '../layouts/Page.astro';
-import ParkingDiagram from '../components/ParkingDiagram.astro';
 import { sitePath } from '../sitePath';
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort((a, b) => b.data.sequence - a.data.sequence);
 const [latest, ...earlier] = posts;
+const featuredImage = latest?.data.listingImage ?? latest?.data.heroImage;
+const featuredImageAlt = latest?.data.listingImageAlt ?? latest?.data.heroImageAlt ?? '';
 const minutes = (body = '') => Math.max(1, Math.ceil(body.trim().split(/\s+/).length / 220));
 ---
 <Page>
@@ -15,7 +16,7 @@ const minutes = (body = '') => Math.max(1, Math.ceil(body.trim().split(/\s+/).le
   </section>
   <section class="posts frame" aria-labelledby="posts-title">
     <div class="section-label"><h2 id="posts-title">Posts</h2><span>{String(posts.length).padStart(2, '0')} {posts.length === 1 ? 'post' : 'posts'}</span></div>
-    {latest && <article class="featured">
+    {latest && <article class:list={['featured', { 'featured--with-art': !!featuredImage, 'featured--text-only': !featuredImage }]}>
       <div class="featured-copy">
         <p class="eyebrow">Post {String(latest.data.sequence).padStart(2, '0')} <span class="meta-divider">/</span> {latest.data.category}</p>
         <h3><a href={sitePath(`${latest.id}/`)}>{latest.data.title}</a></h3>
@@ -23,9 +24,9 @@ const minutes = (body = '') => Math.max(1, Math.ceil(body.trim().split(/\s+/).le
         <p class="post-meta">{latest.data.historicalPeriod && <span>{latest.data.historicalPeriod}<span class="meta-divider">·</span></span>}{minutes(latest.body)} min read</p>
         <a class="read-link" href={sitePath(`${latest.id}/`)}>Read more <span aria-hidden="true">↗</span></a>
       </div>
-      <a class="featured-art" href={sitePath(`${latest.id}/`)} aria-label={`Read ${latest.data.title}`}>
-        {latest.data.heroImage ? <img src={sitePath(latest.data.heroImage)} alt={latest.data.heroImageAlt ?? ''} /> : latest.id === 'how-a-parking-lot-explains-the-hash-table' ? <ParkingDiagram /> : <div class="post-number" aria-hidden="true">{String(latest.data.sequence).padStart(2, '0')}</div>}
-      </a>
+      {featuredImage && <a class="featured-art" href={sitePath(`${latest.id}/`)} aria-label={`Read ${latest.data.title}`}>
+        <img src={sitePath(featuredImage)} alt={featuredImageAlt} />
+      </a>}
     </article>}
     {earlier.length > 0 && <div class="archive">{earlier.map(post => <article><p class="eyebrow">Post {String(post.data.sequence).padStart(2, '0')} / {post.data.category}</p><h3><a href={sitePath(`${post.id}/`)}>{post.data.title}</a></h3><p>{post.data.description}</p></article>)}</div>}
   </section>

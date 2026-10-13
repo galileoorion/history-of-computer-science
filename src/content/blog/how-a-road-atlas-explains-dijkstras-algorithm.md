@@ -4,6 +4,8 @@ subtitle: "A seven-town route shows how the 1956 algorithm works\u2014and why a 
 description: "A seven-town Dutch road atlas explains Dijkstra\u2019s shortest-path algorithm, its 1956 origin, and why negative costs can break it."
 sequence: 2
 category: "Algorithms"
+listingImage: "/images/dijkstra-atlas-map.svg"
+listingImageAlt: "Seven-town Dutch road atlas showing the routes used in the Dijkstra example"
 historicalPeriod: "1956–1959"
 author: "Attila Kulik"
 tags: ["Dijkstra", "Shortest paths", "Graph algorithms"]
