@@ -47,3 +47,9 @@
 .featured--text-only .featured-copy h3,.featured--text-only .featured-description{max-width:700px}
 .featured-art img{aspect-ratio:auto;object-fit:contain;height:auto}
 @media(max-width:760px){.featured--with-art{grid-template-columns:1fr}.featured-art{max-width:460px}}
+
+/* A short historical aside alongside the cookie explanation. */
+.prose .history-callout{margin:1.65em 0 2em;padding:23px 27px;border:1px solid #e4cbb7;border-left:4px solid var(--accent);border-radius:12px;background:#fff2e6;font:16px/1.7 var(--sans)}
+.prose .history-callout h3{margin:0 0 10px;color:var(--accent);font:600 17px/1.35 var(--sans)}
+.prose .history-callout p{margin:0}
+@media(max-width:480px){.prose .history-callout{padding:19px 20px;font-size:15px}}
