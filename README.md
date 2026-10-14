@@ -1,4 +1,4 @@
-# The History of Computer Science
+# A History of Computer Science
 
 An Astro blog by Attila Kulik, adapted from the existing philosophy blog's Astro setup. The first post explores the history of hash tables through a parking-lot analogy.
 

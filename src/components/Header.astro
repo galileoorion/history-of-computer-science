@@ -4,9 +4,9 @@ const { pathname } = Astro.url;
 ---
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="site-header frame">
-  <a class="brand" href={sitePath()} aria-label="The History of Computer Science — home">
+  <a class="brand" href={sitePath()} aria-label="A History of Computer Science — home">
     <span class="brand-symbol" aria-hidden="true">[h]</span>
-    <span>The History of<br /><strong>Computer Science</strong></span>
+    <span>A History of<br /><strong>Computer Science</strong></span>
   </a>
   <nav aria-label="Main navigation">
     <a href={sitePath()} aria-current={pathname === sitePath() ? 'page' : undefined}>Posts</a>
