@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" role="img" aria-labelledby="title desc">
+  <title id="title">How the captain combines two reports</title>
+  <desc id="desc">Scanner report 1 has weight 2. Hail report 1 has weight 1. The captain adds bias minus 2, giving score 1. Because 1 is above zero, the order is given.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#55716f" stroke-width="1.6"/></marker>
+  </defs>
+  <rect width="900" height="430" rx="18" fill="#f7f4ec"/>
+  <rect x="22" y="22" width="856" height="386" rx="14" fill="none" stroke="#d6d0c3"/>
+  <text x="48" y="58" fill="#6c5c50" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" letter-spacing="2">FIG. 01 / THE CAPTAIN'S SCORE</text>
+  <text x="48" y="95" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="26" font-weight="700">Two reports become one order</text>
+
+  <rect x="48" y="137" width="226" height="86" rx="12" fill="#e2ebea" stroke="#9ab7b1"/>
+  <text x="66" y="165" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700">INPUT x₁ = 1</text>
+  <text x="66" y="192" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="600">Scanner: ship seen</text>
+  <rect x="48" y="248" width="226" height="86" rx="12" fill="#e2ebea" stroke="#9ab7b1"/>
+  <text x="66" y="276" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700">INPUT x₂ = 1</text>
+  <text x="66" y="303" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="600">Comms: hail heard</text>
+
+  <path d="M274 180 C330 180 326 206 381 206" fill="none" stroke="#55716f" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M274 291 C330 291 326 265 381 265" fill="none" stroke="#55716f" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="299" y="153" width="62" height="27" rx="13" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="330" y="172" text-anchor="middle" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">× 2</text>
+  <rect x="299" y="291" width="62" height="27" rx="13" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="330" y="310" text-anchor="middle" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">× 1</text>
+
+  <rect x="385" y="153" width="251" height="177" rx="16" fill="#e7e7dc" stroke="#9aa5a0" stroke-width="2"/>
+  <text x="409" y="183" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700">CAPTAIN / THRESHOLD UNIT</text>
+  <text x="409" y="222" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" font-weight="700">2 × 1 + 1 × 1</text>
+  <text x="409" y="256" fill="#9b6046" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" font-weight="700">− 2 bias</text>
+  <path d="M409 271H612" stroke="#aab2aa" stroke-width="1.5"/>
+  <text x="409" y="305" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="25" font-weight="700">score = 1</text>
+
+  <path d="M636 242H691" fill="none" stroke="#55716f" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="698" y="176" width="152" height="132" rx="16" fill="#dcece3" stroke="#67a184" stroke-width="2"/>
+  <text x="774" y="209" text-anchor="middle" fill="#316d50" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">1 &gt; 0</text>
+  <text x="774" y="246" text-anchor="middle" fill="#235440" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="26" font-weight="800">ORDER</text>
+  <text x="774" y="277" text-anchor="middle" fill="#235440" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="20" font-weight="600">given</text>
+
+  <text x="48" y="381" fill="#594b43" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16">Inputs × weights, plus a starting lean. The order is given only when the score is above zero.</text>
+</svg>

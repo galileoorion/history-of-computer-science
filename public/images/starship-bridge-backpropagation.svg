@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 510" role="img" aria-labelledby="title desc">
+  <title id="title">One forward pass and one backward gradient calculation</title>
+  <desc id="desc">Forward: input 1, officer weight 0.5, officer score 0.5, captain weight 2, output 1, target 0, squared error 1. Backward: gradient for captain weight is 1, gradient for officer weight is 4. With learning rate 0.1, weights become 1.9 and 0.1, and squared error becomes 0.0361.</desc>
+  <defs>
+    <marker id="forward-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#55716f" stroke-width="1.6"/></marker>
+    <marker id="back-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#b65d48" stroke-width="1.6"/></marker>
+  </defs>
+  <rect width="900" height="510" rx="18" fill="#f7f4ec"/>
+  <rect x="22" y="22" width="856" height="466" rx="14" fill="none" stroke="#d6d0c3"/>
+  <text x="48" y="58" fill="#6c5c50" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" letter-spacing="2">FIG. 04 / BACKPROPAGATION</text>
+  <text x="48" y="96" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="26" font-weight="700">Forward for the score; backward for the gradients</text>
+  <text x="48" y="135" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700" letter-spacing="1">FORWARD PASS →</text>
+
+  <g fill="none" stroke="#55716f" stroke-width="2.5" marker-end="url(#forward-arrow)">
+    <path d="M191 216H229"/>
+    <path d="M408 216H445"/>
+    <path d="M624 216H661"/>
+  </g>
+
+  <rect x="48" y="158" width="143" height="116" rx="13" fill="#e2ebea" stroke="#9ab7b1" stroke-width="2"/>
+  <text x="64" y="188" fill="#315e5c" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="18" font-weight="700">Scanner</text>
+  <text x="64" y="222" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="23" font-weight="700">x = 1</text>
+  <text x="64" y="251" fill="#53605e" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="15">ship reported</text>
+
+  <rect x="236" y="158" width="172" height="116" rx="13" fill="#e4eddf" stroke="#83a878" stroke-width="2"/>
+  <text x="252" y="188" fill="#376346" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="18" font-weight="700">Officer</text>
+  <text x="252" y="221" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="700">w = 0.5</text>
+  <text x="252" y="250" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">h = w × x = 0.5</text>
+
+  <rect x="452" y="158" width="172" height="116" rx="13" fill="#e8e7e1" stroke="#97a19e" stroke-width="2"/>
+  <text x="468" y="188" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="18" font-weight="700">Captain</text>
+  <text x="468" y="221" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="700">v = 2</text>
+  <text x="468" y="250" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16">o = v × h = 1</text>
+
+  <rect x="668" y="158" width="182" height="116" rx="13" fill="#f2ddd5" stroke="#bb6a51" stroke-width="2"/>
+  <text x="684" y="188" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="18" font-weight="700">Simulator</text>
+  <text x="684" y="220" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="700">target t = 0</text>
+  <text x="684" y="250" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700">E = (o−t)² = 1</text>
+
+  <text x="48" y="319" fill="#a2503a" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700" letter-spacing="1">← BACKWARD PASS</text>
+  <path d="M758 289V314H539" fill="none" stroke="#b65d48" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#back-arrow)"/>
+  <path d="M452 349H323" fill="none" stroke="#b65d48" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#back-arrow)"/>
+  <rect x="452" y="326" width="172" height="59" rx="10" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="467" y="348" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">dE/dv = 1</text>
+  <text x="467" y="371" fill="#594b43" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">2(o−t) × h</text>
+  <rect x="236" y="326" width="172" height="59" rx="10" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="251" y="348" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">dE/dw = 4</text>
+  <text x="251" y="371" fill="#594b43" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">2(o−t) × v × x</text>
+
+  <rect x="48" y="414" width="802" height="48" rx="10" fill="#e2ebea" stroke="#9ab7b1"/>
+  <text x="68" y="445" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700">Learning rate 0.1:  w 0.5 → 0.1    v 2 → 1.9    error 1 → 0.0361</text>
+</svg>

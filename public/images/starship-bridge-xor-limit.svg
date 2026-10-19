@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 530" role="img" aria-labelledby="title desc">
+  <title id="title">Why one captain cannot make the XOR decision</title>
+  <desc id="desc">The four report pairs form a square. No alert is needed at zero zero or one one. Alert is needed at zero one or one zero. The alert cases are opposite corners, so one straight decision boundary cannot separate them.</desc>
+  <rect width="900" height="530" rx="18" fill="#f7f4ec"/>
+  <rect x="22" y="22" width="856" height="486" rx="14" fill="none" stroke="#d6d0c3"/>
+  <text x="48" y="58" fill="#6c5c50" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" letter-spacing="2">FIG. 02 / THE XOR LIMIT</text>
+  <text x="48" y="96" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="26" font-weight="700">Exactly one report means alert</text>
+
+  <text x="65" y="161" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">HAIL</text>
+  <rect x="153" y="141" width="448" height="320" rx="12" fill="#fffaf2" stroke="#bfc6bd" stroke-width="2"/>
+  <path d="M377 141V461M153 301H601" stroke="#c6cec5" stroke-width="1.6"/>
+  <text x="265" y="486" text-anchor="middle" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700">SCANNER 0</text>
+  <text x="489" y="486" text-anchor="middle" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700">SCANNER 1</text>
+  <text x="131" y="228" text-anchor="end" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700">1</text>
+  <text x="131" y="388" text-anchor="end" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700">0</text>
+
+  <circle cx="265" cy="221" r="60" fill="#f2ddd5" stroke="#bb6a51" stroke-width="2"/>
+  <text x="265" y="210" text-anchor="middle" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(0, 1)</text>
+  <text x="265" y="239" text-anchor="middle" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="700">ALERT</text>
+
+  <circle cx="489" cy="221" r="60" fill="#e2ebea" stroke="#7da69c" stroke-width="2"/>
+  <text x="489" y="210" text-anchor="middle" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(1, 1)</text>
+  <text x="489" y="239" text-anchor="middle" fill="#315e5c" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="700">CALM</text>
+
+  <circle cx="265" cy="381" r="60" fill="#e2ebea" stroke="#7da69c" stroke-width="2"/>
+  <text x="265" y="370" text-anchor="middle" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(0, 0)</text>
+  <text x="265" y="399" text-anchor="middle" fill="#315e5c" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="700">CALM</text>
+
+  <circle cx="489" cy="381" r="60" fill="#f2ddd5" stroke="#bb6a51" stroke-width="2"/>
+  <text x="489" y="370" text-anchor="middle" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(1, 0)</text>
+  <text x="489" y="399" text-anchor="middle" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="700">ALERT</text>
+
+  <rect x="631" y="170" width="210" height="261" rx="14" fill="#e9e7df" stroke="#c4c6bd"/>
+  <text x="651" y="203" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="19" font-weight="700">Opposite corners</text>
+  <text x="651" y="241" fill="#594b43" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16">A single captain's</text>
+  <text x="651" y="266" fill="#594b43" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16">weighted sum makes</text>
+  <text x="651" y="291" fill="#594b43" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16">one straight decision</text>
+  <text x="651" y="316" fill="#594b43" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16">boundary.</text>
+  <path d="M651 337H817" stroke="#bbbdb4"/>
+  <text x="651" y="365" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16" font-weight="700">No straight line</text>
+  <text x="651" y="390" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16" font-weight="700">separates these</text>
+  <text x="651" y="415" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="16" font-weight="700">two alert cases.</text>
+</svg>

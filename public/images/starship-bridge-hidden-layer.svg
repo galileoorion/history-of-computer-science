@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" role="img" aria-labelledby="title desc">
+  <title id="title">Two bridge officers let the captain compute XOR</title>
+  <desc id="desc">Scanner and hail reports each reach two hidden officers. Officer A says yes if either report is present. Officer B says yes only if both are present. The captain sounds an alert if A says yes and B says no. Outputs for 00, 01, 10, 11 are 0, 1, 1, 0.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#637775" stroke-width="1.6"/></marker>
+  </defs>
+  <rect width="900" height="550" rx="18" fill="#f7f4ec"/>
+  <rect x="22" y="22" width="856" height="506" rx="14" fill="none" stroke="#d6d0c3"/>
+  <text x="48" y="58" fill="#6c5c50" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" letter-spacing="2">FIG. 03 / ADDING A HIDDEN LAYER</text>
+  <text x="48" y="96" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="26" font-weight="700">Two questions solve XOR</text>
+  <text x="48" y="134" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" letter-spacing="1">INPUTS</text>
+  <text x="360" y="134" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" letter-spacing="1">BRIDGE OFFICERS / HIDDEN LAYER</text>
+  <text x="685" y="134" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" letter-spacing="1">CAPTAIN</text>
+
+  <g fill="none" stroke="#93aaa5" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M247 202L345 197"/>
+    <path d="M247 202C296 202 296 323 345 330"/>
+    <path d="M247 327C296 327 296 206 345 197"/>
+    <path d="M247 327L345 333"/>
+    <path d="M581 197C625 197 632 252 668 252"/>
+    <path d="M581 333C625 333 632 297 668 297"/>
+  </g>
+
+  <rect x="48" y="164" width="198" height="76" rx="12" fill="#e2ebea" stroke="#9ab7b1"/>
+  <text x="67" y="194" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">x₁ / SCANNER</text>
+  <text x="67" y="221" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="18">Ship seen?</text>
+  <rect x="48" y="289" width="198" height="76" rx="12" fill="#e2ebea" stroke="#9ab7b1"/>
+  <text x="67" y="319" fill="#315e5c" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700">x₂ / COMMS</text>
+  <text x="67" y="346" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="18">Hail heard?</text>
+
+  <rect x="352" y="151" width="228" height="94" rx="13" fill="#e4eddf" stroke="#83a878" stroke-width="2"/>
+  <text x="371" y="181" fill="#376346" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="20" font-weight="700">Officer A: ANY</text>
+  <text x="371" y="209" fill="#376346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">weights (1, 1)</text>
+  <text x="371" y="231" fill="#376346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">bias 0</text>
+  <rect x="352" y="287" width="228" height="94" rx="13" fill="#f3e9d5" stroke="#c59c5e" stroke-width="2"/>
+  <text x="371" y="317" fill="#805d2e" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="20" font-weight="700">Officer B: BOTH</text>
+  <text x="371" y="345" fill="#805d2e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">weights (1, 1)</text>
+  <text x="371" y="367" fill="#805d2e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">bias −1</text>
+
+  <rect x="615" y="203" width="48" height="28" rx="14" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="639" y="223" text-anchor="middle" fill="#376346" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">+1</text>
+  <rect x="615" y="318" width="48" height="28" rx="14" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="639" y="338" text-anchor="middle" fill="#805d2e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">−1</text>
+  <rect x="675" y="210" width="175" height="134" rx="15" fill="#e8e7e1" stroke="#97a19e" stroke-width="2"/>
+  <text x="694" y="242" fill="#253039" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="21" font-weight="700">Captain</text>
+  <text x="694" y="271" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">score = A − B</text>
+  <text x="694" y="299" fill="#8f442f" font-family="Avenir Next, Inter, Segoe UI, sans-serif" font-size="17" font-weight="700">Alert if &gt; 0</text>
+  <text x="694" y="324" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">bias 0</text>
+
+  <rect x="48" y="416" width="802" height="82" rx="12" fill="#fffaf2" stroke="#d6d0c3"/>
+  <text x="68" y="444" fill="#53605e" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" letter-spacing="1">REPORT PAIR → ALERT</text>
+  <text x="68" y="475" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(0, 0) → 0</text>
+  <text x="258" y="475" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(0, 1) → 1</text>
+  <text x="448" y="475" fill="#8f442f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(1, 0) → 1</text>
+  <text x="638" y="475" fill="#253039" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19" font-weight="700">(1, 1) → 0</text>
+</svg>
