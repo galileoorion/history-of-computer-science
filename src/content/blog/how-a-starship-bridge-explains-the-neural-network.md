@@ -35,24 +35,21 @@ A hidden layer can compute XOR. Training that layer is harder: the examples say 
 
 Later designs extended what trained networks could do. In [1989](https://doi.org/10.1162/neco.1989.1.4.541), Yann LeCun and colleagues used backpropagation to train a **convolutional network**, which reuses sets of weights across an image, to read handwritten US ZIP-code digits. Sepp Hochreiter and Jürgen Schmidhuber introduced [long short-term memory](https://doi.org/10.1162/neco.1997.9.8.1735) (LSTM) in 1997 to help a network retain information over long sequences. In [2012](https://www.cs.toronto.edu/~hinton/absps/imagenet.pdf), Alex Krizhevsky, Ilya Sutskever and Hinton used graphics processors to train a large convolutional network, AlexNet. Its top-five error rate—the proportion of images whose correct category was absent from its five guesses—was 15.3%, compared with 26.2% for the second-best ImageNet entry. In [2017](https://papers.neurips.cc/paper/7181-attention-isall-you-need.pdf), researchers at Google introduced the **transformer**, which uses attention to relate positions in a sequence directly; when generating text, a position cannot attend to future positions. The *Meridian* bridge below returns to the simpler perceptron and the hidden-layer solution to XOR.
 
-## Glossary
-
-- **Neural network:** Connected calculating units that turn input numbers into output numbers.
-- **Artificial neuron:** A unit that combines inputs, adds a bias and applies an activation function.
-- **Weight:** A number that sets how strongly an input counts; it can be positive or negative.
-- **Bias:** A starting value added to a neuron's weighted inputs.
-- **Activation function:** The rule that turns a neuron's score into its output. A **threshold** gives 1 only when the score is above zero.
-- **Layer:** A stage of neurons. A **hidden layer** sits between the input and final output.
-- **Supervised training:** Learning from examples with known correct answers, called **targets**. A **learning rule** specifies how to adjust weights and biases.
-- **Perceptron:** An early neural model that learns by correcting classification mistakes; the single-neuron version appears below.
-- **AND / XOR:** AND gives 1 when both inputs are 1; XOR gives 1 when exactly one input is 1.
-- **Backpropagation:** Working backward from the output error to calculate how each weight affects it. Those effects form a **gradient**.
-- **Learning rate:** The step size used when changing weights or biases during training.
-- **Parameter:** A value the network can adjust, such as a weight or bias.
-
 ## The starship bridge analogy
 
 The bridge of a starship shows how a neuron combines inputs and how learning adjusts its weights. Crew members can send reports to several officers, whose judgements then reach the captain. The ship is an invented survey vessel, the *Meridian*. You will take the captain's chair, train in a simulator, meet the limit of a single captain, add bridge officers, and see what it costs to scale up.
+
+### Bridge key
+
+| In the network | On the *Meridian* |
+| --- | --- |
+| **Input** | An operator's report: 0 or 1. |
+| **Weight** | The points given to a report. |
+| **Bias** | The captain's starting lean. |
+| **Threshold** | The yes-or-no rule for giving an order. |
+| **Output** | The captain's order. |
+| **Hidden layer** | Officers whose judgements reach the captain. |
+| **Target** | The simulator's correct order. |
 
 ### Taking the captain's chair
 
