@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+<title id="title">Three outputs from different convolutional neural network designs</title>
+<desc id="desc">A classifier labels an image containing a square, a detector draws a box around the square, and a segmenter marks its four bright pixels.</desc>
+<rect x="0" y="0" width="1200" height="420" rx="0" fill="#fbf7ef" stroke="#fbf7ef" stroke-width="0"/>
+<text x="60" y="51" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#a65a3c">ONE IMAGE, DIFFERENT QUESTIONS</text>
+<rect x="60" y="80" width="340" height="295" rx="16" fill="#fffdf9" stroke="#d7c8b5" stroke-width="2"/>
+<text x="230" y="120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#243b48">CLASSIFICATION</text>
+<text x="230" y="146" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" fill="#695f56">What is in the image?</text>
+<rect x="162" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="196" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="230" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="264" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="162" y="209" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="196" y="209" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="230" y="209" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="264" y="209" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="162" y="243" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="196" y="243" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="230" y="243" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="264" y="243" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="162" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="196" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="230" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="264" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<text x="230" y="346" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#a65a3c">Label: square</text>
+<rect x="440" y="80" width="340" height="295" rx="16" fill="#fffdf9" stroke="#d7c8b5" stroke-width="2"/>
+<text x="610" y="120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#243b48">DETECTION</text>
+<text x="610" y="146" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" fill="#695f56">Where is the object?</text>
+<rect x="542" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="576" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="610" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="644" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="542" y="209" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="576" y="209" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="610" y="209" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="644" y="209" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="542" y="243" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="576" y="243" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="610" y="243" width="34" height="34" rx="0" fill="#f3c56e" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="644" y="243" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="542" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="576" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="610" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="644" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="574" y="207" width="72" height="72" rx="3" fill="none" stroke="#a65a3c" stroke-width="4"/>
+<text x="610" y="346" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#a65a3c">Box around square</text>
+<rect x="820" y="80" width="340" height="295" rx="16" fill="#fffdf9" stroke="#d7c8b5" stroke-width="2"/>
+<text x="990" y="120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#243b48">SEGMENTATION</text>
+<text x="990" y="146" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" fill="#695f56">Which pixels belong to it?</text>
+<rect x="922" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="956" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="990" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="1024" y="175" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="922" y="209" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="956" y="209" width="34" height="34" rx="0" fill="#a65a3c" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="990" y="209" width="34" height="34" rx="0" fill="#a65a3c" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="1024" y="209" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="922" y="243" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="956" y="243" width="34" height="34" rx="0" fill="#a65a3c" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="990" y="243" width="34" height="34" rx="0" fill="#a65a3c" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="1024" y="243" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="922" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="956" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="990" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<rect x="1024" y="277" width="34" height="34" rx="0" fill="#e9e1d6" stroke="#fbf7ef" stroke-width="2"/>
+<text x="990" y="346" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" fill="#a65a3c">Four marked pixels</text>
+</svg>
