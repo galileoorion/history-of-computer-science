@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 390" role="img" aria-labelledby="title description">
+  <title id="title">A* five-stop route</title>
+  <desc id="description">Directed routes with travel costs in minutes. Start to Arcade costs 2, Start to Basin 3, Arcade to Crossing 2, Arcade to Goal 9, Basin to Goal 4, and Crossing to Goal 2. The six-minute Start–Arcade–Crossing–Goal route is highlighted.</desc>
+  <defs>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9 Z" fill="#b45309"/></marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L9 5 L1 9 Z" fill="#536981"/></marker>
+    <style>
+      text { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #162b43; }
+      .label { font-size: 20px; font-weight: 700; text-anchor: middle; }
+      .heuristic { font-size: 18px; text-anchor: middle; fill: #425872; }
+      .cost { font-size: 20px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .note { font-size: 18px; fill: #425872; }
+      .edge { fill: none; stroke-width: 4; stroke-linecap: round; }
+      .chosen { stroke: #b45309; marker-end: url(#arrow-orange); }
+      .other { stroke: #536981; marker-end: url(#arrow-blue); }
+    </style>
+  </defs>
+  <rect width="720" height="390" rx="20" fill="#f6f3ec"/>
+  <text x="32" y="35" class="note">Arrow labels: travel time in minutes</text>
+
+  <path d="M108 188 L185 140" class="edge chosen"/>
+  <path d="M108 232 L185 280" class="edge other"/>
+  <path d="M285 110 L390 110" class="edge chosen"/>
+  <path d="M278 80 C395 -10 569 5 647 168" class="edge other"/>
+  <path d="M285 312 C395 375 548 378 644 251" class="edge other"/>
+  <path d="M488 136 L601 193" class="edge chosen"/>
+
+  <g><rect x="137" y="146" width="36" height="32" rx="11" fill="#fffdf9" stroke="#d2b787"/><text x="155" y="163" class="cost">2</text></g>
+  <g><rect x="137" y="245" width="36" height="32" rx="11" fill="#fffdf9" stroke="#b7c4ce"/><text x="155" y="262" class="cost">3</text></g>
+  <g><rect x="319" y="73" width="36" height="32" rx="11" fill="#fffdf9" stroke="#d2b787"/><text x="337" y="90" class="cost">2</text></g>
+  <g><rect x="479" y="28" width="36" height="32" rx="11" fill="#fffdf9" stroke="#b7c4ce"/><text x="497" y="45" class="cost">9</text></g>
+  <g><rect x="450" y="342" width="36" height="32" rx="11" fill="#fffdf9" stroke="#b7c4ce"/><text x="468" y="359" class="cost">4</text></g>
+  <g><rect x="530" y="145" width="36" height="32" rx="11" fill="#fffdf9" stroke="#d2b787"/><text x="548" y="162" class="cost">2</text></g>
+
+  <g><rect x="18" y="173" width="94" height="74" rx="17" fill="#fff9ec" stroke="#b45309" stroke-width="3"/><text x="65" y="204" class="label">Start</text><text x="65" y="228" class="heuristic">h = 5</text></g>
+  <g><rect x="186" y="73" width="99" height="74" rx="17" fill="#fff9ec" stroke="#b45309" stroke-width="3"/><text x="235.5" y="104" class="label">Arcade</text><text x="235.5" y="128" class="heuristic">h = 4</text></g>
+  <g><rect x="186" y="276" width="99" height="74" rx="17" fill="#ffffff" stroke="#536981" stroke-width="3"/><text x="235.5" y="307" class="label">Basin</text><text x="235.5" y="331" class="heuristic">h = 4</text></g>
+  <g><rect x="390" y="73" width="100" height="74" rx="17" fill="#fff9ec" stroke="#b45309" stroke-width="3"/><text x="440" y="104" class="label">Crossing</text><text x="440" y="128" class="heuristic">h = 2</text></g>
+  <g><rect x="601" y="173" width="100" height="74" rx="17" fill="#fff9ec" stroke="#b45309" stroke-width="3"/><text x="651" y="204" class="label">Goal</text><text x="651" y="228" class="heuristic">h = 0</text></g>
+</svg>
