@@ -76,6 +76,6 @@ The small map captures the core lesson: **progress already made and distance sti
 - [SRI International, *Shakey the Robot*](https://www.sri.com/publication/artificial-intelligence-pubs/shakey-the-robot-pub/): the project's 1966–1972 period and its planning and route-finding aims.
 - [Computer History Museum, *Shakey*](https://www.computerhistory.org/revolution/artificial-intelligence-robotics/13/289): A*'s connection to Shakey and later uses.
 - [Carnegie Mellon University, *Search and Games* course notes](https://www.cs.cmu.edu/~15281-f23/coursenotes/search/index.html): `f = g + h`, admissibility, consistency and graph-search guarantees.
-- [Amit Patel, *Heuristics for A* Pathfinding*](https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html): matching heuristics to movement rules and cost units.
+- [Amit Patel, *Heuristics for A\* Pathfinding*](https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html): matching heuristics to movement rules and cost units.
 
 The five-stop route, its times and its estimates were created for this article. The feature illustration is a visual metaphor; the labelled graph supplies the exact data used in the walkthrough.
