@@ -33,9 +33,11 @@ A* keeps a list of stops it has reached but not yet examined. It repeatedly take
 
 ## A five-stop journey
 
-Consider this invented map of one-way connections. The number on each arrow is the travel time in minutes. Amber arrows form the cheapest route. The small `h` beside each stop is an optimistic estimate of the remaining time; those estimates are given for the example, rather than calculated from the drawing's geometry.
+Consider this invented map of one-way connections. The number on each arrow is the travel time in minutes. Amber arrows form the cheapest route. The small `h` beside each stop is an optimistic estimate of the remaining time. The diagram shows connections rather than physical positions, so it is not drawn to scale.
 
 ![Five-stop directed route graph: Start to Arcade costs 2 and to Basin costs 3; Arcade to Crossing costs 2 and to Goal costs 9; Basin to Goal costs 4; Crossing to Goal costs 2. The Start–Arcade–Crossing–Goal route is highlighted. Remaining-time estimates are 5, 4, 4, 2 and 0 respectively.](/images/a-star-five-stop-route.svg)
+
+Where do these particular `h` values come from? Imagine a separate scale map on which the straight-line distances to Goal are 5 km from Start, 4 km from Arcade and Basin, 2 km from Crossing, and 0 km from Goal. Suppose no route can be travelled faster than 1 km per minute. Dividing each distance by that maximum speed gives lower bounds of **5, 4, 4, 2 and 0 minutes**. These are the `h` labels in the diagram. Roads may take longer, but cannot beat the straight-line journey at the maximum speed. Moving along an edge also cannot reduce this estimate by more than that edge's travel time, making the heuristic consistent.
 
 The true cheapest remaining times are 6 at Start, 4 at Arcade, 4 at Basin, 2 at Crossing and 0 at Goal. Each `h` is no greater than the corresponding true cost. Start's estimate of 5 is deliberately a little low.
 
