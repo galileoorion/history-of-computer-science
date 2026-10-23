@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 780" role="img" aria-labelledby="title desc">
+  <title id="title">Two alternating GAN training steps</title>
+  <desc id="desc">First, real camera-trap photos and generated pictures with known source labels teach the discriminator. Second, a random input passes through the generator to make a new picture; a fixed discriminator scores it, and the gradient updates the generator.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#315247"/>
+    </marker>
+    <style>
+      .bg { fill:#fbf8ef; }
+      .panel { fill:#fffefa; stroke:#d6decf; stroke-width:2; rx:18; }
+      .real { fill:#e2eee4; stroke:#315247; stroke-width:2.5; rx:14; }
+      .fake { fill:#f1e2cf; stroke:#77512f; stroke-width:2.5; rx:14; }
+      .judge { fill:#e2eaf0; stroke:#315269; stroke-width:2.5; rx:14; }
+      .head { font:700 24px system-ui,sans-serif; fill:#173c32; }
+      .label { font:700 21px system-ui,sans-serif; fill:#203b35; }
+      .detail { font:18px system-ui,sans-serif; fill:#40554c; }
+      .step { font:700 19px system-ui,sans-serif; fill:#88562b; }
+      .line { fill:none; stroke:#315247; stroke-width:3; marker-end:url(#arrow); }
+    </style>
+  </defs>
+  <rect class="bg" width="640" height="780" rx="18"/>
+  <rect class="panel" x="18" y="18" width="604" height="344"/>
+  <text class="head" x="40" y="59">1. Train the source judge</text>
+  <rect class="real" x="38" y="100" width="250" height="94"/>
+  <text class="label" x="163" y="139" text-anchor="middle">Real fox photos</text>
+  <text class="detail" x="163" y="168" text-anchor="middle">known label: real</text>
+  <rect class="fake" x="352" y="100" width="250" height="94"/>
+  <text class="label" x="477" y="139" text-anchor="middle">Made fox pictures</text>
+  <text class="detail" x="477" y="168" text-anchor="middle">known label: generated</text>
+  <path class="line" d="M163 195 V215 H270 V232"/>
+  <path class="line" d="M477 195 V215 H370 V232"/>
+  <rect class="judge" x="188" y="245" width="264" height="73"/>
+  <text class="label" x="320" y="290" text-anchor="middle">Discriminator learns</text>
+  <text class="detail" x="320" y="344" text-anchor="middle">It improves its source guesses.</text>
+
+  <rect class="panel" x="18" y="380" width="604" height="380"/>
+  <text class="head" x="40" y="421">2. Train the image maker</text>
+  <rect class="real" x="36" y="466" width="160" height="92"/>
+  <text class="label" x="116" y="502" text-anchor="middle">Random</text>
+  <text class="detail" x="116" y="531" text-anchor="middle">numbers</text>
+  <path class="line" d="M197 512 H220"/>
+  <rect class="fake" x="232" y="466" width="170" height="92"/>
+  <text class="label" x="317" y="502" text-anchor="middle">Generator</text>
+  <text class="detail" x="317" y="531" text-anchor="middle">makes a picture</text>
+  <path class="line" d="M403 512 H426"/>
+  <rect class="fake" x="438" y="466" width="164" height="92"/>
+  <text class="label" x="520" y="502" text-anchor="middle">New fox</text>
+  <text class="detail" x="520" y="531" text-anchor="middle">picture</text>
+  <path class="line" d="M520 559 V591 H434 V607"/>
+  <rect class="judge" x="270" y="620" width="286" height="75"/>
+  <text class="label" x="413" y="654" text-anchor="middle">Fixed discriminator</text>
+  <text class="detail" x="413" y="680" text-anchor="middle">scores the new picture</text>
+  <text class="step" x="320" y="735" text-anchor="middle">Its gradient updates the generator.</text>
+</svg>
