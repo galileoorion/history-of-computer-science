@@ -33,13 +33,11 @@ The drawing below is our entire museum. We will always take children from left t
 
 With **depth-first search**, start at A and take the leftmost unchecked branch each time: A to B, B to D, and D to H. H has no gallery farther in, so you **backtrack** through D to B. B still has E to check. Once B's branch is finished, return to A and check C's branch, visiting F and G.
 
-The order in which you first enter galleries is:
+The numbered badges show the order in which you first enter the galleries. Follow the numbers from 1 to 8; the path goes deep down the left branch before it moves to the right.
 
-```text
-DFS: A → B → D → H → E → C → F → G
-```
+![Museum gallery tree numbered in depth-first visit order: 1 A, 2 B, 3 D, 4 H, 5 E, 6 C, 7 F, 8 G.](/images/tree-traversal-dfs-order.svg)
 
-The arrows record **first visits**, not every doorway you walk through. To get from H to E, you pass back through D and B; those return visits are left out.
+*The numbers mark **first visits**, not every doorway you walk through. To get from H to E, you pass back through D and B; those return visits are left out.*
 
 To remember unfinished choices, imagine putting notes on a pile. At A, put a note for C down first and a note for B on top. Take the top note, and you check B next. A computer calls this pile a **stack**: the last note added is the first removed.
 
@@ -49,11 +47,9 @@ If the object you want is in H, this left-to-right DFS reaches it on its fourth 
 
 With **breadth-first search**, check A and put B and C on a waiting list. Check B next, adding D and E behind C. Then check C and add F and G. When D is checked, add H at the back. The list works like a line of people: whoever joins first is served first. A computer calls this a **queue**: first in, first out.
 
-The resulting order is:
+The numbered badges show BFS moving across each row before going deeper. Follow the numbers from 1 to 8.
 
-```text
-BFS: A → B → C → D → E → F → G → H
-```
+![Museum gallery tree numbered in breadth-first visit order: 1 A, 2 B, 3 C, 4 D, 5 E, 6 F, 7 G, 8 H.](/images/tree-traversal-bfs-order.svg)
 
 The queue holds B and C before any depth-two gallery. It then holds the depth-two galleries before H, which is at depth three. This is why BFS visits the tree level by level. The queue's middle steps can be checked directly:
 

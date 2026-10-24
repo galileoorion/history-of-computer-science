@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 470" role="img" aria-labelledby="title desc">
+  <title id="title">Breadth-first visit order in the museum tree</title>
+  <desc id="desc">Numbered badges show first visits: 1 A, 2 B, 3 C, 4 D, 5 E, 6 F, 7 G, 8 H. Gallery A leads to B and C; B to D and E; C to F and G; D to H.</desc>
+  <rect width="600" height="470" rx="22" fill="#f8f4ec"/>
+  <g>
+    <rect x="48" y="25" width="510" height="69" rx="13" fill="#dcebec"/>
+    <rect x="48" y="130" width="510" height="69" rx="13" fill="#e6f0f0"/>
+    <rect x="48" y="235" width="510" height="69" rx="13" fill="#eaf2f2"/>
+    <rect x="48" y="340" width="510" height="69" rx="13" fill="#eef4f4"/>
+  </g>
+  <g fill="#665f57" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    <text x="29" y="67">0</text>
+    <text x="29" y="172">1</text>
+    <text x="29" y="277">2</text>
+    <text x="29" y="382">3</text>
+  </g>
+  <g stroke="#777d7e" stroke-width="4" stroke-linecap="round">
+    <path d="M300 60 L170 165"/>
+    <path d="M300 60 L430 165"/>
+    <path d="M170 165 L95 270"/>
+    <path d="M170 165 L245 270"/>
+    <path d="M430 165 L355 270"/>
+    <path d="M430 165 L505 270"/>
+    <path d="M95 270 L95 375"/>
+  </g>
+  <g fill="#184b58" stroke="#fffdf8" stroke-width="5">
+    <circle cx="300" cy="60" r="31"/>
+    <circle cx="170" cy="165" r="31"/>
+    <circle cx="430" cy="165" r="31"/>
+    <circle cx="95" cy="270" r="31"/>
+    <circle cx="245" cy="270" r="31"/>
+    <circle cx="355" cy="270" r="31"/>
+    <circle cx="505" cy="270" r="31"/>
+    <circle cx="95" cy="375" r="31"/>
+  </g>
+  <g fill="#fffdf8" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="central">
+    <text x="300" y="60">A</text>
+    <text x="170" y="165">B</text>
+    <text x="430" y="165">C</text>
+    <text x="95" y="270">D</text>
+    <text x="245" y="270">E</text>
+    <text x="355" y="270">F</text>
+    <text x="505" y="270">G</text>
+    <text x="95" y="375">H</text>
+  </g>
+  <g fill="#1d6974" stroke="#fffdf8" stroke-width="3">
+    <circle cx="328" cy="33" r="19"/>
+    <circle cx="198" cy="138" r="19"/>
+    <circle cx="458" cy="138" r="19"/>
+    <circle cx="123" cy="243" r="19"/>
+    <circle cx="273" cy="243" r="19"/>
+    <circle cx="383" cy="243" r="19"/>
+    <circle cx="533" cy="243" r="19"/>
+    <circle cx="123" cy="348" r="19"/>
+  </g>
+  <g fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" text-anchor="middle" dominant-baseline="central">
+    <text x="328" y="33">1</text>
+    <text x="198" y="138">2</text>
+    <text x="458" y="138">3</text>
+    <text x="123" y="243">4</text>
+    <text x="273" y="243">5</text>
+    <text x="383" y="243">6</text>
+    <text x="533" y="243">7</text>
+    <text x="123" y="348">8</text>
+  </g>
+  <text x="300" y="447" fill="#665f57" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="middle">Depth from A · badges show first-visit order</text>
+</svg>
