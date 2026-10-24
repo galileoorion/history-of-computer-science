@@ -2,7 +2,7 @@
 title: "How a Wildlife Field Guide Explains GANs"
 subtitle: "A photo archive, an image maker and an editor reveal how two networks learn together"
 description: "A wildlife photo archive makes the generator, discriminator, training loop and limits of generative adversarial networks easier to see."
-sequence: 11
+sequence: 8
 category: "Neural networks"
 historicalPeriod: "2014–2019"
 author: "Attila Kulik"
