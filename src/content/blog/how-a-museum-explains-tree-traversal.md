@@ -2,7 +2,7 @@
 title: "How a Museum Explains Tree Traversal"
 subtitle: "Depth-first search follows one branch; breadth-first search visits rooms level by level"
 description: "Explore a branching museum to see how DFS and BFS visit a tree, why a stack and a queue produce different orders, and when each approach helps."
-sequence: 14
+sequence: 10
 category: "Algorithms"
 historicalPeriod: "1882–1972"
 author: "Attila Kulik"
