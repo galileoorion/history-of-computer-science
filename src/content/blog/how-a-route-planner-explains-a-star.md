@@ -2,7 +2,7 @@
 title: "How a Route Planner Explains A*"
 subtitle: "The shortest route comes from balancing distance travelled with distance still to go"
 description: "Follow a five-stop route to see how A* uses an optimistic estimate to find a shortest path, why it can stop searching, and when its guarantee holds."
-sequence: 7
+sequence: 8
 category: "Algorithms"
 historicalPeriod: "1966–1968"
 author: "Attila Kulik"

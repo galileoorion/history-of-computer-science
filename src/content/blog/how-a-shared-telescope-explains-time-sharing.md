@@ -2,7 +2,7 @@
 title: "How a Shared Telescope Explains Time-Sharing"
 subtitle: "How one computer gave several people responsive access, one short turn at a time"
 description: "A shared telescope and a six-turn example explain how an operating system gives programs turns on one CPU, saves their place, and makes shared computing interactive."
-sequence: 9
+sequence: 13
 category: "Operating systems"
 historicalPeriod: "1959–1963"
 author: "Attila Kulik"
