@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 600" role="img" aria-labelledby="title desc">
+  <title id="title">Binary search for oak in a 15-word dictionary</title>
+  <desc id="desc">First check hazel at position 8 and discard positions 1 through 8. Then check lilac at position 12 and discard positions 9 through 12. Finally check oak at position 14 and find it.</desc>
+  <rect width="360" height="600" rx="18" fill="#f4f0e5"/>
+  <text x="16" y="34" fill="#173b43" font-family="Arial, sans-serif" font-size="21" font-weight="700">Find OAK by halves</text>
+  <g font-family="Arial, sans-serif" font-size="11.5" fill="#36534e">
+    <rect x="16" y="51" width="14" height="14" rx="3" fill="#e4e9e7"/>
+    <text x="35" y="62">ruled out</text>
+    <rect x="111" y="51" width="14" height="14" rx="3" fill="#e5c781"/>
+    <text x="130" y="62">checked</text>
+    <rect x="211" y="51" width="14" height="14" rx="3" fill="#d8eee4"/>
+    <text x="230" y="62">kept</text>
+  </g>
+  <rect x="12" y="86" width="336" height="222" rx="14" fill="#fffdf8" stroke="#d8d9ce"/>
+  <text x="25" y="111" fill="#173b43" font-family="Arial, sans-serif" font-size="16" font-weight="700">1  Check HAZEL at 8</text>
+  <text x="25" y="129" fill="#526b68" font-family="Arial, sans-serif" font-size="12">Keep positions 9–15</text>
+  <rect x="25" y="142" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="32" y="160" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">1 apple</text>
+  <rect x="134" y="142" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="141" y="160" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">2 birch</text>
+  <rect x="243" y="142" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="250" y="160" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">3 cedar</text>
+  <rect x="25" y="172" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="32" y="190" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">4 daisy</text>
+  <rect x="134" y="172" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="141" y="190" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">5 elm</text>
+  <rect x="243" y="172" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="250" y="190" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">6 fern</text>
+  <rect x="25" y="202" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="32" y="220" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">7 grape</text>
+  <rect x="134" y="202" width="96" height="26" rx="6" fill="#e5c781"/>
+  <text x="141" y="220" fill="#173b43" font-family="Arial, sans-serif" font-size="13.5" font-weight="700">8 hazel</text>
+  <rect x="243" y="202" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="250" y="220" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">9 iris</text>
+  <rect x="25" y="232" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="32" y="250" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">10 juniper</text>
+  <rect x="134" y="232" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="141" y="250" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">11 kiwi</text>
+  <rect x="243" y="232" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="250" y="250" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">12 lilac</text>
+  <rect x="25" y="262" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="32" y="280" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">13 maple</text>
+  <rect x="134" y="262" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="141" y="280" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">14 oak</text>
+  <rect x="243" y="262" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="250" y="280" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">15 pine</text>
+  <rect x="12" y="318" width="336" height="166" rx="14" fill="#fffdf8" stroke="#d8d9ce"/>
+  <text x="25" y="343" fill="#173b43" font-family="Arial, sans-serif" font-size="16" font-weight="700">2  Check LILAC at 12</text>
+  <text x="25" y="361" fill="#526b68" font-family="Arial, sans-serif" font-size="12">Keep positions 13–15</text>
+  <rect x="25" y="375" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="32" y="393" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">9 iris</text>
+  <rect x="134" y="375" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="141" y="393" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">10 juniper</text>
+  <rect x="243" y="375" width="96" height="26" rx="6" fill="#e4e9e7"/>
+  <text x="250" y="393" fill="#657772" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">11 kiwi</text>
+  <rect x="25" y="405" width="96" height="26" rx="6" fill="#e5c781"/>
+  <text x="32" y="423" fill="#173b43" font-family="Arial, sans-serif" font-size="13.5" font-weight="700">12 lilac</text>
+  <rect x="134" y="405" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="141" y="423" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">13 maple</text>
+  <rect x="243" y="405" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="250" y="423" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">14 oak</text>
+  <rect x="25" y="435" width="96" height="26" rx="6" fill="#d8eee4"/>
+  <text x="32" y="453" fill="#24594b" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">15 pine</text>
+  <rect x="12" y="494" width="336" height="91" rx="14" fill="#fffdf8" stroke="#d8d9ce"/>
+  <text x="25" y="519" fill="#173b43" font-family="Arial, sans-serif" font-size="16" font-weight="700">3  Check OAK at 14</text>
+  <text x="25" y="537" fill="#526b68" font-family="Arial, sans-serif" font-size="12">Found at position 14</text>
+  <rect x="25" y="550" width="96" height="26" rx="6" fill="#f4f5ef"/>
+  <text x="32" y="568" fill="#526b68" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">13 maple</text>
+  <rect x="134" y="550" width="96" height="26" rx="6" fill="#e5c781"/>
+  <text x="141" y="568" fill="#173b43" font-family="Arial, sans-serif" font-size="13.5" font-weight="700">14 oak</text>
+  <rect x="243" y="550" width="96" height="26" rx="6" fill="#f4f5ef"/>
+  <text x="250" y="568" fill="#526b68" font-family="Arial, sans-serif" font-size="13.5" font-weight="400">15 pine</text>
+</svg>
