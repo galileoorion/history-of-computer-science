@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 470" role="img" aria-labelledby="title desc">
+  <title id="title">Museum gallery tree</title>
+  <desc id="desc">Gallery A leads to B and C. B leads to D and E, C leads to F and G, and D leads to H. Rows mark depths zero through three.</desc>
+  <rect width="600" height="470" rx="22" fill="#f8f4ec"/>
+  <g fill="#ede7dc">
+    <rect x="48" y="25" width="510" height="69" rx="13"/>
+    <rect x="48" y="130" width="510" height="69" rx="13"/>
+    <rect x="48" y="235" width="510" height="69" rx="13"/>
+    <rect x="48" y="340" width="510" height="69" rx="13"/>
+  </g>
+  <g fill="#665f57" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    <text x="29" y="67">0</text>
+    <text x="29" y="172">1</text>
+    <text x="29" y="277">2</text>
+    <text x="29" y="382">3</text>
+  </g>
+  <g stroke="#777d7e" stroke-width="4" stroke-linecap="round">
+    <path d="M300 60 L170 165 M300 60 L430 165 M170 165 L95 270 M170 165 L245 270 M430 165 L355 270 M430 165 L505 270 M95 270 L95 375"/>
+  </g>
+  <g fill="#184b58" stroke="#fffdf8" stroke-width="5">
+    <circle cx="300" cy="60" r="31"/>
+    <circle cx="170" cy="165" r="31"/>
+    <circle cx="430" cy="165" r="31"/>
+    <circle cx="95" cy="270" r="31"/>
+    <circle cx="245" cy="270" r="31"/>
+    <circle cx="355" cy="270" r="31"/>
+    <circle cx="505" cy="270" r="31"/>
+    <circle cx="95" cy="375" r="31"/>
+  </g>
+  <g fill="#fffdf8" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="central">
+    <text x="300" y="60">A</text>
+    <text x="170" y="165">B</text>
+    <text x="430" y="165">C</text>
+    <text x="95" y="270">D</text>
+    <text x="245" y="270">E</text>
+    <text x="355" y="270">F</text>
+    <text x="505" y="270">G</text>
+    <text x="95" y="375">H</text>
+  </g>
+  <text x="300" y="447" fill="#665f57" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="middle">Distance in doorways from A</text>
+</svg>
