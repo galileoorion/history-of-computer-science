@@ -7,8 +7,8 @@ category: "Algorithms"
 historicalPeriod: "1882–1972"
 author: "Attila Kulik"
 tags: ["Tree traversal", "Depth-first search", "Breadth-first search", "Algorithms"]
-heroImage: "/images/tree-traversal-museum-feature.jpg"
-heroImageAlt: "Cutaway illustration of a branching museum, with an amber route following one corridor and teal routes spreading from the entrance"
+heroImage: "/images/tree-traversal-museum-feature-photo-v2.jpg"
+heroImageAlt: "Photorealistic depiction of a front-facing marble statue in a museum hall between two branching galleries"
 pubDate: 2026-10-24
 draft: false
 ---
@@ -96,4 +96,4 @@ If doorways have different costs, the route with the fewest doorways might not b
 - [Edward F. Moore, *The Shortest Path Through a Maze* (1959)](https://books.google.com/books/about/The_Shortest_Path_Through_a_Maze.html?id=IVZBHAAACAAJ): publication record.
 - [Robert Tarjan, “Depth-First Search and Linear Graph Algorithms” (1972)](https://doi.org/10.1137/0201010): depth-first search in linear graph algorithms.
 
-The museum, its gallery labels, and its visit orders are constructed examples for this article. The feature illustration is a visual metaphor; the labelled tree supplies the exact structure used in the walkthrough.
+The museum, its gallery labels, and its visit orders are constructed examples for this article. The AI-generated, photographic-style feature image is a visual metaphor; the labelled tree supplies the exact structure used in the walkthrough.
