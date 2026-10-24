@@ -53,3 +53,10 @@
 .prose .history-callout h3{margin:0 0 10px;color:var(--accent);font:600 17px/1.35 var(--sans)}
 .prose .history-callout p{margin:0}
 @media(max-width:480px){.prose .history-callout{padding:19px 20px;font-size:15px}}
+
+/* Keep the four scaling counts visible together on narrow screens. */
+@media(max-width:640px){
+  .prose--scaling table{display:table;table-layout:fixed;overflow-x:visible;font-size:12px;line-height:1.4}
+  .prose--scaling th,.prose--scaling td{min-width:0;padding:9px 6px;overflow-wrap:normal}
+  .prose--scaling th:first-child,.prose--scaling td:first-child{min-width:0}
+}

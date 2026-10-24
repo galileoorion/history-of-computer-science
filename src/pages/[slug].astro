@@ -29,7 +29,7 @@ const minutes = Math.max(1, Math.ceil((post.body ?? '').trim().split(/\s+/).leng
       </header>
       <div class="reading-layout">
         <aside class="contents"><details open><summary>In this post</summary><nav aria-label="Article sections"><ol>{sections.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></nav></details></aside>
-        <article class:list={['prose', { 'prose--atlas': post.id === 'how-a-road-atlas-explains-dijkstras-algorithm' }]}>
+        <article class:list={['prose', { 'prose--atlas': post.id === 'how-a-road-atlas-explains-dijkstras-algorithm', 'prose--scaling': post.id === 'how-to-tell-whether-an-algorithm-will-scale' }]}>
           {post.data.heroImage && <img class="article-image" src={sitePath(post.data.heroImage)} alt={post.data.heroImageAlt ?? ''} />}
           <Content />
           <div class="article-end"><a class="text-link" href={sitePath()}>← Back to all posts</a><a class="text-link" href="#main-content">Back to top ↑</a></div>

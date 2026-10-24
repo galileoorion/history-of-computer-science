@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 650" role="img" aria-labelledby="title desc">
+  <title id="title">Four comparisons narrow ten possible entries to none</title>
+  <desc id="desc">Four rows show ten, five, two and one possible sorted guest-list entries before each middle entry is checked. Gold marks the entry compared; teal marks other possibilities. Each step keeps only one smaller group, ending with no entries.</desc>
+  <rect width="500" height="650" rx="20" fill="#f7f5ee"/>
+  <text x="29" y="48" fill="#173b47" font-family="Arial, sans-serif" font-size="30" font-weight="700">The missing-name search</text>
+  <text x="30" y="79" fill="#48616a" font-family="Arial, sans-serif" font-size="20">Check the middle. Keep one side.</text>
+  <g fill="#173b47" font-family="Arial, sans-serif" font-size="23" font-weight="700">
+    <text x="30" y="130">1</text><text x="64" y="130">10 possible entries</text>
+    <text x="30" y="255">2</text><text x="64" y="255">5 possible entries</text>
+    <text x="30" y="380">3</text><text x="64" y="380">2 possible entries</text>
+    <text x="30" y="505">4</text><text x="64" y="505">1 possible entry</text>
+  </g>
+  <g stroke="#173b47" stroke-width="2">
+    <rect x="64" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="104" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="144" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="184" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="224" y="147" width="34" height="38" rx="5" fill="#e8ba60"/><rect x="264" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="304" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="344" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="384" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="424" y="147" width="34" height="38" rx="5" fill="#9bd1cb"/>
+    <rect x="64" y="272" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="104" y="272" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="144" y="272" width="34" height="38" rx="5" fill="#e8ba60"/><rect x="184" y="272" width="34" height="38" rx="5" fill="#9bd1cb"/><rect x="224" y="272" width="34" height="38" rx="5" fill="#9bd1cb"/>
+    <rect x="64" y="397" width="34" height="38" rx="5" fill="#e8ba60"/><rect x="104" y="397" width="34" height="38" rx="5" fill="#9bd1cb"/>
+    <rect x="64" y="522" width="34" height="38" rx="5" fill="#e8ba60"/>
+  </g>
+  <g fill="#496268" font-family="Arial, sans-serif" font-size="20"><text x="64" y="214">Keep 5</text><text x="64" y="339">Keep 2</text><text x="64" y="464">Keep 1</text><text x="64" y="589">Keep 0: absent</text></g>
+  <circle cx="300" cy="581" r="12" fill="#e8ba60"/><text x="323" y="588" fill="#496268" font-family="Arial, sans-serif" font-size="19">checked entry</text>
+</svg>
