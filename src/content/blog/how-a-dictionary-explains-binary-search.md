@@ -1,6 +1,6 @@
 ---
 title: "How a Dictionary Explains Binary Search"
-subtitle: "Why checking the middle lets you discard half the search each time"
+subtitle: "Why checking the middle lets you discard half the remaining entries each time"
 description: "Use a printed dictionary to see how binary search finds a word in a sorted list, why the search takes so few checks, and where the analogy breaks down."
 sequence: 11
 category: "Algorithms"
@@ -63,7 +63,7 @@ The same rules also establish when a word is absent. Search these entries for *l
 
 With 15 entries, the first check leaves at most seven possibilities. The next leaves at most three, then at most one. Even if the word is absent, four checks are enough to settle the question.
 
-The same pattern works for much larger lists. A million entries need no more than 20 checks of a middle entry. Each time you double the size of the list, you add only about one more check. A search from the beginning, by contrast, might have to read every entry. [Steven Skiena's binary-search lecture](https://www3.cs.stonybrook.edu/~skiena/214/lectures/lect19/lect19.html) explains this repeated halving.
+The same pattern works for much larger lists. Searching a list of a million entries takes no more than 20 checks. Each time you double the size of the list, you add only about one more check. A search from the beginning, by contrast, might have to read every entry. [Steven Skiena's binary-search lecture](https://www3.cs.stonybrook.edu/~skiena/214/lectures/lect19/lect19.html) explains this repeated halving.
 
 The comparison assumes you can reach the middle entry quickly. A printed dictionary helps us picture the idea, but opening it at the exact middle word is awkward: pages hold different numbers of words, and turning pages takes time. A computer can jump to a numbered entry in a suitable list.
 
@@ -71,15 +71,15 @@ The comparison assumes you can reach the middle entry quickly. A printed diction
 
 The method of narrowing an ordered range is older than electronic computers. In 1946, John Mauchly gave a [Moore School lecture on sorting and collating](https://curation.cs.manchester.ac.uk/digital60/www.digital60.org/birth/themooreschool/list.html). [Donald Knuth's historical account](https://rtheunissen.github.io/bst/docs/references/1973_knuth_taocp_vol_3_section_6.pdf) identifies Mauchly's discussion as an early published mention of binary search. The lecture was given in 1946; [Manchester's publication history](https://curation.cs.manchester.ac.uk/computer50/www.computer50.org/mark1/moore.school/intro.html) dates the volume containing it to 1948.
 
-Describing the idea was easier than writing a version that handled every list length. Knuth credits **D. H. Lehmer's 1960** paper with what was apparently the first published version that worked for any number of entries. **Hermann Bottenbruch** presented another version in [a 1961 technical report](https://digital.library.unt.edu/ark:/67531/metadc871723/) that appeared as a [1962 journal article](https://projects.csail.mit.edu/jacm/jacm62.html), *Structure and Use of ALGOL 60*. A program must take care at the edges of each remaining group: it must neither skip the word it wants nor keep checking the same word forever.
+Describing the idea was easier than writing a version that handled every list length. According to Knuth, **D. H. Lehmer's 1960** paper apparently contained the first published version that worked for any number of entries. **Hermann Bottenbruch** presented another version in [a 1961 technical report](https://digital.library.unt.edu/ark:/67531/metadc871723/) that appeared as a [1962 journal article](https://projects.csail.mit.edu/jacm/jacm62.html), *Structure and Use of ALGOL 60*. A program must take care at the edges of each remaining group: it must neither skip the word it wants nor keep checking the same word forever.
 
 ## When to use it
 
-Binary search helps when a computer has an ordered list it can jump around in: for example, a roster sorted by name or a catalogue sorted by product code. It can also show where a new name or code belongs, even if that exact entry is missing.
+Binary search helps when a computer has an ordered list whose entries it can reach directly: for example, a roster sorted by name or a catalogue sorted by product code. It can also show where a new name or code belongs, even if that exact entry is missing.
 
 Keeping the order takes work. If a new name is added to a long roster, other entries may need to move to make room. If the entries cannot be reached directly and must be read one by one, checking the middle loses much of its advantage. Binary search is most useful when the list is already ordered and searching it matters more than changing it.
 
-The dictionary therefore teaches both the strength and the condition behind it. One comparison can dismiss half the possibilities, but only when the items are ordered and the next middle item is easy to reach.
+The dictionary shows why binary search is powerful and what it requires. One comparison can dismiss half the possibilities, but only when the items are ordered and the next middle item is easy to reach.
 
 ## Sources
 
