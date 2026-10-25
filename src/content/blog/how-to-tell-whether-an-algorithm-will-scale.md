@@ -1,6 +1,6 @@
 ---
 title: "How to Tell Whether an Algorithm Will Scale"
-subtitle: "A concert guest list shows what happens when the work grows slowly, steadily, or much faster than the list"
+subtitle: "A concert guest list shows how doubling the list can add one check, double the checks, or roughly quadruple them"
 description: "Double a concert guest list from 10 to 20 to 40 names and count the checks behind logarithmic, linear and quadratic growth."
 sequence: 12
 category: "Algorithms"
