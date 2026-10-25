@@ -37,7 +37,7 @@ Later designs extended what trained networks could do. In [1989](https://doi.org
 
 ## The starship bridge analogy
 
-The bridge of a starship shows how a neuron combines inputs and how learning adjusts its weights. Crew members can send reports to several officers, whose judgements then reach the captain. The ship is an invented survey vessel, the *Meridian*. You will take the captain's chair, train in a simulator, meet the limit of a single captain, add bridge officers, and see what it costs to scale up.
+The bridge of a starship shows how a neuron combines inputs and how learning adjusts its weights. Crew members can send reports to several officers, whose judgements then reach the captain. The ship is an invented survey vessel, the *Meridian*. You will take the captain's chair, train in a simulator, meet the limit of a single captain, add bridge officers, and see how the computational work grows as the network scales.
 
 ### Bridge key
 
@@ -63,7 +63,7 @@ Suppose the scanner operator's report is worth 2 points, the communications oper
 
 ### Training in the simulator
 
-New captains learn in a **training simulator**, a mock bridge that plays out encounters with known correct outcomes. That is how supervised training works: each example supplies an input and a target output. Suppose you should open the docking bay only when a ship is both on the scanner and hailing you. This is the function AND. The correct orders are no (0) for (0, 0), (0, 1) and (1, 0), and open the bay (1) for (1, 1).
+New captains learn in a **training simulator**, a mock bridge that plays out encounters with known correct outcomes. That is how supervised training works: each example supplies an input and a target output. Suppose you should open the docking bay only when a ship is both on the scanner and hailing you. This is the logical AND function. The correct orders are no (0) for (0, 0), (0, 1) and (1, 0), and open the bay (1) for (1, 1).
 
 You begin with no trust in either operator and no lean either way: both weights and the bias are 0. After each encounter, the instructor tells you the correct order. You then apply the perceptron learning rule: change each operator's weight by (correct order − your order) × (that operator's report), and change your lean by (correct order − your order).
 
