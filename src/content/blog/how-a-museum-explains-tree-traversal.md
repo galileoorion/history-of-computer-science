@@ -21,7 +21,7 @@ These are two ways to **traverse** a tree: to visit its parts in a planned order
 
 In computer science, a **graph** is a set of points, with links connecting some pairs. A **tree** is a special kind of graph: you can get from any point to any other, and you cannot return to your starting point without retracing a link. The points are called **nodes**. We choose one node as the **root**. Every other node has one **parent** closer to the root, giving exactly one route from the root to any node. A computer's folder hierarchy is a familiar example: a folder can contain other folders, which can contain still more folders.
 
-In our museum, a gallery is a node, a doorway leading farther in is a parent–child link, and the entrance gallery is the root. The galleries below a room are its children. A gallery with no children is a **leaf**. The **depth** of a gallery is its number of doorways from the entrance: the entrance has depth zero, its children depth one, and so on.
+In our museum, a gallery is a node, a doorway leading farther in is a parent–child link, and the entrance gallery is the root. The galleries one doorway farther from a room are its children. A gallery with no children is a **leaf**. The **depth** of a gallery is its number of doorways from the entrance: the entrance has depth zero, its children depth one, and so on.
 
 The drawing below is our entire museum. We will always take children from left to right, because the visit order within a level or branch depends on that choice.
 
