@@ -17,7 +17,7 @@ Three astronomers want to use one telescope tonight. Ada is studying a crater, B
 
 A telescope can look in only one direction at a time. In this imagined observatory, the astronomers share that limited resource by taking turns. **Time-sharing** applies the same idea to a computer: an **operating system** gives different running programs brief turns on a **central processing unit**, or **CPU**, and preserves enough information for each program to continue later. Quick, repeated turns let several people use one computer interactively.
 
-Now picture Ada, Ben and Cyra at three terminals connected to one computer. Ada types a command and soon sees a response. While she reads it and decides what to type next, her process can wait for input while Ben's or Cyra's work uses the CPU. Each person can work with the computer in the same session, even though its single CPU executes only one process at a time.
+Now picture Ada, Ben and Cyra at three terminals connected to one computer. Ada types a command and soon sees a response. While she reads it and decides what to type next, her process can wait for input while Ben's or Cyra's work uses the CPU. All three can interact with the computer during the same period, even though its single CPU executes only one process at a time.
 
 ## What the computer shares
 
@@ -43,7 +43,7 @@ Suppose Ada, Ben and Cyra each have a process ready to run. To make the arithmet
 
 ![Two six-turn CPU timelines. When all are ready, Ada, Ben and Cyra each run twice. When Ada waits for input after her first turn, Ben and Cyra keep running; the order becomes Ada, Ben, Cyra, Ben, Cyra, Ben.](/images/time-sharing-three-programs.svg)
 
-In the first row, after three turns, **30 milliseconds** have passed and each process has received **10 milliseconds** of CPU time. After six turns, **60 milliseconds** have passed and each has received **20 milliseconds**. If all three always need the CPU and we ignore switching costs, each receives **20 ÷ 60 = one-third** of its capacity. The CPU has still performed only **60 milliseconds** of work in those 60 milliseconds. Taking turns improves access and response time; it does not create extra CPU power.
+In the first row, after three turns, **30 milliseconds** have passed and each process has received **10 milliseconds** of CPU time. After six turns, **60 milliseconds** have passed and each has received **20 milliseconds**. If all three always need the CPU and we ignore switching costs, each receives **20 ÷ 60 = one-third** of the CPU time. The CPU has still performed only **60 milliseconds** of work in those 60 milliseconds. Taking turns improves access and response time; it does not create extra CPU power.
 
 Now suppose Ada's process waits for her next keystroke after its first turn. When its next turn would arrive, Ada is still typing, so the operating system gives the CPU to Ben instead. The next two turns go to Cyra and Ben. In the same **60 milliseconds**, Ada uses **10 milliseconds**, Ben **30 milliseconds**, and Cyra **20 milliseconds**. No CPU turn is wasted on Ada while she waits. When she finishes typing, her process can become ready again. The original MIT paper described short bursts of computation returning to each active user frequently enough for interactive work.
 
@@ -61,7 +61,7 @@ Time-sharing did not spring from one person's finished design. At MIT, John McCa
 
 Other groups explored time-sharing too. Ed Fredkin at Bolt Beranek and Newman and Jack Dennis at MIT developed a system demonstrated on a PDP-1 in **September 1962**. It used a magnetic drum to hold one user's work while another used the machine, as the [Computer History Museum describes](https://www.computerhistory.org/pdp-1/timesharing/). These projects differed in their machines and details, but they addressed the same practical question: how could several people get useful, timely access to an expensive computer?
 
-Time-sharing made a computer less like a machine that returned a stack of results later and more like one a person could work with through a terminal. Its promise depended on load: if too many processes demanded CPU time continuously, each would wait longer, and saving and restoring contexts also used some time. The shared telescope offers the central picture: **one resource, separate users, repeated turns, and a remembered place for each return**.
+Time-sharing made a computer less like a machine that returned a stack of results later and more like one a person could work with through a terminal. Its promise depended on load: if too many processes demanded CPU time continuously, each would wait longer, and saving and restoring contexts also used some time. The shared telescope offers the central picture: **one resource, separate users, repeated turns, and saved state from which each task can resume**.
 
 ## Sources
 
