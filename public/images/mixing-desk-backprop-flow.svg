@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 650" role="img" aria-labelledby="title desc">
+  <title id="title">A forward pass and backward pass through two faders</title>
+  <desc id="desc">The forward pass takes input 1 through a channel weight of 0.5 and master weight of 2, yielding output 1 and squared error 0.16 against target 0.6. The backward pass finds loss slope 0.8, master-weight sensitivity 0.4 and channel-weight sensitivity 1.6. A gradient-descent step changes the weights to 0.34 and 1.96.</desc>
+  <defs>
+    <marker id="down" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M1 1 L9 5 L1 9 Z" fill="#227f92"/></marker>
+    <marker id="up" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M1 1 L9 5 L1 9 Z" fill="#bb6425"/></marker>
+  </defs>
+  <rect width="720" height="650" rx="24" fill="#f8f6f0"/>
+  <text x="43" y="61" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#183c48">Forward pass</text>
+  <text x="400" y="61" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#8e4519">Backward pass</text>
+
+  <g font-family="Arial, sans-serif" fill="#183c48">
+    <rect x="42" y="90" width="284" height="90" rx="15" fill="#e3f2f4" stroke="#227f92" stroke-width="2"/>
+    <text x="62" y="127" font-size="23" font-weight="700">Input signal</text>
+    <text x="62" y="158" font-size="25">x = 1</text>
+    <rect x="42" y="207" width="284" height="90" rx="15" fill="#e3f2f4" stroke="#227f92" stroke-width="2"/>
+    <text x="62" y="244" font-size="23" font-weight="700">Channel fader</text>
+    <text x="62" y="275" font-size="24">h = 0.5 × 1 = 0.5</text>
+    <rect x="42" y="324" width="284" height="90" rx="15" fill="#e3f2f4" stroke="#227f92" stroke-width="2"/>
+    <text x="62" y="361" font-size="23" font-weight="700">Master fader</text>
+    <text x="62" y="392" font-size="24">o = 2 × 0.5 = 1</text>
+    <rect x="42" y="441" width="284" height="90" rx="15" fill="#e3f2f4" stroke="#227f92" stroke-width="2"/>
+    <text x="62" y="478" font-size="23" font-weight="700">Compare with target</text>
+    <text x="62" y="509" font-size="24">t = 0.6; loss = 0.16</text>
+  </g>
+  <g stroke="#227f92" stroke-width="3" marker-end="url(#down)">
+    <path d="M184 181 V201"/><path d="M184 298 V318"/><path d="M184 415 V435"/>
+  </g>
+
+  <g font-family="Arial, sans-serif" fill="#8e4519">
+    <rect x="394" y="441" width="284" height="90" rx="15" fill="#fcebdc" stroke="#bb6425" stroke-width="2"/>
+    <text x="414" y="478" font-size="23" font-weight="700">Loss slope</text>
+    <text x="414" y="509" font-size="24">2 × (1 − 0.6) = 0.8</text>
+    <rect x="394" y="324" width="284" height="90" rx="15" fill="#fcebdc" stroke="#bb6425" stroke-width="2"/>
+    <text x="414" y="361" font-size="23" font-weight="700">Master sensitivity</text>
+    <text x="414" y="392" font-size="24">0.8 × 0.5 = 0.4</text>
+    <rect x="394" y="207" width="284" height="90" rx="15" fill="#fcebdc" stroke="#bb6425" stroke-width="2"/>
+    <text x="414" y="244" font-size="23" font-weight="700">Channel sensitivity</text>
+    <text x="414" y="275" font-size="24">0.8 × 2 × 1 = 1.6</text>
+  </g>
+  <g stroke="#bb6425" stroke-width="3" marker-end="url(#up)">
+    <path d="M536 437 V418"/><path d="M536 320 V301"/>
+  </g>
+  <path d="M394 486 H331" stroke="#746e63" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <rect x="42" y="561" width="636" height="62" rx="14" fill="#223d48"/>
+  <text x="62" y="599" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#ffffff">New weights: 0.34 and 1.96 → output 0.6664</text>
+</svg>
