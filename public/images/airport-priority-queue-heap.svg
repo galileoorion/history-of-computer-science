@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" role="img" aria-labelledby="title desc">
+  <title id="title">Five flight cards in a min-heap</title>
+  <desc id="desc">Aster 4 at the root connects to Birch 7 and Cedar 6. Birch connects to Dove 9 and Elm 8. Every parent has a score less than either child.</desc>
+  <rect width="800" height="440" rx="20" fill="#f3f7f7"/>
+  <text x="39" y="47" fill="#17364c" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">A min-heap of waiting flights</text>
+  <text x="39" y="76" fill="#496579" font-family="Arial, Helvetica, sans-serif" font-size="17">Each parent score is no greater than its children's scores.</text>
+  <g stroke="#85a9b3" stroke-width="5" stroke-linecap="round">
+    <path d="M400 138 L250 238"/><path d="M400 138 L550 238"/>
+    <path d="M250 273 L137 345"/><path d="M250 273 L362 345"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <g transform="translate(400 143)">
+      <rect x="-89" y="-45" width="178" height="90" rx="14" fill="#e8ab50" stroke="#986929" stroke-width="3"/>
+      <text x="0" y="-8" fill="#183249" font-size="24" font-weight="700">ASTER</text>
+      <text x="0" y="27" fill="#183249" font-size="30" font-weight="700">4</text>
+    </g>
+    <g transform="translate(250 252)">
+      <rect x="-83" y="-42" width="166" height="84" rx="14" fill="#d9ebeb" stroke="#7295a0" stroke-width="3"/>
+      <text x="0" y="-7" fill="#17364c" font-size="22" font-weight="700">BIRCH</text>
+      <text x="0" y="26" fill="#17364c" font-size="28" font-weight="700">7</text>
+    </g>
+    <g transform="translate(550 252)">
+      <rect x="-83" y="-42" width="166" height="84" rx="14" fill="#d9ebeb" stroke="#7295a0" stroke-width="3"/>
+      <text x="0" y="-7" fill="#17364c" font-size="22" font-weight="700">CEDAR</text>
+      <text x="0" y="26" fill="#17364c" font-size="28" font-weight="700">6</text>
+    </g>
+    <g transform="translate(137 365)">
+      <rect x="-75" y="-39" width="150" height="78" rx="14" fill="#fff" stroke="#a6b9bd" stroke-width="3"/>
+      <text x="0" y="-7" fill="#17364c" font-size="21" font-weight="700">DOVE</text>
+      <text x="0" y="24" fill="#17364c" font-size="27" font-weight="700">9</text>
+    </g>
+    <g transform="translate(362 365)">
+      <rect x="-75" y="-39" width="150" height="78" rx="14" fill="#fff" stroke="#a6b9bd" stroke-width="3"/>
+      <text x="0" y="-7" fill="#17364c" font-size="21" font-weight="700">ELM</text>
+      <text x="0" y="24" fill="#17364c" font-size="27" font-weight="700">8</text>
+    </g>
+  </g>
+</svg>
