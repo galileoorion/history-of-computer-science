@@ -62,7 +62,7 @@ The figures show all seven steps. Filled red dots mark circled towns; dashed dot
 
 ![Step 2: Utrecht is circled at 62. Amersfoort gets 89 and Arnhem gets 127, both via Utrecht.](/images/dijkstra-atlas-step-2.svg)
 
-**3. Amsterdam (79)** offers Amersfoort 79 + 52 = 131, so its 89 stays. It gives Zwolle 79 + 105 = 184 and Groningen 79 + 183 = 262. Groningen's number remains provisional.
+**3. Amsterdam (79)** offers Amersfoort 79 + 52 = 131, so Amersfoort keeps 89. It gives Zwolle 79 + 105 = 184 and Groningen 79 + 183 = 262. Groningen's number remains provisional.
 
 ![Step 3: Amsterdam is circled at 79. Zwolle gets 184 and Groningen gets 262, both via Amsterdam; Amersfoort keeps 89 because 131 is longer.](/images/dijkstra-atlas-step-3.svg)
 

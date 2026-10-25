@@ -67,7 +67,7 @@ At each step, you take the top course on the eligible list and write it into you
 | 8 | Operating Systems | none | Machine Learning |
 | 9 | Machine Learning | none | empty |
 
-The order is therefore Calculus, Discrete Mathematics, Intro to Programming, Linear Algebra, Data Structures, Computer Architecture, Algorithms, Operating Systems, Machine Learning. Every step is allowed, because a course reaches 0, and so joins the eligible list, only after all of its prerequisites are in the plan.
+The order is therefore Calculus, Discrete Mathematics, Intro to Programming, Linear Algebra, Data Structures, Computer Architecture, Algorithms, Operating Systems, Machine Learning. Every step is allowed because a course joins the eligible list only after all of its prerequisites are in the plan.
 
 ### Other orders
 
@@ -77,7 +77,7 @@ If you may choose any eligible course at each step, Kahn's method can produce an
 
 ### The fewest semesters
 
-Every complete order contains all nine courses, so no order is shorter than another in courses. What can differ is the number of semesters. Assuming each course takes one semester, prerequisites must have been completed in earlier semesters, and there is no limit on courses per semester, the minimum is four.
+Every complete order contains all nine courses, so no order contains fewer courses than another. What can differ is the number of semesters. Assuming each course takes one semester, prerequisites must have been completed in earlier semesters, and there is no limit on courses per semester, the minimum is four.
 
 The semester plan comes from running Kahn's algorithm in rounds. Each semester, you take every course on the eligible list at once, and you lower the counts only when the semester ends. Semester 1 is Calculus, Discrete Mathematics and Intro to Programming, and semester 2 is Linear Algebra, Data Structures and Computer Architecture. Semester 3 is Algorithms and Operating Systems, and semester 4 is Machine Learning. That is 3 + 3 + 2 + 1 = 9 courses in four semesters.
 
@@ -93,13 +93,13 @@ A cap on courses per semester makes the problem harder. With at most two courses
 
 Choosing eligible courses without regard to their later dependencies can take six semesters instead. Suppose your first three semesters are Calculus and Intro to Programming, then Data Structures and Computer Architecture, then Linear Algebra and Operating Systems. Discrete Mathematics, Algorithms and Machine Learning are then left, and each is a prerequisite of the next, so they need three more semesters.
 
-For a cap of two and one-semester courses, Edward Coffman and Ronald Graham published a priority rule in 1972 that always reaches the minimum. In the general version, where the cap is part of the input, Jeffrey Ullman showed in 1975 that deciding whether a plan fits within a specified number of semesters is **NP-complete**: a proposed plan can be checked quickly, but no polynomial-time method is known for finding an optimal plan in every case. Kahn's algorithm, run in rounds, finds the fewest semesters when there is no cap.
+When each course takes one semester and at most two can be taken per semester, Edward Coffman and Ronald Graham published a priority rule in 1972 that always reaches the minimum. In the general version, where the cap is part of the input, Jeffrey Ullman showed in 1975 that deciding whether a plan fits within a specified number of semesters is **NP-complete**: a proposed plan can be checked quickly, but no polynomial-time method is known for finding an optimal plan in every case. Kahn's algorithm, run in rounds, finds the fewest semesters when there is no cap.
 
 ### When the catalogue contains a loop
 
 The original catalogue contains no loop, and Kahn's algorithm confirms it by placing all nine courses in the study plan. If there were a loop, some courses would be left behind. Suppose the catalogue is misprinted so that Data Structures requires Operating Systems, while Operating Systems still requires Data Structures. Data Structures then starts with a count of 2.
 
-You place Calculus, Discrete Mathematics, Intro to Programming, Linear Algebra and Computer Architecture, and then the eligible list is empty. Four courses remain at a count of 1. Data Structures and Operating Systems are waiting for each other, and Algorithms and Machine Learning are waiting behind them. A study plan with only 5 of the 9 courses is the signal of a cycle.
+You place Calculus, Discrete Mathematics, Intro to Programming, Linear Algebra and Computer Architecture, and then the eligible list is empty. Each of the four remaining courses has a count of 1. Data Structures and Operating Systems are waiting for each other, and Algorithms and Machine Learning are waiting behind them. A study plan with only 5 of the 9 courses is the signal of a cycle.
 
 The test works in both directions. Without a loop, tracing unpassed prerequisites backwards from any waiting course must end at a course whose count is 0, so the eligible list cannot run out early. With a loop, the courses on it never reach 0. The algorithm thus detects the kind of network inconsistency that Jarnagin studied.
 
