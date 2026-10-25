@@ -1,6 +1,6 @@
 ---
 title: "How a Route Planner Explains A*"
-subtitle: "The shortest route comes from balancing distance travelled with distance still to go"
+subtitle: "A* finds the cheapest route by balancing the cost so far with an estimate of the remaining cost"
 description: "Follow a five-stop route to see how A* uses an optimistic estimate to find a shortest path, why it can stop searching, and when its guarantee holds."
 sequence: 7
 category: "Algorithms"
@@ -37,7 +37,7 @@ Consider this invented map of one-way connections. The number on each arrow is t
 
 ![Five-stop directed route graph: Start to Arcade costs 2 and to Basin costs 3; Arcade to Crossing costs 2 and to Goal costs 9; Basin to Goal costs 4; Crossing to Goal costs 2. The Start–Arcade–Crossing–Goal route is highlighted. Remaining-time estimates are 5, 4, 4, 2 and 0 respectively.](/images/a-star-five-stop-route.svg)
 
-Where do these particular `h` values come from? Imagine a separate scale map on which the straight-line distances to Goal are 5 km from Start, 4 km from Arcade and Basin, 2 km from Crossing, and 0 km from Goal. Suppose no route can be travelled faster than 1 km per minute. Dividing each distance by that maximum speed gives lower bounds of **5, 4, 4, 2 and 0 minutes**. These are the `h` labels in the diagram. Roads may take longer, but cannot beat the straight-line journey at the maximum speed. Moving along an edge also cannot reduce this estimate by more than that edge's travel time, making the heuristic consistent.
+Where do these particular `h` values come from? Imagine a separate map drawn to scale on which the straight-line distances to Goal are 5 km from Start, 4 km from Arcade and Basin, 2 km from Crossing, and 0 km from Goal. Suppose no route can be travelled faster than 1 km per minute. Dividing each distance by that maximum speed gives lower bounds of **5, 4, 4, 2 and 0 minutes**. These are the `h` labels in the diagram. Roads may take longer, but cannot beat the straight-line journey at the maximum speed. Moving along an edge also cannot reduce this estimate by more than that edge's travel time, making the heuristic consistent.
 
 The true cheapest remaining times are 6 at Start, 4 at Arcade, 4 at Basin, 2 at Crossing and 0 at Goal. Each `h` is no greater than the corresponding true cost. Start's estimate of 5 is deliberately a little low.
 
@@ -70,9 +70,9 @@ Peter E. Hart, Nils J. Nilsson and Bertram Raphael developed A* at the Stanford 
 
 This work grew out of SRI's **Shakey** robot research. From **1966 to 1972**, the project explored how a mobile robot could perceive its surroundings, plan and find routes. The [Computer History Museum's Shakey exhibit](https://www.computerhistory.org/revolution/artificial-intelligence-robotics/13/289) identifies A* as one of the sophisticated search techniques developed by the team. The robot's world was simple compared with a modern street map, but the question was enduring: which possibility should a planner examine next?
 
-Today, A* appears in practical pathfinding tools. [Godot's `AStarGrid2D`](https://docs.godotengine.org/en/4.4/classes/class_astargrid2d.html) finds paths across two-dimensional grids for games. [Nav2's Smac Planner](https://docs.nav2.org/rolling/configuration_and_development/configuration_guide/planners_plugins/smac/) includes A* based planners for mobile robots, including robots that must account for how they turn. In each case, the planner needs a starting point, a destination, allowed moves and costs. A* does not supply the map or the heuristic by itself. Its practical value comes from modelling the real costs accurately and choosing a lower bound that is both safe and informative. A closed road or changed travel time also changes the problem, so a previously computed route must be checked or planned again.
+Today, A* appears in practical pathfinding tools. [Godot's `AStarGrid2D`](https://docs.godotengine.org/en/4.4/classes/class_astargrid2d.html) finds paths across two-dimensional grids for games. [Nav2's Smac Planner](https://docs.nav2.org/rolling/configuration_and_development/configuration_guide/planners_plugins/smac/) includes A*-based planners for mobile robots, including robots that must account for how they turn. In each case, the planner needs a starting point, a destination, allowed moves and costs. A* does not supply the map or the heuristic by itself. Its practical value comes from modelling the real costs accurately and choosing a lower bound that is both safe and informative. A closed road or changed travel time also changes the problem, so a previously computed route must be checked or planned again.
 
-The small map captures the core lesson: **progress already made and distance still expected both matter**. A* uses their sum to decide where to look, and an honest lower bound lets it know when the best route has been found.
+The small map captures the core lesson: **cost so far and estimated remaining cost both matter**. A* uses their sum to decide where to look, and an honest lower bound lets it know when the best route has been found.
 
 ## Sources
 
