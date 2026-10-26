@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 430" role="img" aria-labelledby="title desc">
+  <title id="title">Four-station directed transit graph</title>
+  <desc id="desc">Harbor points to Market in 4 minutes and Library in 7. Market points to Library in 2 and Terminal in 10. Library points to Market in 1 and Terminal in 3.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto-start-reverse">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#21677e"/>
+    </marker>
+  </defs>
+  <rect width="640" height="430" rx="18" fill="#f4f8f8"/>
+  <text x="26" y="39" fill="#17364c" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Four stations, six one-way rides</text>
+  <text x="26" y="68" fill="#4c6473" font-family="Arial, Helvetica, sans-serif" font-size="19">Arrow labels show travel time in minutes.</text>
+  <g fill="none" stroke="#21677e" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)">
+    <path d="M158 192 L245 136"/>
+    <path d="M158 248 L245 307"/>
+    <path d="M292 146 L292 298"/>
+    <path d="M338 298 L338 146"/>
+    <path d="M385 136 L478 192"/>
+    <path d="M385 307 L478 248"/>
+  </g>
+  <g fill="#fff" stroke="#8db0b9" stroke-width="3" font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <rect x="28" y="192" width="130" height="56" rx="16"/>
+    <rect x="250" y="84" width="130" height="56" rx="16"/>
+    <rect x="250" y="304" width="130" height="56" rx="16"/>
+    <rect x="482" y="192" width="130" height="56" rx="16"/>
+  </g>
+  <g fill="#17364c" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" text-anchor="middle">
+    <text x="93" y="229">Harbor</text>
+    <text x="315" y="121">Market</text>
+    <text x="315" y="341">Library</text>
+    <text x="547" y="229">Terminal</text>
+  </g>
+  <g fill="#17364c" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" text-anchor="middle">
+    <text x="191" y="155">4</text>
+    <text x="191" y="300">7</text>
+    <text x="265" y="229">2</text>
+    <text x="363" y="229">1</text>
+    <text x="430" y="154">10</text>
+    <text x="430" y="300">3</text>
+  </g>
+  <text x="26" y="405" fill="#4c6473" font-family="Arial, Helvetica, sans-serif" font-size="18">These are invented ride times; the drawing is not to scale.</text>
+</svg>
