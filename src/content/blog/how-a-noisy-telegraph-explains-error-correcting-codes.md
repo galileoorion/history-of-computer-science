@@ -41,7 +41,9 @@ The complete block, read from position 1 to position 7, is **`0110011`**. This i
 
 ![Seven-bit Hamming code 0110011. Positions 1, 2 and 4 hold check bits. Check p1 covers positions 1, 3, 5 and 7; p2 covers 2, 3, 6 and 7; p4 covers 4, 5, 6 and 7.](/images/noisy-telegraph-hamming-checks.svg)
 
-The overlapping groups are the useful part. Position 6, for example, belongs to the `p2` and `p4` groups but not the `p1` group. Position 3 belongs to `p1` and `p2` but not `p4`. A changed bit leaves a different pattern of failed checks depending on its position.
+The overlapping groups give each position a unique pattern of checks. If exactly one bit changes, every check covering that position fails, while the other checks pass.
+
+One failed check points to a position covered only by that check: `p1` points to position 1, `p2` to position 2, and `p4` to position 4. Two failed checks point to a position covered by both **but not by the third**: `p1` and `p2` point to position 3, `p1` and `p4` to position 5, and `p2` and `p4` to position 6. If all three fail, they point to position 7, the only position covered by all three.
 
 ## Let one signal change
 
