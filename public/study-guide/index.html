@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Data Design Study Guide | A History of Computer Science</title>
+<meta name="description" content="A system design study guide covering entities, relationships, keys, normalisation, indexes, datastore choices, partitioning and schema evolution.">
+<link rel="canonical" href="https://tech.attilakulik.com/study-guide/">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: matches the API design study guide — reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --check: #8a5a0b;
+  --check-soft: #f6eedd;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b; --check: #e1a94d; --check-soft: #2a2416;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b; --check: #e1a94d; --check-soft: #2a2416;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 6px; }
+.btn {
+  font: 500 13px/1 var(--font-mono); color: var(--ink); background: var(--sheet);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 9px 14px; cursor: pointer;
+}
+.btn[aria-pressed="true"] { background: var(--check); color: var(--sheet); border-color: var(--check); }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toolbar .hint { font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style>
+</head><body>
+<div class="shell">
+  <header class="mast">
+    <span class="eyebrow">Study guide · System design interviews</span>
+    <h1>Data design: from <span class="verb">entities</span> to storage</h1>
+    <p class="lede">Entities and relationships, keys, normalisation, indexes, denormalisation, datastore families, partitioning and schema evolution, with a definition at every new term and practice questions at the end.</p>
+    <ul class="meta">
+      <li><b>Updated</b> 5 Nov 2026</li>
+      <li><b>Sections</b> 10 + exercises</li>
+    </ul>
+    <details class="mtoc">
+      <summary>Contents</summary>
+      <ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#entities-relationships-and-cardinality"><span class="tk">§2</span><span>Entities, relationships and cardinality</span></a></li><li><a href="#access-patterns-and-the-order-of-design"><span class="tk">§3</span><span>Access patterns and the order of design</span></a></li><li><a href="#keys-and-integrity-constraints"><span class="tk">§4</span><span>Keys and integrity constraints</span></a></li><li><a href="#functional-dependencies-and-normalisation"><span class="tk">§5</span><span>Functional dependencies and normalisation</span></a></li><li><a href="#indexes"><span class="tk">§6</span><span>Indexes</span></a></li><li><a href="#denormalisation-and-read-models"><span class="tk">§7</span><span>Denormalisation and read models</span></a></li><li><a href="#choosing-a-datastore-family"><span class="tk">§8</span><span>Choosing a datastore family</span></a></li><li><a href="#partitioning-and-hot-keys"><span class="tk">§9</span><span>Partitioning and hot keys</span></a></li><li><a href="#schema-evolution"><span class="tk">§10</span><span>Schema evolution</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol>
+    </details>
+  </header>
+  <nav class="rail" aria-label="Contents">
+    <p>Contents</p>
+    <ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#entities-relationships-and-cardinality"><span class="tk">§2</span><span>Entities, relationships and cardinality</span></a></li><li><a href="#access-patterns-and-the-order-of-design"><span class="tk">§3</span><span>Access patterns and the order of design</span></a></li><li><a href="#keys-and-integrity-constraints"><span class="tk">§4</span><span>Keys and integrity constraints</span></a></li><li><a href="#functional-dependencies-and-normalisation"><span class="tk">§5</span><span>Functional dependencies and normalisation</span></a></li><li><a href="#indexes"><span class="tk">§6</span><span>Indexes</span></a></li><li><a href="#denormalisation-and-read-models"><span class="tk">§7</span><span>Denormalisation and read models</span></a></li><li><a href="#choosing-a-datastore-family"><span class="tk">§8</span><span>Choosing a datastore family</span></a></li><li><a href="#partitioning-and-hot-keys"><span class="tk">§9</span><span>Partitioning and hot keys</span></a></li><li><a href="#schema-evolution"><span class="tk">§10</span><span>Schema evolution</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol>
+  </nav>
+  <main>
+<section class="sec" id="learning-objectives"><p class="kicker">Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Explain what a data model contains, distinguish the conceptual, logical and physical models, and say how much of the model to specify at the high-level and at the low-level design stage.</li>
+<li>Model a domain as entities, attributes and relationships, state the cardinality and participation of each relationship, resolve a many-to-many relationship into an associative entity, and distinguish an entity from a value object.</li>
+<li>Derive the access patterns of a system from its API surface and use them to justify every later storage decision.</li>
+<li>Choose primary and foreign keys and declare integrity constraints, distinguishing natural from surrogate keys.</li>
+<li>Identify functional dependencies, recognise the anomalies they cause, and decompose a table into third normal form or Boyce–Codd normal form.</li>
+<li>Calculate the depth of a B-tree index and the pages a query reads with and without it, order the columns of a composite index, and justify a denormalisation or read model with the mechanism that keeps it consistent.</li>
+<li>Choose a datastore family and a partition key from access patterns, calculate the load on the hottest shard, and plan a schema change with expand–migrate–contract.</li>
+</ol>
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines the central term, data model, and the terms every later section relies on: schema, entity, attribute, relationship, value object, and the three stages of data modelling. Each definition is set out in a callout where the term is first introduced, and the prose after it explains the mechanism.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data model</dfn> The description of what data a system holds, how the pieces relate to one another, which rules the data must obey, and which queries will be run against it, written independently of any particular set of stored values.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Schema</dfn> The concrete statement of a data model in one database: its tables or collections, their fields and types, and the constraints on them.</p></aside>
+<p>Item 36 of the self-checklist defines the data model as "the entities, their relationships, and the queries I will run against them", and the inclusion of queries is deliberate: two models with identical entities can need different storage if they are read differently. The word schema comes from the Greek <em>skhēma</em>, shape or plan. The model is the design and the schema is that design expressed in the vocabulary a particular engine accepts. Values change constantly while the model changes rarely, which is why code is written against the model and keeps working as the data grows.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Entity</dfn> A thing the system needs to remember and tell apart from other things of the same kind, such as a user, an order or a short link.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Attribute</dfn> A single named property of an entity, such as a customer's email address, with a defined type and set of permitted values.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Relationship</dfn> An association between entities that the system must record, such as "a customer places an order".</p></aside>
+<p>The source note traces the word entity to two traditions that are both still in use, and they explain why data design appears at both levels of design. The first is the entity–relationship model, which Peter Chen introduced in 1976 for designing databases: data is described as entities, their attributes and the relationships between them, and drawn as an entity–relationship diagram. In a relational schema an entity usually becomes a table, an attribute a column, and a relationship either a column that refers to another table or, for a many-to-many relationship, a table of its own.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Value object</dfn> In domain-driven design, an object with no identity of its own, defined entirely by its attribute values, such as an amount of money or an address; two value objects with equal values are interchangeable.</p></aside>
+<p>The second tradition is domain-driven design, from Eric Evans's 2003 book of that name. There an entity is an object defined by a stable identity rather than by its values: an order stays the same order when its status changes from paid to shipped. A value object has no identity, so £40.00 is the same as any other £40.00, and changing it means replacing it. The distinction decides persistence as well as class design. An entity needs a key, because something must stay fixed while its attributes change; a value object is usually stored inline as columns of the entity that owns it, or embedded in its document, and needs no key of its own.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Conceptual model</dfn> A model listing the entities and relationships and their business rules, in terms users recognise, with no reference to tables, keys or technology.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Logical model</dfn> A model that adds attributes, keys and normalised dependencies in the terms of one family of data model, without choosing a product.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Physical model</dfn> The model as implemented in one database product: tables, column types, indexes, partitioning, storage parameters and any deliberate denormalisation.</p></aside>
+<p>The three stages exist because the questions at each stage have different owners and change at different rates. Whether an order may exist without a customer is a business rule settled with domain experts. Whether the customer's details are stored once or repeated on each order is a structural decision settled by reasoning about dependencies. Whether the order table has an index on its date column is a performance decision settled by the queries. Keeping the stages apart means a change of database product touches only the physical model, and a change of indexing never alters what the data means.</p>
+<p>The source note maps the conceptual and logical stages to high-level design (HLD), the view of a system as components and their connections, and the physical stage to low-level design (LLD), the view of what happens inside one component. It qualifies the mapping as rough, and the qualification matters: the same note places the choice of datastore family and partition key in HLD, and both are physical decisions. They are taken early because they shape the architecture diagram, whereas column types and indexes do not. The following diagram shows the three stages, the input that drives each one, and where the HLD and LLD boundary falls.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> conceptual model          logical model                physical model
+ entities, relationships ─► attributes, keys,         ─► tables or collections, types,
+ business rules             normalised dependencies      indexes, partitioning, denormalisation
+       ▲                          ▲                             ▲
+ domain experts             dependency analysis           access patterns and measured load
+ ├──────────────── HLD ─────────────────┤  + datastore family and partition key
+                                        ├──────────────── LLD ──────────────────┤</code></pre></div></figure>
+<p>Read the diagram from left to right: each stage adds detail to the one before it, and the input underneath each stage is what justifies the detail it adds. The HLD bracket covers the first two stages plus the two physical decisions that shape the architecture; the LLD bracket covers the rest of the physical model. In a system design interview, step 5 of the script in the complete guide, "Data model and storage choice", gets 6 minutes, and the source note describes this as six minutes of a 45-minute round. The nine step durations in that script add up to 3 + 5 + 4 + 3 + 6 + 8 + 10 + 5 + 2 = 46 minutes, so the script overruns its own frame by one minute; the six minutes for data are unaffected.</p>
+<p>The confusion learners most often have with the term data model is to treat it as a synonym for the list of tables. A list of tables is one physical rendering of a model, and it omits most of what the model contains: the business rules that make relationships mandatory or optional, the dependencies that justify how attributes were grouped, the access patterns that justify the indexes and the datastore, and the reasons for any departure from the logical design. Two databases with identical tables can encode different models, for example if one requires every order to have a customer and the other allows orphaned orders.</p>
+</section><section class="sec" id="entities-relationships-and-cardinality"><p class="kicker">§2 · Conceptual model</p><h2>Entities, relationships and cardinality</h2>
+<p>The source notes list entities and say that "a user owns many short URLs", but they do not explain how to state a relationship precisely, so this section goes beyond the notes. It uses a running example for the rest of the guide, the online shop from the storage note's curriculum: customers place orders, each order contains one or more lines, and each line refers to a product. The example is illustrative.</p>
+<p>The method is to read the requirements for nouns the business needs to keep facts about, which become candidate entities, and for verbs connecting them, which become candidate relationships. A noun that only describes another, such as "email address" in "each customer has an email address", is an attribute. The test for promoting an attribute to an entity is whether the system must record facts about it in turn: a delivery address printed once on a label can be a value object stored on the order, but an address that customers save, name and reuse across orders has facts and an identity of its own, and becomes an entity.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cardinality</dfn> The maximum number of instances of one entity that can be associated with a single instance of another through a relationship, stated as one or many.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Participation</dfn> Whether every instance of an entity must take part in a relationship (mandatory) or may exist without taking part (optional); also called optionality or minimum cardinality.</p></aside>
+<p>Cardinality is borrowed from set theory, where it means the number of members of a set. In modelling it answers "at most how many?", and participation answers "at least how many?", so together they give each end of a relationship a range such as <code>0..*</code> or <code>1..1</code>. A customer places zero or more orders, because a newly registered customer has none, while an order is placed by exactly one customer, because an order without a customer has no one to bill. Both ends matter because they turn into different physical constructs: the "exactly one" end becomes a foreign key column that may not be null, and the "zero or more" end needs no column at all.</p>
+<p>The relationship between orders and products is many-to-many: one order holds several products and one product appears in many orders. A relational table cannot represent this with one column, because a column holds one value per row, and storing a list of product identifiers in one field breaks first normal form, defined in "Functional dependencies and normalisation".</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Associative entity</dfn> An entity introduced to resolve a many-to-many relationship, with one instance per pairing of the two related entities and any facts that belong to the pairing; also called a junction, link or bridge table.</p></aside>
+<p>In the shop the associative entity is the order line. It replaces one many-to-many relationship with two one-to-many relationships, and it gives a home to facts that belong to neither side alone: the quantity ordered and the price charged on that order for that product. The price charged is a property of the sale, not of the product, which is why the order line is an entity and not merely a pair of pointers. The following diagram shows the shop's conceptual model, with each relationship labelled by its verb and each end by its range.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> ┌──────────┐ 1..1     places     0..* ┌──────────┐ 1..1   contains   1..* ┌────────────┐ 0..*  refers to  1..1 ┌──────────┐
+ │ Customer │──────────────────────────│  Order   │────────────────────────│ Order line │────────────────────────│ Product  │
+ └──────────┘                          └──────────┘                        └────────────┘                        └──────────┘
+  id, email, name                       id, placed_at                       quantity, unit_price                  id, sku, name, list_price</code></pre></div></figure>
+<p>Read each range as belonging to the entity it sits next to: the <code>0..*</code> beside Order says a customer places zero or more orders, and the <code>1..1</code> beside Customer says each order has exactly one customer. The <code>1..*</code> beside Order line says an order has at least one line, a rule that a foreign key cannot enforce on its own, because it constrains the parent rather than the child; it is usually checked by the application, or by inserting the order and its lines in one transaction.</p>
+</section><section class="sec" id="access-patterns-and-the-order-of-design"><p class="kicker">§3 · Checklist item 36</p><h2>Access patterns and the order of design</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Access pattern</dfn> A specific read or write the system performs, stated with its input, its result and how often it happens, such as "fetch an order with its lines by order identifier, about 500 times per second".</p></aside>
+<p>The conceptual model in "Entities, relationships and cardinality" says what exists; access patterns say how it is used, and the source notes treat them as the decisive input. The storage note puts the principle as "You don't choose a database type. You choose an access pattern, and the type follows", and the entity note says access patterns matter most at the HLD stage because they decide the storage choice and the partitioning. An access pattern is more than a query: its frequency and latency target decide whether it needs an index, a copy, or a different store.</p>
+<p>The dependency between the API and the data model can be resolved in four steps. A short list of entity names comes first, because API resources are those entities. The API surface comes second, because each endpoint is a read or write the storage layer must serve. The data model and storage choice come third, derived from the access patterns those endpoints imply, and the architecture comes fourth. Designing the schema first means choosing storage before knowing which queries it must serve, which the note says leads to tables no endpoint reads and to a datastore chosen by habit.</p>
+<p>The following table lists the shop's main access patterns, and it is useful because every later decision in the guide refers back to one of its rows. The frequencies are assumptions for the example, not figures from the notes.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Endpoint</th><th>Access pattern</th><th>Assumed frequency</th><th>What it requires of the data model</th></tr></thead>
+<tbody>
+<tr><td><code>GET /orders/{id}</code></td><td>Read one order with its lines and product names</td><td>500 per second</td><td>Lookup by order key, lines grouped by order</td></tr>
+<tr><td><code>GET /customers/{id}/orders</code></td><td>Latest 20 orders for a customer, newest first</td><td>300 per second</td><td>Index on <code>(customer_id, placed_at)</code></td></tr>
+<tr><td><code>POST /orders</code></td><td>Create an order, its lines and a stock decrement atomically</td><td>50 per second</td><td>Multi-entity transaction across order, lines and stock</td></tr>
+<tr><td><code>GET /products/{id}/orders</code></td><td>Orders containing a product, for support staff</td><td>1 per second</td><td>Index on <code>order_line(product_id)</code></td></tr>
+</tbody></table></div>
+<p>Read across each row and the right-hand column is the justification the notes ask for: "this endpoint needs this query, and this query needs this store and this key". The third row, an atomic write across three entities, is the one that points to a relational store in "Choosing a datastore family", and the second row is the one that motivates the composite index in "Indexes". The process is not strictly linear: modelling the data often exposes a query no endpoint asked for, and the notes' response is to add the endpoint rather than treat the API as finished.</p>
+</section><section class="sec" id="keys-and-integrity-constraints"><p class="kicker">§4 · Logical model</p><h2>Keys and integrity constraints</h2>
+<p>The entity note lists "primary keys and foreign keys" and "nullability and uniqueness constraints" among the LLD decisions without explaining how to choose them, so this section goes beyond the notes. Translating the conceptual model into a logical relational model needs a way to identify each row and a way for one table to refer to another, and keys provide both.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Candidate key</dfn> A set of attributes whose values are unique for every row and from which no attribute can be removed without losing that uniqueness.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Primary key</dfn> The candidate key chosen to identify rows in a table and to be referenced by other tables.</p></aside>
+<p>A customer table might have a customer number and an email address that are each unique, so both are candidate keys. Minimality is what separates a candidate key from its supersets: the pair (customer number, email) is also unique but is not a candidate key, because the customer number alone suffices. Choosing which candidate becomes the primary key is a design decision, and the main criterion is stability, because every foreign key referring to the primary key must change whenever its value does. This is the persistence form of the entity–value object distinction in "Core concepts": the primary key is the identity that stays fixed while everything else about the entity changes.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Natural key</dfn> A key made of attributes with meaning in the domain that exist independently of the database, such as an ISBN, a SKU or an email address.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Surrogate key</dfn> A key with no domain meaning, generated by the system solely to identify rows, such as an identity integer or a UUID.</p></aside>
+<p>The trade-off is between meaning and stability. A natural key needs no extra column and is readable, but it inherits every change the outside world makes to it: customers change email addresses and suppliers reissue product codes. A surrogate key never needs to change, because nothing outside depends on its value, but it does not prevent duplicates, since the same customer registered twice receives two surrogate values. The common practice is a surrogate primary key plus a unique constraint on the natural candidate key, which keeps references stable and still rejects duplicates. The URL shortener in the entity note is a case where the natural key is the right primary key: <code>short_code</code> is generated by the system, never changes, and is the value every lookup supplies.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Foreign key</dfn> A column or set of columns whose values must match a candidate key, normally the primary key, of a row in a referenced table.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Integrity constraint</dfn> A rule declared in the schema that the database checks on every change, rejecting any change that violates it: NOT NULL, UNIQUE, CHECK, primary key and foreign key constraints.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Referential integrity</dfn> The property that every foreign key value refers to a row that exists, so no reference is left dangling.</p></aside>
+<p>Foreign keys turn relationships into structure. "A customer places orders" becomes a <code>customer_id</code> column on the order table, on the "many" side, and the participation rule "every order has exactly one customer" becomes <code>NOT NULL</code>. When a referenced row is deleted the schema declares what happens: <code>RESTRICT</code> refuses the deletion, <code>CASCADE</code> deletes the referring rows too, and <code>SET NULL</code> clears the reference. The choice follows from the domain: cascading the deletion of a customer into their orders would destroy financial records. The storage note calls this "constraints as truth": correctness enforced by the engine rather than by every application that touches the table. The illustrative schema that follows applies these rules to the shop.</p>
+<figure class="code"><figcaption>SQL</figcaption><div class="scroll"><pre><code>CREATE TABLE customer (
+  customer_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, <span class="c">-- surrogate key: stable identity</span>
+  email       TEXT NOT NULL UNIQUE,                            <span class="c">-- natural candidate key kept as a constraint</span>
+  name        TEXT NOT NULL
+);
+CREATE TABLE product (
+  product_id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  sku         TEXT NOT NULL UNIQUE,                            <span class="c">-- supplier code, may be reissued</span>
+  name        TEXT NOT NULL,
+  list_price  NUMERIC(10,2) NOT NULL CHECK (list_price &gt;= 0)   <span class="c">-- CHECK encodes a business rule</span>
+);
+CREATE TABLE customer_order (                                  <span class="c">-- ORDER is a reserved word in SQL</span>
+  order_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  customer_id BIGINT NOT NULL                                  <span class="c">-- mandatory participation: 1..1</span>
+              REFERENCES customer (customer_id) ON DELETE RESTRICT, <span class="c">-- keep financial history</span>
+  placed_at   TIMESTAMPTZ NOT NULL
+);
+CREATE TABLE order_line (                                      <span class="c">-- associative entity</span>
+  order_id    BIGINT NOT NULL REFERENCES customer_order (order_id) ON DELETE CASCADE,
+  product_id  BIGINT NOT NULL REFERENCES product (product_id),
+  quantity    INTEGER NOT NULL CHECK (quantity &gt; 0),
+  unit_price  NUMERIC(10,2) NOT NULL,                          <span class="c">-- price charged: a fact of the sale</span>
+  PRIMARY KEY (order_id, product_id)                           <span class="c">-- one line per product per order</span>
+);</code></pre></div></figure>
+<p>The composite primary key on <code>order_line</code> states a business rule as well as an identity: a product appears at most once per order, so a second unit raises the quantity. If the business wanted two lines for the same product at different discounts, the key would become a line number within the order, which shows that key choice is a statement about the domain.</p>
+<p>Keys and constraints also depend on the datastore, and here the entity note mixes two families. Its HLD example puts <code>ShortUrl</code> in a key-value store partitioned on <code>short_code</code>, but its LLD example writes <code>owner_id BIGINT REFERENCES users(id)</code> and an index on <code>owner_id</code>, which are relational constructs. A key-value store enforces no foreign keys, and it serves "list my links" only through a secondary index it maintains, such as a DynamoDB global secondary index, or one the application maintains; the storage note warns that owning such an index means owning its consistency. The LLD schema as written is correct for a relational store, which is a defensible choice for a URL shortener at moderate scale, but it then contradicts the HLD choice. Either the HLD should say relational, or the LLD should replace the foreign key with an application-level check and name the secondary index.</p>
+</section><section class="sec" id="functional-dependencies-and-normalisation"><p class="kicker">§5 · Logical model</p><h2>Functional dependencies and normalisation</h2>
+<p>The entity note defines normalisation in one clause, "how far data is split into separate tables so that each fact is stored once", and this section supplies the theory behind it, going beyond the notes. Keys say which attributes identify a row; normalisation uses the same idea to decide which attributes belong together, so that no fact is stored in many rows where the copies could disagree.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Functional dependency</dfn> A constraint written <code>X → Y</code>, meaning any two rows that agree on attributes X must also agree on attributes Y; X is the determinant.</p></aside>
+<p>A functional dependency is a statement about the domain, not about the rows present: <code>customer_id → customer_email</code> holds because the business assigns one email per customer, and it would hold in an empty table. A candidate key is exactly a minimal set of attributes that determines every other attribute. Normalisation finds dependencies whose determinant is not a key and moves them into tables where it is.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data anomaly</dfn> An inconsistency or loss of information caused by redundant storage: an update anomaly (a change must be repeated in many rows and some are missed), an insertion anomaly (a fact cannot be recorded without an unrelated fact), or a deletion anomaly (removing one fact removes another).</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Normal form</dfn> A condition on a table's structure that rules out one class of anomaly; the forms are numbered in increasing strictness, each including the one before.</p></aside>
+<p>E. F. Codd, who proposed the relational model at IBM in 1970, defined the first three normal forms in 1970 and 1971, borrowing the term from mathematics, where a normal form is a standard representation of an object. Each form forbids one shape of dependency, so they can be learned as a sequence of questions asked of a table.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>First normal form (1NF)</dfn> Every attribute holds a single, indivisible value per row, with no lists or repeating groups in one field.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partial dependency</dfn> A dependency in which a non-key attribute depends on only part of a composite candidate key.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Second normal form (2NF)</dfn> First normal form, and no non-key attribute has a partial dependency on a candidate key.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Transitive dependency</dfn> A dependency <code>A → C</code> that holds only because <code>A → B</code> and <code>B → C</code>, where B is not a candidate key.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Third normal form (3NF)</dfn> Second normal form, and no non-key attribute is transitively dependent on a candidate key: every non-key attribute depends on the key, the whole key, and nothing but the key.</p></aside>
+<p>The mechanism behind each form is the same. A partial or transitive dependency means some attribute is determined by something smaller than the row's key, so the same determinant value, and with it the same dependent value, recurs in every row that shares it. Moving the dependency into its own table, keyed by its determinant, stores the dependent value once per determinant value instead of once per row.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Lossless-join decomposition</dfn> A split of one table into several such that joining the parts on their shared attributes reproduces exactly the original rows, none lost and none invented.</p></aside>
+<p>For a split into two tables, the decomposition is lossless when the shared attributes form a key of at least one part, which is why each normalisation step keeps the determinant in both tables: as the primary key of the new table and as a foreign key in the old one.</p>
+<h3 class="worked"><span>Worked example</span>normalising the shop's order data</h3>
+<p>Suppose a prototype stores everything in one table, <code>sales(order_id, placed_at, customer_id, customer_name, customer_email, product_id, product_name, list_price, quantity, unit_price)</code>, one row per product per order, with primary key <code>(order_id, product_id)</code>. Every field holds one value, so it is in 1NF.</p>
+<p>Step 1 writes the dependencies from the business rules: <code>order_id → placed_at, customer_id</code>; <code>customer_id → customer_name, customer_email</code>; <code>product_id → product_name, list_price</code>; and <code>(order_id, product_id) → quantity, unit_price</code>.</p>
+<p>Step 2 checks 2NF. <code>placed_at</code> and <code>customer_id</code> depend on <code>order_id</code> alone, and <code>product_name</code> and <code>list_price</code> on <code>product_id</code> alone; all four are partial dependencies. Splitting them out gives <code>order(order_id, placed_at, customer_id, customer_name, customer_email)</code>, <code>product(product_id, product_name, list_price)</code> and <code>order_line(order_id, product_id, quantity, unit_price)</code>.</p>
+<p>Step 3 checks 3NF. In <code>order</code>, <code>order_id → customer_id → customer_name, customer_email</code>, and <code>customer_id</code> is not a key of <code>order</code>, so the name and email are transitively dependent. Splitting gives <code>customer(customer_id, customer_name, customer_email)</code> and <code>order(order_id, placed_at, customer_id)</code>, which is the schema in "Keys and integrity constraints".</p>
+<p>Step 4 measures the redundancy removed. Assume 200 customers, 1,000 orders of 3 lines each, and 30-byte emails; these are assumptions for the example. The single table has 1,000 × 3 = 3,000 rows, so each email is stored 3,000 ÷ 200 = 15 times on average, occupying 3,000 × 30 = 90,000 bytes, against 200 × 30 = 6,000 bytes in <code>customer</code>. As a check, 90,000 ÷ 6,000 = 15, the average number of copies. Storage is the smaller benefit: in the single table a change of email must update 15 rows, and any row missed leaves the customer with two emails. The table also has an insertion anomaly, because a new product cannot be recorded until someone orders it, and a deletion anomaly, because deleting the only order for a product deletes its name and price.</p>
+<p>The following diagram shows the decomposition as a tree, each split labelled by the normal form that required it.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> sales(order_id, product_id, placed_at, customer_id, customer_name, customer_email, product_name, list_price, quantity, unit_price)
+   ├── 2NF: order_id → … ──► order(order_id, placed_at, customer_id, customer_name, customer_email)
+   │                           └── 3NF: customer_id → … ──► customer(customer_id, customer_name, customer_email)
+   │                                                        order(order_id, placed_at, customer_id)
+   ├── 2NF: product_id → … ─► product(product_id, product_name, list_price)
+   └── whole key ───────────► order_line(order_id, product_id, quantity, unit_price)</code></pre></div></figure>
+<p>Read each branch as one dependency leaving the parent table together with its determinant, which stays behind as a foreign key so the split remains lossless. The leaves are the four tables of the final schema.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Boyce–Codd normal form (BCNF)</dfn> For every non-trivial dependency <code>X → Y</code> in the table, X is a superkey, meaning X contains a candidate key.</p></aside>
+<p>Raymond Boyce and Codd defined BCNF in 1974 to close a gap in 3NF, which constrains only dependencies of non-key attributes. The gap appears with overlapping composite candidate keys. In a tutoring service where each tutor teaches one course and each student has one tutor per course, <code>tutoring(student, course, tutor)</code> has <code>(student, course) → tutor</code> and <code>tutor → course</code>, so both <code>(student, course)</code> and <code>(student, tutor)</code> are candidate keys. Every attribute belongs to a candidate key, so the table is in 3NF, yet <code>tutor → course</code> repeats each tutor's course for every student. Splitting into <code>tutor_course(tutor, course)</code> and <code>tutor_student(student, tutor)</code> reaches BCNF, at the cost that "one tutor per student per course" can no longer be enforced by a key on one table. The shop has no overlapping keys, so there 3NF and BCNF coincide.</p>
+</section><section class="sec" id="indexes"><p class="kicker">§6 · Checklist item 38</p><h2>Indexes</h2>
+<p>The normalised model in "Functional dependencies and normalisation" says what is stored; the physical model decides how, so that the access patterns from "Access patterns and the order of design" run fast enough. Item 38 of the checklist asks which indexes the queries need and what each costs. Databases store tables in fixed-size pages, typically 4 to 16 KB, and read whole pages at a time, so the cost of a query is approximately the number of pages it touches.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Index</dfn> An auxiliary structure that maps column values to row locations, so that queries find rows without scanning the whole table.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>B-tree</dfn> A balanced, sorted tree of fixed-size pages, each holding many keys and child pointers, with every leaf at the same depth; the default index structure in relational databases.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Fanout</dfn> The number of child pointers a B-tree page holds, roughly the page size divided by the size of one key-and-pointer entry.</p></aside>
+<p>Rudolf Bayer and Edward McCreight described the B-tree at Boeing in 1970; the meaning of the B was never officially stated. The structure works because its fanout is large: each level multiplies the reachable rows by hundreds, so depth grows with the logarithm of the row count to the base of the fanout. A lookup reads one page per level from root to leaf, then the table page the leaf points to.</p>
+<h3 class="worked"><span>Worked example</span>checking the glossary's "a few pages"</h3>
+<p>The index glossary entry says a composite index on <code>(customer_id, created_at)</code> turns "latest 20 orders for a customer" from a scan of 50 million rows into "a read of a few pages". Assume 8,192-byte pages, 16-byte index entries and 200-byte rows, and ignore page headers; these are assumptions, not figures from the note.</p>
+<p>The fanout is 8,192 ÷ 16 = 512. Two levels reach 512 × 512 = 262,144 rows, fewer than 50,000,000; three reach 262,144 × 512 = 134,217,728, more, so the index is 3 levels deep (check: log 50,000,000 ÷ log 512 = 7.699 ÷ 2.709 = 2.84, rounded up to 3). The descent reads 3 pages, and the 20 adjacent entries for one customer fit in one leaf, since 20 × 16 = 320 bytes. Fetching the 20 rows can then cost up to 20 table pages, because a customer's orders are scattered across the table in the order they were placed. The indexed query reads up to 3 + 20 = 23 pages.</p>
+<p>Without the index, each page holds 8,192 ÷ 200 = 40.96, so 40 whole rows, and the scan reads 50,000,000 ÷ 40 = 1,250,000 pages, about 1,250,000 ÷ 23 = 54,348 times as many. The glossary's claim holds for the index itself, but "a few pages" understates the query by the row fetches, which dominate. A covering index, defined next, removes them and brings the query down to the 3 pages of the descent, or 4 if the customer's entries straddle two leaves.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Covering index</dfn> An index that contains every column a query needs, so the query is answered from the index alone without reading the table.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Composite index</dfn> An index on several columns in a fixed order, sorted by the first, then the second within equal values of the first, so it serves conditions on any leading prefix of its columns.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Selectivity</dfn> The fraction of a table's rows a condition matches; an index helps only when the condition is selective enough that following pointers costs less than scanning.</p></aside>
+<p>Column order in a composite index comes from the query: equality conditions first, then the column used for a range or sort. <code>(customer_id, placed_at)</code> serves "this customer's orders, newest first", because one customer's entries are contiguous and already sorted by time, but it cannot serve a query on <code>placed_at</code> alone, because rows from one day are scattered across every customer's range. The glossary names the two classic failures: ordering the columns wrongly, and wrapping the indexed column in a function, as in <code>WHERE date(placed_at) = …</code>, which hides the stored values from the planner. Selectivity sets the limit from the other side: a condition matching 30% of the 50 million rows needs up to 15,000,000 random page reads through the index, twelve times the 1,250,000 sequential reads of a scan, so the planner ignores the index.</p>
+<p>Indexes are paid for on every write. Each insert, delete, and update of an indexed column must change every index, so a table with four secondary indexes turns one row insert into one table-page write and four index-leaf writes, five instead of one, before page splits. The rule that follows is to index for the access patterns the system has, not for every column a query might mention. The illustrative statements below index the shop's two non-key patterns.</p>
+<figure class="code"><figcaption>SQL</figcaption><div class="scroll"><pre><code>CREATE INDEX order_by_customer_time
+  ON customer_order (customer_id, placed_at DESC)   <span class="c">-- equality column first, sort column second</span>
+  INCLUDE (order_id);                               <span class="c">-- covering for a list of order ids and dates: no table read</span>
+
+CREATE INDEX order_line_by_product
+  ON order_line (product_id);                       <span class="c">-- PK leads with order_id, so it cannot serve this lookup</span></code></pre></div></figure>
+</section><section class="sec" id="denormalisation-and-read-models"><p class="kicker">§7 · Physical model</p><h2>Denormalisation and read models</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Denormalisation</dfn> The deliberate storage of redundant, pre-joined or derived copies of data in a normalised schema, to serve particular reads cheaply, with the copies kept consistent by a stated mechanism.</p></aside>
+<p>Indexes make it cheaper to find rows; denormalisation makes it cheaper to assemble them, by storing the result of a join or computation in advance. The entity note places it among the LLD decisions: where data is "deliberately duplicated for read speed". It differs from an unnormalised design in that it is a decision taken after normalising, for a named read, with a named mechanism for consistency. It reintroduces exactly the update anomaly that "Functional dependencies and normalisation" removed, so it pays only where the read is far more frequent than the write it complicates.</p>
+<h3 class="worked"><span>Worked example</span>a stored order total</h3>
+<p>The order history page shows each order's total, which otherwise means reading and summing every line. An order has three lines: 2 units at £12.50, 1 at £40.00 and 3 at £4.00. The line amounts are 2 × 12.50 = £25.00, 1 × 40.00 = £40.00 and 3 × 4.00 = £12.00, and the total is 25.00 + 40.00 + 12.00 = £77.00. Adding <code>order_total</code> to <code>customer_order</code> lets the page read one row per order instead of one per line. The column is a second copy of a fact the lines determine, so the lines and the total are written in one transaction, or a trigger recomputes the total when a line changes, and a reconciliation query that recomputes totals from lines checks that the mechanism works. Orders rarely change once placed, so the write cost is small and the saving applies to every page view.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>CQRS</dfn> Command Query Responsibility Segregation: maintaining separate read models, shaped to particular screens, that are updated from the changes made to the write model.</p></aside>
+<p>CQRS generalises denormalisation from one column to whole read models. The glossary's example is an order-history page that reads a <code>customer_order_summary</code> document built from order, payment and shipment events, instead of joining four tables per request. Because the read model is updated after the write commits, typically from an event stream or change data capture, it lags its source, and the contract of the screen must tolerate that lag. The glossary's failure mode is the general risk of every denormalisation: updating the copy from some write paths but not others, so the copies drift permanently. Routing all updates through one propagation path, rather than through each piece of code that writes, is what prevents it.</p>
+</section><section class="sec" id="choosing-a-datastore-family"><p class="kicker">§8 · Checklist item 37</p><h2>Choosing a datastore family</h2>
+<p>The sections up to "Denormalisation and read models" assume a relational store. To decide which storage technology fits the queries, answer five questions before naming a product: what the queries are, the read and write shape, the consistency each operation needs, the access keys, and the operational reality.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Datastore family</dfn> A class of databases sharing one data model and its trade-offs: relational, document, key-value, wide-column or graph.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partition key</dfn> The attribute whose value decides which partition, and so which machine, holds a record; queries that supply it touch one partition.</p></aside>
+<p>The storage note singles out the access key: whether there is "a single natural partition key that almost every query includes" decides between relational and the other families more often than anything else. When every query supplies the key, data can be spread across machines by that key and each query sent to one machine. When queries filter on different attributes, or join entities, a store that only finds data by key cannot answer them without copies. The following table compares the five families across the dimensions the note uses, and it is useful because each family's strength is another's weakness.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Family</th><th>Model</th><th>Good at</th><th>Breaks where</th><th>Choose when</th></tr></thead>
+<tbody>
+<tr><td>Relational</td><td>Normalised tables, foreign keys, ACID transactions, query planner</td><td>Multi-entity transactions, queries nobody anticipated, constraints enforced by the engine</td><td>Write throughput on one primary, working set beyond RAM, cross-shard joins</td><td>Transactions, relationships or unknown future queries</td></tr>
+<tr><td>Document</td><td>Self-contained JSON-like documents with secondary indexes</td><td>Aggregates read and written whole, heterogeneous fields</td><td>Cross-document consistency, unanticipated queries, duplication drift</td><td>Each access pattern reads one aggregate</td></tr>
+<tr><td>Key-value</td><td>Get and put by key</td><td>Sub-millisecond lookups, caches, sessions, counters</td><td>No query without the key, memory-bound, hot keys</td><td>Every access supplies a known key</td></tr>
+<tr><td>Wide-column</td><td>Partitions by partition key, sorted columns within each</td><td>Very high ordered write volume under a known key</td><td>New queries need new tables, no joins, unbounded partitions</td><td>Write volume beyond a sharded relational cluster and stable key-based access</td></tr>
+<tr><td>Graph</td><td>Nodes and edges with direct neighbour pointers</td><td>Deep, variable-length traversals</td><td>Bulk analytics, high write load, one or two hops</td><td>Traversal depth is the query, usually as a secondary store</td></tr>
+</tbody></table></div>
+<p>Reading down the "Breaks where" column, each family past relational gives up the ability to answer an unplanned question in exchange for scale or speed on planned ones, which is why the note's default is "relational until a specific constraint forces otherwise", with the constraint named. Applied to the shop, the atomic order creation in "Access patterns and the order of design" needs a multi-entity transaction, so orders, lines and stock belong in a relational store, which is the note's own choice of Postgres for the online shop. Two points from the note qualify the comparison. A document store is not schemaless: the schema moves from the database into every application version that ever wrote data, which the note calls schema-on-read, and Postgres JSONB offers most of the document benefits with transactions and constraints. And every additional engine costs, in the note's words, "a backup, a migration path and a page at 3 a.m.", which the families glossary entry restates as counting each additional store as an operational cost.</p>
+</section><section class="sec" id="partitioning-and-hot-keys"><p class="kicker">§9 · Checklist items 40 and 41</p><h2>Partitioning and hot keys</h2>
+<p>The partition key from "Choosing a datastore family" also decides how data is spread across machines once one machine is not enough. The entity note includes the partition key in HLD for this reason: it determines which queries stay on one machine, and so shapes the architecture.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Sharding</dfn> Horizontal partitioning: splitting a dataset across nodes by a partition key, using hash or range assignment, so that write capacity and storage grow with the number of shards.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Hot key</dfn> A partition key that receives a disproportionate share of traffic, saturating the shard, cache node or pipeline that owns it.</p></aside>
+<p>Hash assignment spreads keys evenly by count; range assignment keeps neighbouring keys together so range queries touch few shards, at the risk that new keys, such as today's timestamps, all land on one shard. The sharding glossary's example partitions orders by a hash of <code>customer_id</code> across 16 shards, so each customer's orders sit on one shard and a per-customer query touches one node, while a query by product touches all 16. The partition key thus fixes both the balance of load and the cost of every query that does not include it. Item 40 adds that the key should spread traffic as well as data, and the hot key glossary names the failure: checking balance by key count rather than traffic.</p>
+<h3 class="worked"><span>Worked example</span>the hottest shard</h3>
+<p>The sharding glossary describes a tenant that generates 40% of requests. With 16 shards partitioned by a hash of tenant, an even spread would give each shard 100 ÷ 16 = 6.25% of traffic. The hot tenant's 40% lands on one shard, and the other 60% spreads over all 16, adding 60 ÷ 16 = 3.75% to each. The hot shard carries 40 + 3.75 = 43.75%, which is 43.75 ÷ 6.25 = 7 times the average, while the other 15 carry 3.75% each. As a check, 43.75 + 15 × 3.75 = 43.75 + 56.25 = 100%.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Key salting</dfn> Appending a suffix to a hot key so that its records spread across several partitions.</p></aside>
+<p>Salting the tenant's key with 8 suffixes, assuming they hash to 8 different shards, spreads its 40% as 40 ÷ 8 = 5% per shard. Those 8 shards carry 5 + 3.75 = 8.75% each, 8.75 ÷ 6.25 = 1.4 times the average, and the other 8 carry 3.75% (check: 8 × 8.75 + 8 × 3.75 = 70 + 30 = 100%). The cost is that every read of that tenant's data must now query 8 partitions and merge the results, which is why salting is applied only to keys known to be hot. Wide-column stores face the related problem of unbounded partitions, which the storage note handles by bucketing, partitioning a chat channel's messages by channel and month so that no partition grows without limit.</p>
+</section><section class="sec" id="schema-evolution"><p class="kicker">§10 · Checklist item 39</p><h2>Schema evolution</h2>
+<p>Every decision so far is made against today's requirements, and item 39 asks how the schema will change without breaking running code. The difficulty comes from deployment: in a system serving traffic, the database changes at one moment but application servers are replaced one by one, so old and new code run against the same schema at the same time. A change that removes something the old code reads causes errors for as long as any old server runs, and a change that destroys data cannot be undone by reverting code.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Migration</dfn> A versioned, repeatable script that changes a schema, and if necessary its data, from one version to the next, stored with the application code and applied in order to every environment.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Backward compatibility</dfn> The property of a schema change that code written for the previous version keeps working against the new one.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Expand–migrate–contract</dfn> Making a breaking change as backward-compatible steps: add the new structure alongside the old, dual-write and backfill, switch reads, then remove the old structure; also called parallel change.</p></aside>
+<p>The zero-downtime migration glossary uses renaming <code>user.name</code> to <code>full_name</code> as its example, and the following diagram shows its steps as states, each deployed and verified before the next.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> v1: reads and writes name
+   ──► expand: add full_name (nullable)              old code unaffected
+   ──► dual-write name and full_name; backfill rows in batches
+   ──► switch reads to full_name                     rollback still possible
+   ──► stop writing name
+   ──► contract: drop name, in a later release       the only irreversible step</code></pre></div></figure>
+<p>Read it from top to bottom as a sequence in which every state is safe for both the code version before it and the one after it. While both columns are written, the system can return to reading <code>name</code> at any point. The glossary's failure mode is collapsing the last two states: dropping the column in the same release that stops writing it breaks instances of the previous version still running during a rolling deploy. The illustrative migrations that follow implement the steps.</p>
+<figure class="code"><figcaption>SQL</figcaption><div class="scroll"><pre><code><span class="c">-- Migration 1, expand: nullable, so existing inserts that omit it still succeed</span>
+ALTER TABLE app_user ADD COLUMN full_name TEXT;
+
+<span class="c">-- Deploy code that writes both columns, then backfill in batches to avoid long locks</span>
+UPDATE app_user SET full_name = name
+ WHERE full_name IS NULL AND user_id BETWEEN 1 AND 10000;   <span class="c">-- repeat per range; idempotent</span>
+
+<span class="c">-- Migration 2, once backfilled: enforce the rule on the new column</span>
+ALTER TABLE app_user ALTER COLUMN full_name SET NOT NULL;
+
+<span class="c">-- Deploy code that reads full_name; later, code that stops writing name</span>
+
+<span class="c">-- Migration 3, contract, in a later release than the one that stopped writing name</span>
+ALTER TABLE app_user DROP COLUMN name;</code></pre></div></figure>
+<p>The price is time and temporary complexity: the change spans several releases and doubles the write paths while it runs, as the glossary notes. The same pattern handles changes of cardinality, such as letting a customer hold several emails, where the expand step creates a <code>customer_email</code> table rather than a column, and it handles moving data between datastores, where the dual write goes to two engines.</p>
+</section><section class="sec" id="common-mistakes"><p class="kicker">Review</p><h2>Common mistakes</h2>
+<p>The first mistake is choosing a datastore before listing the access patterns. It happens because a familiar product, or one described as scalable, feels like a safe starting point, and the costs appear only when a query arrives that the store cannot serve. The families glossary names the result: a document or wide-column store chosen "for scale", followed by a need for joins and multi-row transactions it does not provide. What is correct is the order in "Access patterns and the order of design": entity names, then endpoints, then access patterns, and only then the family, defaulting to relational until a named constraint forces otherwise.</p>
+<p>The second mistake is using a changeable natural key, such as an email address, as the primary key. It happens because the value is already unique and saves a column. When it changes, every foreign key referring to it must change in the same transaction, and external systems holding the old value point at nothing. What is correct is a surrogate primary key with the natural key declared unique, as set out in "Keys and integrity constraints", unless the natural key is system-generated and immutable, like a short code.</p>
+<p>The third mistake is storing the current value where the historical value is the fact, for example reading an order line's price from the product table. It happens because "price" looks like one attribute when the domain has two: the product's current list price and the price charged on a past sale. Joining to the product makes every past invoice change when the price list changes. What is correct is the dependency analysis in "Functional dependencies and normalisation", which puts <code>unit_price</code> on the order line; this is not denormalisation, because the two prices are different facts.</p>
+<p>The fourth mistake is checking partition balance by key count rather than traffic. It happens because hash partitioning makes key counts even by construction, and the dashboard shows equal shard sizes. One key carrying a large share of requests still saturates its shard, as the worked example in "Partitioning and hot keys" shows with one shard at 7 times the average. What is correct is to measure traffic per key, choose a partition key whose traffic spreads, and salt or isolate the keys known to be hot.</p>
+<p>The fifth mistake is dropping an old column in the same release that stops writing it, or updating a denormalised copy from only some write paths. Both happen because the change looks complete from the point of view of the newest code. Instances of the previous version are still running during a rolling deploy, and write paths that were missed keep producing stale copies. What is correct is to keep the irreversible contract step for a later release, as in "Schema evolution", and to propagate every denormalised copy through one path, as in "Denormalisation and read models".</p>
+</section><section class="sec" id="practice-questions"><p class="kicker">Exercises</p><h2>Practice questions</h2>
+<p>The questions that follow mix recall, calculation and application across the whole guide. Each answer is collapsed beneath its question; open it once you have worked out your own answer.</p>
+<div class="practice"><div class="qa"><p class="qlabel">Question 1 · recall</p><p class="q">For each decision about the shop, state whether it belongs to the conceptual, logical or physical model, and whether it is taken at the HLD or the LLD stage.</p><ol class="parts" type="a"><li><p>Every order is placed by exactly one customer.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>Conceptual, and HLD: it is a business rule a domain expert can confirm without knowing anything about databases.</p></div></details></li><li><p>Orders are stored in Postgres and partitioned by a hash of <code>customer_id</code>.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>Physical, but taken at HLD: the datastore family and partition key shape the architecture, which is why the entity note places them in HLD although they are physical decisions.</p></div></details></li><li><p>The order table has a covering index on <code>(customer_id, placed_at)</code>.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>Physical, and LLD: it changes how fast a query runs, not what the data means, and it does not change the architecture.</p></div></details></li></ol></div><div class="qa"><p class="qlabel">Question 2 · distinction</p><p class="q">Distinguish an entity from a value object, and say how each is usually persisted.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>An entity has a stable identity that persists while its attributes change, as an order stays the same order when its status changes; a value object has no identity and is defined by its values, as £40.00 equals any other £40.00. An entity therefore needs a primary key. A value object is usually stored inline, as columns of the entity that owns it or embedded in its document, and is replaced rather than updated.</p></div></details></div><div class="qa"><p class="qlabel">Question 3 · calculation</p><p class="q">A table holds 2,000,000,000 rows. Its B-tree index uses 8,192-byte pages and 20-byte entries. How many levels does the index have, and how many page reads does a single-row lookup need, counting the table page?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The fanout is 8,192 ÷ 20 = 409.6, so 409 whole entries. Three levels reach 409 × 409 × 409 = 167,281 × 409 = 68,417,929 rows, fewer than 2,000,000,000; four reach 68,417,929 × 409 = 27,982,932,961, more, so the index has 4 levels. As a check, log 2,000,000,000 ÷ log 409 = 9.301 ÷ 2.612 = 3.56, rounded up to 4. A lookup reads 4 index pages and 1 table page, 5 in total.</p></div></details></div><div class="qa"><p class="qlabel">Question 4 · calculation</p><p class="q">A dataset is hash-partitioned across 32 shards, and one key carries 25% of all traffic. What share does the hottest shard carry, relative to the average? What does salting the key with 16 suffixes, landing on 16 different shards, reduce that to?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The average shard carries 100 ÷ 32 = 3.125%. The other 75% spreads as 75 ÷ 32 = 2.34375% per shard, so the hot shard carries 25 + 2.34375 = 27.34375%, which is 27.34375 ÷ 3.125 = 8.75 times the average. With 16 salts the key adds 25 ÷ 16 = 1.5625% to each of 16 shards, which then carry 1.5625 + 2.34375 = 3.90625%, or 3.90625 ÷ 3.125 = 1.25 times the average. Check: 16 × 3.90625 + 16 × 2.34375 = 62.5 + 37.5 = 100%. Reads of that key now query 16 partitions.</p></div></details></div><div class="qa"><p class="qlabel">Question 5 · application</p><p class="q">A university records <code>enrolment(student_id, student_name, module_code, module_title, lecturer_id, lecturer_name, grade)</code>, one row per student per module, and each module has exactly one lecturer. State the dependencies and key, the normal form violated, and a 3NF decomposition.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The dependencies are <code>student_id → student_name</code>, <code>module_code → module_title, lecturer_id</code>, <code>lecturer_id → lecturer_name</code> and <code>(student_id, module_code) → grade</code>, so the key is <code>(student_id, module_code)</code>.</p>
+<ul>
+<li>The table violates 2NF, because <code>student_name</code> depends only on <code>student_id</code>, and <code>module_title</code> and <code>lecturer_id</code> only on <code>module_code</code>.</li>
+<li>After removing those, a module table holding <code>lecturer_name</code> would violate 3NF through <code>module_code → lecturer_id → lecturer_name</code>.</li>
+<li>The 3NF schema is <code>student(student_id, student_name)</code>, <code>module(module_code, module_title, lecturer_id)</code>, <code>lecturer(lecturer_id, lecturer_name)</code> and <code>enrolment(student_id, module_code, grade)</code>; each determinant stays behind as a foreign key, so the decomposition is lossless.</li>
+</ul></div></details></div><div class="qa"><p class="qlabel">Question 6 · misconception</p><p class="q">A colleague proposes a document store "because it is schemaless, so we will never need migrations". What is wrong with the reasoning?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>A document store does not remove the schema; it moves it from the database into every application version that wrote data, which the storage note calls schema-on-read. Old documents keep their old shape, so the code must either handle every shape ever written or the documents must be migrated, and without engine-side constraints nothing reports how many shapes exist. Changing a field still needs expand–migrate–contract, with the backfill rewriting documents instead of rows. If flexible fields are the real need, Postgres JSONB provides them with transactions and constraints.</p></div></details></div><div class="qa"><p class="qlabel">Question 7 · open-ended, combining subtopics</p><p class="q">The shop now sells clothing in sizes and colours, takes payment in euros as well as pounds, and expects one wholesale customer to place 30% of all orders. Describe the changes to the data model, covering entities and relationships, keys, normalisation, indexes, partitioning, and how you would deploy the change.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>A complete answer combines the subtopics as follows.</p>
+<ul>
+<li>Entities: add <code>product_variant</code> in a one-to-many relationship with <code>product</code>, because size and colour describe the item sold and stock is held per variant; give it a surrogate key and unique constraints on its SKU and on <code>(product_id, size, colour)</code>, and make <code>order_line</code> refer to the variant.</li>
+<li>Normalisation: price now depends on the pair (variant, currency), so add <code>variant_price(variant_id, currency, amount)</code> rather than two price columns; add <code>currency</code> to the order and keep <code>unit_price</code> on the line as the amount charged, a historical fact. Money is a value object, an amount with its currency, stored inline.</li>
+<li>Indexes: add <code>product_variant(product_id)</code> for the product page, which lists all variants of one product.</li>
+<li>Partitioning: if orders are sharded by <code>customer_id</code>, the wholesale customer makes one shard hot; salt that customer's key, or give it a dedicated partition, and measure traffic per key rather than key counts.</li>
+<li>Deployment: use expand–migrate–contract, creating the new tables, backfilling one default variant and one GBP price per product, dual-writing, switching reads, and dropping <code>product.list_price</code> and the old line reference in a later release.</li>
+</ul></div></details></div></div>
+</section><section class="sec" id="review-checklist"><p class="kicker">Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, you should be able to say what a data model contains beyond a list of tables and place each decision at the conceptual, logical or physical stage and at HLD or LLD; model a domain as entities, attributes and relationships with cardinality and participation at both ends, resolve a many-to-many relationship into an associative entity, and tell an entity from a value object; derive access patterns from an API surface and use them to justify each storage decision; choose primary and foreign keys and constraints, justify a primary key by its stability, and spot a schema that mixes relational constructs into a key-value design; write a table's functional dependencies, name the anomalies they cause, and decompose it losslessly into 3NF, recognising when BCNF differs; calculate B-tree depth and the pages a query reads with and without an index, including row fetches, and order a composite index's columns; justify a denormalisation or read model by its read and its consistency mechanism; choose a datastore family from the five questions in the storage note; calculate the load on the hottest shard and the effect of salting; and plan a schema change with expand–migrate–contract in which only the final step is irreversible. A reader who can do all of these has covered the material.</p></section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script>
+
+</body></html>
