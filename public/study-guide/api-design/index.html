@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>API Design Study Guide | A History of Computer Science</title>
+<meta name="description" content="A system design study guide covering HTTP semantics, API styles, retries, idempotency, concurrent updates, pagination, versioning and rate limits.">
+<link rel="canonical" href="https://tech.attilakulik.com/study-guide/api-design/">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: a spec-sheet reading column with a sticky section rail; definitions sit as margin-ruled asides, self-tests as boxed exercise panels. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --check: #8a5a0b;
+  --check-soft: #f6eedd;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b; --check: #e1a94d; --check-soft: #2a2416;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b; --check: #e1a94d; --check-soft: #2a2416;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 6px; }
+.btn {
+  font: 500 13px/1 var(--font-mono); color: var(--ink); background: var(--sheet);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 9px 14px; cursor: pointer;
+}
+.btn[aria-pressed="true"] { background: var(--check); color: var(--sheet); border-color: var(--check); }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toolbar .hint { font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style>
+</head><body>
+
+<div class="shell">
+  <header class="mast">
+    <span class="eyebrow">Study guide · System design</span>
+    <h1>API design: the <span class="verb">contract</span> behind the endpoints</h1>
+    <p class="lede">HTTP semantics, resource design, retries and idempotency, concurrent updates, pagination, versioning and rate limits, with a definition at every new term and practice questions at the end.</p>
+    <ul class="meta">
+      <li><b>Updated</b> 5 Nov 2026</li>
+      <li><b>Sections</b> 10 + exercises</li>
+    </ul>
+    <details class="mtoc">
+      <summary>Contents</summary>
+      <ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#http-semantics-the-contract-builds-on"><span class="tk">§2</span><span>HTTP semantics the contract builds on</span></a></li><li><a href="#resources-and-the-api-surface"><span class="tk">§3</span><span>Resources and the API surface</span></a></li><li><a href="#choosing-an-api-style"><span class="tk">§4</span><span>Choosing an API style</span></a></li><li><a href="#errors-and-retry-safety"><span class="tk">§5</span><span>Errors and retry safety</span></a></li><li><a href="#idempotency-keys"><span class="tk">§6</span><span>Idempotency keys</span></a></li><li><a href="#conditional-requests-and-concurrent-updates"><span class="tk">§7</span><span>Conditional requests and concurrent updates</span></a></li><li><a href="#pagination"><span class="tk">§8</span><span>Pagination</span></a></li><li><a href="#versioning-and-evolution"><span class="tk">§9</span><span>Versioning and evolution</span></a></li><li><a href="#rate-limits-and-quotas"><span class="tk">§10</span><span>Rate limits and quotas</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol>
+    </details>
+  </header>
+  <nav class="rail" aria-label="Contents">
+    <p>Contents</p>
+    <ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#http-semantics-the-contract-builds-on"><span class="tk">§2</span><span>HTTP semantics the contract builds on</span></a></li><li><a href="#resources-and-the-api-surface"><span class="tk">§3</span><span>Resources and the API surface</span></a></li><li><a href="#choosing-an-api-style"><span class="tk">§4</span><span>Choosing an API style</span></a></li><li><a href="#errors-and-retry-safety"><span class="tk">§5</span><span>Errors and retry safety</span></a></li><li><a href="#idempotency-keys"><span class="tk">§6</span><span>Idempotency keys</span></a></li><li><a href="#conditional-requests-and-concurrent-updates"><span class="tk">§7</span><span>Conditional requests and concurrent updates</span></a></li><li><a href="#pagination"><span class="tk">§8</span><span>Pagination</span></a></li><li><a href="#versioning-and-evolution"><span class="tk">§9</span><span>Versioning and evolution</span></a></li><li><a href="#rate-limits-and-quotas"><span class="tk">§10</span><span>Rate limits and quotas</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol>
+  </nav>
+  <main>
+<section class="sec" id="learning-objectives"><p class="kicker">Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Explain what an API contract is, why it is more expensive to change than the code behind it, and how much of it to specify at the high-level and at the low-level design stage.</li>
+<li>Apply HTTP method semantics and status codes to decide which operations are safe or idempotent and how each outcome should be signalled to a client.</li>
+<li>Derive an API surface from a list of core entities, and choose between REST, gRPC, GraphQL and event-based interfaces, including when an operation should be asynchronous.</li>
+<li>Design error responses that let a client distinguish permanent, transient and ambiguous failures, and calculate the load that retries at several layers can generate.</li>
+<li>Apply idempotency keys and conditional requests to make retries and concurrent updates safe, and calculate the storage a deduplication window needs.</li>
+<li>Calculate the cost of offset pagination against keyset pagination, and design an opaque cursor that stays correct while the underlying data changes.</li>
+<li>Distinguish breaking from non-breaking changes, plan versioning and deprecation, and calculate how many requests a token-bucket rate limit admits.</li>
+</ol>
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines four terms that every later section relies on. Each definition is set out in a callout where the term is first introduced, and the prose after it explains the mechanism.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Application programming interface (API)</dfn> The agreed boundary through which one piece of software asks another to do something. The client, or consumer, makes the request; the provider answers it.</p></aside>
+<p>The word interface carries its engineering sense of a shared boundary between two systems, and application programming distinguishes it from a user interface: the party on the other side is a program, not a person. Between services the boundary is a network interface such as an HTTP endpoint or a gRPC method; inside one service it is a set of class or method signatures, such as <code>ParkingLot.park(vehicle): Ticket</code>.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Contract</dfn> The precise agreement about what a caller of an API may send and what it will receive, including the behaviour that no single request reveals.</p></aside>
+<p>A complete contract states the operations, the name and type of every input and output field, which inputs are required, the status and error codes, and the behavioural guarantees that are not visible in a single request: what happens when a request is repeated, how large result sets are split into pages, how two concurrent updates interact, how much traffic a client may send, and how the contract itself will change over time. Items 23 to 28 under "Interfaces" in the self-checklist are a list of these behavioural questions.</p>
+<p>The mechanism that gives the contract its weight is independent deployment. The provider and its clients are built, released and run by different teams or organisations, on different schedules. Anything behind the contract, such as the database schema, the class structure or the caching strategy, can be changed in one deployment by the provider alone. Anything in the contract can only be changed by coordinating with every client that depends on it, and for a public API those clients are not known individually. A field name chosen in an afternoon can therefore stay in place for years, which is the reason to spend design effort on the contract out of proportion to the size of the code that implements it.</p>
+<p>The source note frames API design as belonging to two levels of design, and the remaining two terms name those levels.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>High-level design (HLD)</dfn> The description of a system as components and the connections between them, viewed from above, leaving out what happens inside each component.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Low-level design (LLD)</dfn> The description of what happens inside one component: its classes, methods, data structures and the exact behaviour of each operation. The term is inherited from the waterfall-era split between architectural design and detailed design.</p></aside>
+<p>At the HLD level, API design means naming the operations, deciding which component owns each one, choosing the protocol and deciding whether each call is synchronous or asynchronous. At the LLD level it means writing out the full contract. The operation is the same at both levels; what changes is how precisely its behaviour is written down. In the interview script in section 6 of the complete guide, the API step is given 3 minutes. The source note describes that as three minutes of a 45-minute round, but the nine step durations in the script add up to 3 + 5 + 4 + 3 + 6 + 8 + 10 + 5 + 2 = 46 minutes, so the script as written overruns its own 45-minute frame by one minute; trimming any step by a minute restores it.</p>
+<p>The confusion learners most often have with the central term is to treat an API as a list of URLs. A list of endpoints is the HLD view of the API, and it is the right amount of detail in the first minutes of a design discussion, but it says nothing about the behaviour that causes failures in production: a payment request retried after a timeout, two editors saving the same record, a client paging through a list while rows are inserted, or an old mobile app meeting a renamed field. A second, related confusion is to equate API with HTTP. Method signatures between classes, gRPC services and events on a message stream are all APIs, and the contract questions apply to each of them.</p>
+</section><section class="sec" id="http-semantics-the-contract-builds-on"><p class="kicker">§2 · RFC 9110</p><h2>HTTP semantics the contract builds on</h2>
+<p>This section covers a prerequisite that the source notes assume without explaining. Most network APIs are carried over HTTP, and the later sections on retries, idempotency and conditional updates rely on properties that HTTP already defines. The current definition is RFC 9110, <em>HTTP Semantics</em>, published by the IETF in 2022, which consolidated material previously spread over several older RFCs.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>HTTP method</dfn> The verb of an HTTP request, such as <code>GET</code>, <code>PUT</code> or <code>POST</code>, stating what the client wants done to the target URL.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Safe method</dfn> An HTTP method whose semantics are read-only, so the client requests no change of state on the server: <code>GET</code>, <code>HEAD</code> and <code>OPTIONS</code>.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Idempotent method</dfn> An HTTP method for which the intended effect on the server of several identical requests is the same as the effect of one: the safe methods plus <code>PUT</code> and <code>DELETE</code>.</p></aside>
+<p>An HTTP method is the verb of a request, the part that says what the client wants done to the target URL. HTTP classifies methods by two properties that clients, proxies and libraries are allowed to rely on. A safe method is one whose semantics are read-only: the client does not request any change of state on the server, so <code>GET</code>, <code>HEAD</code> and <code>OPTIONS</code> can be sent speculatively, prefetched or cached. An idempotent method is one where the intended effect on the server of several identical requests is the same as the effect of one. Every safe method is idempotent, and so are <code>PUT</code>, which replaces the target with the supplied representation, and <code>DELETE</code>, which removes it. <code>POST</code> and <code>PATCH</code> are not idempotent in general, because <code>POST</code> typically creates something new on each call and <code>PATCH</code> may express a relative change such as "add one item".</p>
+<p>The reason these properties exist is the ambiguity of a lost response. When a connection drops after a request has been sent, the client cannot tell whether the server processed it. HTTP allows a client or proxy to resend an idempotent request automatically in that situation, because doing so cannot change the outcome; it does not allow the same for <code>POST</code>. The property concerns the effect on server state, not the response. A second <code>DELETE</code> for the same order may return <code>404 Not Found</code> while the first returned <code>204 No Content</code>, and the method is still idempotent, because the server's state after both calls is the same as after one. The idempotency note presents returning <code>204</code> rather than <code>404</code> on the repeat as a rule; under RFC 9110 both responses conform, so it is a design choice. Returning <code>204</code> makes a retried delete look identical to a first delete, which simplifies clients that retry; returning <code>404</code> tells the truth about the current state. Either is acceptable if the contract states which one the API uses.</p>
+<p>The following table sets out the methods an API contract normally uses against the safe and idempotent properties, and adds whether a client can retry a request with no extra mechanism. It is useful because the last column is the one that decides where idempotency keys, covered in "Idempotency keys", are needed.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Safe</th>
+<th>Idempotent</th>
+<th>Typical use</th>
+<th>Retry after an ambiguous failure without extra mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Read a resource or collection</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>Replace a resource with a full representation</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>Remove a resource</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td>No</td>
+<td>Not in general</td>
+<td>Change part of a resource</td>
+<td>Only if the patch sets absolute values</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td>No</td>
+<td>No</td>
+<td>Create a resource or trigger an action</td>
+<td>No; needs an idempotency key or a client-supplied identity</td>
+</tr>
+</tbody>
+</table></div>
+<p>Read down the last column and the pattern is that the operations which create or change something relative to its current state are the ones that need help. That is the same split the idempotency note draws between absolute writes, which are safe to repeat, and relative writes, creates, appends and external effects, which are not.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Status code</dfn> The three-digit number at the start of an HTTP response, whose first digit gives the class of outcome: 2xx success, 3xx further action, 4xx client error, 5xx server error.</p></aside>
+<p>A status code is the three-digit number at the start of every HTTP response, and its first digit gives the class of outcome. <code>2xx</code> means the request succeeded, for example <code>200 OK</code>, <code>201 Created</code> with a <code>Location</code> header naming the new resource, <code>202 Accepted</code> for work that has been queued, and <code>204 No Content</code>. <code>3xx</code> means the client must take a further action such as following a redirect, and <code>304 Not Modified</code> tells a client its cached copy is still current. <code>4xx</code> means the request itself is at fault, so repeating it unchanged will normally fail again: <code>400 Bad Request</code>, <code>401 Unauthorized</code> for missing or invalid credentials, <code>403 Forbidden</code>, <code>404 Not Found</code>, <code>409 Conflict</code>, <code>412 Precondition Failed</code>, <code>422 Unprocessable Content</code> and <code>429 Too Many Requests</code>. <code>5xx</code> means the server failed, so the same request may succeed later: <code>500 Internal Server Error</code>, <code>502 Bad Gateway</code>, <code>503 Service Unavailable</code> and <code>504 Gateway Timeout</code>. The class is a first approximation of whether to retry; "Errors and retry safety" refines it, because <code>429</code> is a client-class code that should be retried and a <code>500</code> received after a non-idempotent request should not be blindly repeated.</p>
+</section><section class="sec" id="resources-and-the-api-surface"><p class="kicker">§3 · Surface</p><h2>Resources and the API surface</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>REST</dfn> Representational State Transfer, the architectural style Roy Fielding described in 2000, in which clients act on resources identified by URLs by transferring representations of them with a uniform set of methods.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Resource</dfn> A noun of the domain, such as an order or a short link, identified by a URL and acted on through HTTP methods.</p></aside>
+<p>With the method vocabulary in place, the next step is deciding what the API's operations act on. For HTTP APIs the prevailing answer is REST, short for Representational State Transfer, the architectural style that Roy Fielding described in his doctoral dissertation in 2000. A REST API is organised around resources, the nouns of the domain, each identified by a URL. Clients act on a resource by transferring representations of it, usually JSON documents, using the uniform set of HTTP methods. The nouns go in the URL and the verbs come from the method, so <code>POST /urls</code> creates a short link, <code>GET /urls/{code}</code> reads one, <code>DELETE /urls/{code}</code> removes one and <code>GET /users/{id}/urls</code> lists the links a user owns. Nesting a collection under its owner, as in that last URL, expresses ownership in the address itself.</p>
+<p>Not every operation is a create, read, update or delete. Cancelling an order, for example, is an action with its own rules. There are two established ways to express it. The first models the action as a resource of its own, <code>POST /orders/{id}/cancellations</code>, which gives the cancellation an identity, a timestamp and a place to record a reason. The second, used in Google's API design guidance, is a custom method written as <code>POST /orders/{id}:cancel</code>. Both keep the noun-based structure; what to avoid is drifting into verb-named URLs such as <code>/cancelOrder</code>, which reintroduce one-off conventions for every action.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Access pattern</dfn> A specific read or write the system performs, together with how often it happens; the set of access patterns justifies the data model and the choice of datastore.</p></aside>
+<p>The order in which the surface is designed matters because the API and the data model depend on each other in both directions. A four-step process resolves this dependency. A short list of entity names comes first, because REST resources are those entities, and agreeing on the nouns before writing endpoints prevents the same thing being called <code>/links</code> in one place and <code>/short-urls</code> in another. The API surface comes second, because each endpoint is a read or a write the storage layer must serve. Those reads and writes, with their frequencies, are the access patterns of the system, and the data model and choice of datastore come third because they can only be justified by access patterns. The architecture comes fourth. The diagram below shows that flow for the URL shortener used in the source notes.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> core entities        API surface            access patterns          data model and store        architecture
+ User, ShortUrl,  ──► POST /urls         ──► lookup one record    ──► key-value store,        ──► cache on the read path,
+ Click                GET /{code}            by key, read-heavy       partitioned on              writes to the store
+                      GET /users/{id}/urls   list by owner            short_code; index on
+                                                                      owner_id
+        ▲                                                                   │
+        └────────── a missing endpoint discovered while modelling data ◄────┘</code></pre></div></figure>
+<p>Read the diagram from left to right: each box supplies the reasons for the next one, so the key-value store is justified by the single-key lookup, which is justified by <code>GET /{code}</code>, which exists because of the <code>ShortUrl</code> entity. The return arrow records that the process is not strictly linear. Modelling the data often exposes a query no endpoint asked for, such as listing a user's links, and the right response is to add the endpoint rather than treat the API as finished.</p>
+<p>Granularity is the remaining surface decision, and it is one the source notes do not discuss. Every API call across a network costs at least one round trip, so an API whose operations are too fine-grained forces clients into long sequences of calls. A mobile screen that shows an order with its items and their product names should not need one call for the order, one per item and one per product, which is the API-level form of the N+1 query problem: one call to get a list, then N further calls for its members. The usual remedies are to shape operations around what a client needs to accomplish, to let a client request related data in one call, for example with an <code>expand=items.product</code> parameter, or to provide a batch endpoint. The opposite error, one large operation that returns everything, wastes bandwidth and couples every client to the full response shape, which is part of the motivation for GraphQL in "Choosing an API style".</p>
+</section><section class="sec" id="choosing-an-api-style"><p class="kicker">§4 · Checklist item 23</p><h2>Choosing an API style</h2>
+<p>Once the operations are known, item 23 of the self-checklist asks which style should carry them. The source notes name four options, REST, gRPC, GraphQL and events on a message stream, without comparing them, so this section goes beyond the notes.</p>
+<p>REST over HTTP with JSON bodies was introduced under "Resources and the API surface". Its strengths come from HTTP itself: every language and tool can call it, responses to <code>GET</code> can be cached by browsers, proxies and content delivery networks, and a request can be inspected and replayed with a command-line tool. Its contract is usually written in OpenAPI, a machine-readable description format, but nothing forces the implementation to match the description.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>gRPC</dfn> A remote procedure call framework, open-sourced by Google in 2015, that presents network requests as function calls carried over HTTP/2.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Protocol Buffers</dfn> Google's schema language and binary encoding, from which gRPC generates client and server code that enforces the contract.</p></aside>
+<p>gRPC is a remote procedure call framework that Google open-sourced in 2015, derived from its internal system called Stubby; the leading "g" is officially left undefined. A remote procedure call presents a network request as if it were a function call, <code>orders.GetOrder(GetOrderRequest)</code>, and gRPC carries those calls over HTTP/2. The contract is written in Protocol Buffers, Google's schema language and binary encoding, from which client and server code is generated in each language. The generated code enforces the contract at compile time, the binary encoding is smaller and faster to parse than JSON, and HTTP/2 allows streaming in either direction. The costs are that browsers cannot call gRPC directly without a translating proxy, messages are not human-readable, and long-lived HTTP/2 connections need request-level load balancing.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>GraphQL</dfn> A query language for APIs, published by Facebook in 2015, in which a client sends a query naming exactly the fields it wants from a typed schema exposed at one endpoint.</p></aside>
+<p>GraphQL is a query language for APIs developed at Facebook from 2012 and published in 2015. The server exposes a typed schema of objects and their relationships through a single endpoint, and each client sends a query naming exactly the fields it wants, so one request can fetch an order, its items and their product names. That removes over-fetching (receiving fields the client does not use) and under-fetching (needing several calls), which matters when many different clients, such as web, iOS and Android, need different shapes of the same data. The costs move to the server: one innocent-looking query can fan out into thousands of database reads, so the server needs query cost limits and batching, and because queries are usually sent as <code>POST</code> requests to one URL, ordinary HTTP caching does not apply.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Webhook</dfn> An HTTP request that a service sends to an endpoint you expose when an event happens, delivered at least once and in no guaranteed order.</p></aside>
+<p>Event-based interfaces invert the direction of the call. Instead of a client asking for something, a producer publishes a fact that has happened, such as <code>OrderPlaced</code>, and consumers react to it in their own time. Inside a system the events travel over a broker such as Kafka; across organisational boundaries the usual form is the webhook, an HTTP request that a service sends to an endpoint you expose when an event happens, so that you learn of it without polling. The webhook glossary entry records the contract that comes with this style: delivery is at least once and possibly out of order, so receivers need signature checks, deduplication on the event identifier and a periodic reconciliation against the sender's API.</p>
+<p>The following table compares the four styles across the dimensions that usually decide between them. It is useful because each style is strong where another is weak, so the choice depends on who the clients are.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>REST over HTTP</th>
+<th>gRPC</th>
+<th>GraphQL</th>
+<th>Events and webhooks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Direction</td>
+<td>Client asks, server answers</td>
+<td>Client asks, server answers, optional streams</td>
+<td>Client asks, server answers</td>
+<td>Producer pushes facts to consumers</td>
+</tr>
+<tr>
+<td>Contract definition</td>
+<td>OpenAPI document, often optional</td>
+<td>Protocol Buffers schema, enforced by generated code</td>
+<td>Typed schema, enforced by the server</td>
+<td>Event schema, often in a registry</td>
+</tr>
+<tr>
+<td>Encoding</td>
+<td>JSON text</td>
+<td>Binary</td>
+<td>JSON text</td>
+<td>JSON or binary</td>
+</tr>
+<tr>
+<td>HTTP caching</td>
+<td>Works for <code>GET</code></td>
+<td>Not applicable</td>
+<td>Does not apply to <code>POST</code> queries</td>
+<td>Not applicable</td>
+</tr>
+<tr>
+<td>Main cost</td>
+<td>Many calls or over-fetching for varied clients</td>
+<td>Tooling needed; no direct browser access</td>
+<td>Query cost control on the server</td>
+<td>At-least-once, unordered delivery to handle</td>
+</tr>
+<tr>
+<td>Typical fit</td>
+<td>Public and partner APIs</td>
+<td>Internal service-to-service calls</td>
+<td>Several client types aggregating data</td>
+<td>Notifying other systems of changes</td>
+</tr>
+</tbody>
+</table></div>
+<p>The table suggests a common arrangement rather than a single winner: REST for the public edge, gRPC between internal services, GraphQL as an aggregation layer in front of several services when client needs diverge, and events wherever one system must react to another without being called by it.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Synchronous operation</dfn> An operation whose caller waits for the result before continuing.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Asynchronous operation</dfn> An operation the provider accepts and queues, answering the caller before the work is done.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Long-running operation</dfn> A pattern for asynchronous work in which the provider answers <code>202 Accepted</code> with the URL of an operation resource that the client reads until it reaches a terminal state.</p></aside>
+<p>The second decision the source note places at the HLD stage is whether each operation is synchronous, meaning the caller waits for the result, or asynchronous, meaning the provider accepts the request, queues the work and answers before it is done. The choice shapes the architecture, because an asynchronous operation needs a queue and a worker pool. It belongs in the contract as well, because the client needs a way to learn the outcome. The established pattern, beyond the source notes, is the long-running operation: the provider answers <code>202 Accepted</code> with a <code>Location</code> header pointing at an operation resource, and the client reads that resource until it reports success or failure, or registers a webhook to be told. Holding an HTTP request open for minutes instead would occupy a connection and a server thread for the whole time, and it would collide with the idle timeouts that load balancers and proxies impose. The exchange below is illustrative.</p>
+<figure class="code"><figcaption>HTTP</figcaption><div class="scroll"><pre><code>POST /reports HTTP/1.1
+Idempotency-Key: 3f6c2a9e-8d41-4b7a-9c1e-5a2d7f0b6e11  <span class="c"> # the create is a POST, so a retry needs a key (see "Idempotency keys")</span>
+Content-Type: application/json
+
+{"type": "monthly_sales", "month": "2026-10"}
+
+HTTP/1.1 202 Accepted                                   <span class="c"> # the work is queued, not done</span>
+Location: /operations/op_81f2                           <span class="c"> # where the client can watch progress</span>
+Retry-After: 5                                          <span class="c"> # suggested polling interval in seconds</span>
+
+GET /operations/op_81f2 HTTP/1.1
+
+HTTP/1.1 200 OK
+{"id": "op_81f2", "status": "succeeded",                <span class="c"> # status moves pending -&gt; running -&gt; succeeded or failed</span>
+ "result": "/reports/rep_5521"}                         <span class="c"> # the finished resource has its own URL</span></code></pre></div></figure>
+<p>The diagram below shows the states the operation resource moves through, which is what the client's polling observes.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> 202 Accepted ──► pending ──► running ──► succeeded  (result URL present)
+                                  │
+                                  └─────► failed     (problem details present)</code></pre></div></figure>
+<p>Read it as the lifecycle the contract promises: every operation starts at <code>pending</code>, passes through <code>running</code>, and ends in exactly one of the two terminal states, which never change afterwards. Because the terminal states are final, a client that loses track of an operation can always recover by reading it again.</p>
+</section><section class="sec" id="errors-and-retry-safety"><p class="kicker">§5 · Checklist item 27</p><h2>Errors and retry safety</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Retryable error</dfn> A failure after which repeating the same request can succeed and is safe to attempt.</p></aside>
+<p>Resource design and the choice of style describe what happens when calls succeed; item 27 of the self-checklist asks what the API returns when they fail, and whether clients can tell which failures are safe to retry. A client receiving an error needs answers to two questions: did the operation take effect, and would trying again help? A retryable error is one where the answer to the second question is yes. Sorting failures by those two questions gives three groups, which the status code classes from "HTTP semantics the contract builds on" only partly separate.</p>
+<p>Permanent failures are those where the request is wrong or not allowed, such as <code>400</code>, <code>401</code>, <code>403</code>, <code>404</code> and <code>422</code>. The operation did not take effect and repeating it unchanged will fail again, so the client should not retry. Transient failures are those where the server refused the request before doing anything, such as <code>429 Too Many Requests</code> and <code>503 Service Unavailable</code>. The operation did not take effect and repeating it later should work, ideally after the delay the server names in a <code>Retry-After</code> header. Ambiguous failures are those where the client cannot know whether the operation took effect: a timeout, a dropped connection, a <code>502</code> or <code>504</code> from a gateway, or a <code>500</code> after the server had started work. For an idempotent operation the client can simply retry. For a non-idempotent one, a retry may perform the operation twice, and the only safe options are an idempotency key, described in "Idempotency keys", or reading the state to find out what happened. The ambiguous group is the reason idempotency is part of API design rather than an implementation detail.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Problem details</dfn> The standard JSON error body defined in RFC 9457, with the media type <code>application/problem+json</code> and the members <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code> and <code>instance</code>.</p></aside>
+<p>A status code alone is too coarse for a client to act on, so the contract also fixes the shape of the error body. The standard format is problem details, defined in RFC 9457 (2023), which replaced RFC 7807. A problem-details body has the media type <code>application/problem+json</code> and the members shown in the illustrative example below.</p>
+<figure class="code"><figcaption>JSON</figcaption><div class="scroll"><pre><code>{
+  "type": "https://api.example.com/problems/insufficient-stock",
+  "title": "Not enough stock",
+  "status": 409,
+  "detail": "Only 2 units of SKU 8812 are available; 5 were requested.",
+  "instance": "/orders/req_7c1d",
+  "available": 2
+}</code></pre></div></figure>
+<p>The <code>type</code> URI is the stable, machine-readable identifier of the error and is the part clients branch on; <code>title</code> is a short human summary of that type; <code>status</code> repeats the HTTP status; <code>detail</code> explains this occurrence for a human and should not be parsed by programs; <code>instance</code> identifies the specific request; and extension members such as <code>available</code> carry data the client can use to recover. Because <code>type</code> is part of the contract, adding a new error type is a contract change that clients must be able to tolerate, a point taken up in "Versioning and evolution".</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Exponential backoff</dfn> A retry policy that lengthens the wait between attempts geometrically, for example 100, 200 and 400 ms.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Jitter</dfn> Randomisation of each retry wait, so that clients that failed together do not retry together.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Retry amplification</dfn> The multiplication of load on a lower service when several layers of a call chain each retry: k layers making n attempts each send up to n^k calls.</p></aside>
+<p>The client side of the contract is the retry policy. Exponential backoff lengthens the wait between attempts geometrically, for example 100, 200 and 400 ms, so that a struggling server receives less traffic the longer it struggles. Jitter randomises each wait so that thousands of clients that failed at the same moment do not retry at the same moment; with full jitter a client sleeps a random time between zero and min(cap, base × 2^attempt). Even with both, retries add load exactly when the provider is least able to absorb it, and the effect multiplies when several layers of a call chain each retry, a pattern called retry amplification.</p>
+<h3 class="worked"><span>Worked example</span>retry amplification across layers</h3>
+<p>The retry glossary entry states that three layers making three attempts each can send 27 calls to the bottom service. To trace it, consider a request path client → gateway → order service → inventory service, in which the client, the gateway and the order service each make up to three attempts at the next hop, and suppose the inventory service is failing every call.</p>
+<ol>
+<li>The order service, invoked once, calls the inventory service up to 3 times.</li>
+<li>The gateway, invoked once, calls the order service up to 3 times, and each of those makes up to 3 inventory calls, giving 3 × 3 = 9 inventory calls.</li>
+<li>The client calls the gateway up to 3 times, and each of those produces up to 9 inventory calls, giving 3 × 9 = 27 inventory calls for one user action.</li>
+</ol>
+<p>In general, k retrying layers with n attempts each give up to n^k calls at the bottom, and 3^3 = 27 checks the figure. As an assumption for scale, take a base load of 1,000 user requests per second: a full outage of the inventory service then turns it into 1,000 × 27 = 27,000 calls per second against a service that is already failing. The glossary's remedies follow directly from the arithmetic. Retrying at one layer only, usually the outermost layer or the one that holds the idempotency key, brings the multiplier back to 3, or 3,000 calls per second. A retry budget that caps retries at 10% of a client's traffic bounds it further, to 1,000 + 0.10 × 1,000 = 1,100 calls per second, regardless of how many layers retry.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Deadline propagation</dfn> Passing the remaining time budget down a call chain, so that downstream services stop working once the original caller can no longer use the result.</p></aside>
+<p>Retries also need time limits, and deadline propagation supplies them across a chain: each caller passes the remaining time budget down, so downstream services stop working on a request once the original caller can no longer use the answer. In the glossary's example a gateway sets an 800 ms deadline, the order service spends 200 ms and forwards the remaining 800 − 200 = 600 ms, and the inventory service abandons its query at 600 ms rather than at its own default of 2 seconds. gRPC carries deadlines in the protocol; an HTTP API has to carry them in a header of its own and say so in the contract.</p>
+</section><section class="sec" id="idempotency-keys"><p class="kicker">§6 · Checklist item 26</p><h2>Idempotency keys</h2>
+<p>Retrying an ambiguous failure is safe only if a repeated request has no further effect, and item 26 of the self-checklist asks whether the API supports idempotency keys to make that so. The term idempotency comes from mathematics, where an operation is idempotent if applying it twice gives the same result as applying it once; the HTTP sense in "HTTP semantics the contract builds on" applies the same idea to the effect of a request on server state.</p>
+<p>The idempotency note orders four mechanisms from cheapest to strongest, and the order matters because the first three need no extra infrastructure. Natural idempotency sends absolute state rather than changes, <code>quantity = 3</code> rather than <code>quantity -= 1</code>, so a repeat writes the same value. A natural key with a unique constraint lets the database reject the duplicate, for example a chat message carrying a client-generated <code>client_msg_id</code>. A conditional write applies an update only if the version is still the one the client read, which is the subject of "Conditional requests and concurrent updates". Only when none of these can express the operation, for example a payment that calls an external provider or a create with no natural identity, does the API need an explicit key.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Idempotency key</dfn> A client-generated identifier, sent with a non-idempotent request and reused on every retry, that lets the server recognise a repeat and return the original result.</p></aside>
+<p>An idempotency key is a client-generated identifier, sent with a non-idempotent request, that lets the server recognise a repeat of that request and return the original result instead of performing it again. The conventional carrier is an <code>Idempotency-Key</code> request header; the idempotency note records that this is an IETF Internet-Draft (draft-07 in October 2025) on the standards track rather than a published RFC, and that Stripe, Adyen and PayPal all use the same header name. Five rules from the note define a correct implementation, and each follows from the ambiguous failure the key exists to resolve.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Request fingerprint</dfn> A hash of the canonicalised request body, stored with an idempotency key so that the same key arriving with a different body is rejected.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Dedup window</dfn> The period during which the server still recognises a duplicate request; after it, the key is forgotten.</p></aside>
+<p>The client generates the key before the first attempt and reuses it unchanged on every retry, typically as a random version 4 UUID. A key generated per attempt deduplicates nothing, and a key generated by the server is useless because the client that timed out never received it. The key is unique within a scope of (account, operation, key) rather than globally, so that one customer's key can neither collide with nor reveal another's. The server stores the status code and body of the first attempt and replays them verbatim on a repeat, including error responses; a table that only records "seen" stops the duplicate effect but leaves the retrying client without the answer it lost. The server also stores a request fingerprint, a hash of the canonicalised request body, and treats the same key arriving with a different body as an error, <code>422 Unprocessable Content</code>, because silently replaying the old response would drop a genuine request while reporting success. Finally, the server keeps keys for a dedup window, the period during which a duplicate is still recognised, and that window must be longer than the longest time a client might go on retrying. The note cites Stripe's published contract as the model: keys are pruned once they are at least 24 hours old, and a key reused after pruning is treated as a new request.</p>
+<p>Concurrency is where implementations most often fail, and the note's three-state model handles it. The diagram below shows the states a key row moves through and the response each state produces.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code>                     first request
+   (no row) ─────────────────────────────► in_flight ─────── effect completes ───────► completed
+       ▲                                       │                                         │
+       │                    duplicate arrives  │                    duplicate arrives,   │  duplicate arrives,
+       │                    ─► 409 Conflict ◄──┘                    same fingerprint     │  different fingerprint
+       │                                                            ─► replay stored ◄───┤  ─► 422
+       │                                                               status and body   │
+       └───────────────────────────── dedup window expires ──────────────────────────────┘</code></pre></div></figure>
+<p>Read the diagram as the server's decision for each arriving request with a given key: with no row it processes normally; while the first attempt is still running it answers <code>409 Conflict</code>, or briefly waits and checks again; after completion it replays or rejects depending on the fingerprint; and once the window expires the key is forgotten. The note's HTTP contract adds one more case, a missing key on an endpoint that requires one, which is <code>400 Bad Request</code>.</p>
+<p>The key row must be created atomically with the check, which is the failure mode the glossary entry records: if the server checks for the key and inserts it in separate, non-atomic steps, two concurrent duplicates both pass the check. A unique constraint on (account, operation, key) makes the database arbitrate. When the whole effect is a database write, the key row and the effect can be inserted in one transaction, and a concurrent duplicate's insert waits on the constraint until the first transaction commits. When the effect includes an external call, such as charging a card, a transaction cannot stay open across it, so the <code>in_flight</code> row is committed on its own first, the call is made, and the stored result and <code>completed</code> state are written afterwards. That variant goes beyond the source note and adds a recovery duty: a row left <code>in_flight</code> by a crashed server must eventually be resolved, by checking the external provider for the outcome or by expiring the row. The illustrative Spring sketch below shows the single-transaction case.</p>
+<figure class="code"><figcaption>Java</figcaption><div class="scroll"><pre><code>@Transactional                                                   <span class="c">// key row and order commit or roll back together</span>
+public StoredResponse placeOrder(String accountId, String key, OrderRequest req) {
+    String fingerprint = sha256(canonicalJson(req));             <span class="c">// detects the same key reused with a different body</span>
+    <span class="c">// Unique constraint on (account_id, operation, idem_key) makes this insert the atomic check.</span>
+    <span class="c">// DO UPDATE with a no-op assignment, rather than DO NOTHING, so RETURNING yields the row on conflict too.</span>
+    IdemRow row = jdbc.queryForObject("""
+        INSERT INTO idempotency_keys (account_id, operation, idem_key, fingerprint, state, created_at)
+        VALUES (?, 'place_order', ?, ?, 'in_flight', now())
+        ON CONFLICT (account_id, operation, idem_key) DO UPDATE SET idem_key = EXCLUDED.idem_key
+        RETURNING fingerprint, state, status_code, body, (xmax = 0) AS inserted
+        """, IdemRow.MAPPER, accountId, key, fingerprint);
+
+    if (!row.inserted()) {                                       <span class="c">// a previous attempt with this key exists</span>
+        if (!row.fingerprint().equals(fingerprint)) return StoredResponse.problem(422, "idempotency-key-reused");
+        return StoredResponse.of(row.statusCode(), row.body());  <span class="c">// completed: replay the first result verbatim</span>
+    }
+    Order order = orders.create(accountId, req);                 <span class="c">// the effect, inside the same transaction</span>
+    StoredResponse response = StoredResponse.created(order);     <span class="c">// 201 with the order body and Location header</span>
+    jdbc.update("UPDATE idempotency_keys SET state = 'completed', status_code = ?, body = ? " +
+                "WHERE account_id = ? AND operation = 'place_order' AND idem_key = ?",
+                response.status(), response.json(), accountId, key);   <span class="c">// store the response, not just a flag</span>
+    return response;
+}</code></pre></div></figure>
+<p>The comment on the insert records a PostgreSQL detail from the idempotency note: <code>INSERT … ON CONFLICT DO NOTHING RETURNING *</code> returns no rows on a conflict, so the code would be unable to read the stored response; the no-op <code>DO UPDATE</code> makes <code>RETURNING</code> fire in both cases. In this single-transaction form a concurrent duplicate never observes <code>in_flight</code>, because it waits on the constraint and then sees <code>completed</code>. The <code>xmax = 0</code> test is a PostgreSQL-specific way of telling a fresh insert from a conflict. The note adds one more rule that the sketch respects by placing validation before this method: requests that fail validation are not recorded, so a client that sent a malformed request can correct it and retry with the same key.</p>
+<h3 class="worked"><span>Worked example</span>sizing the dedup window</h3>
+<p>The dedup window has a storage cost proportional to request rate and retention, and this calculation shows how to estimate it. The figures are assumptions for illustration, not values from the source notes.</p>
+<ol>
+<li>Assumption: the order-creation endpoint receives an average of 200 keyed requests per second.</li>
+<li>Assumption: the dedup window is 24 hours, matching the Stripe contract cited in the idempotency note. That is 24 × 3,600 = 86,400 seconds.</li>
+<li>Keys held at steady state: 200 × 86,400 = 17,280,000 rows.</li>
+<li>Assumption: each row holds the key, scope, fingerprint, state, status code and a stored response body, about 2,000 bytes in total.</li>
+<li>Storage: 17,280,000 × 2,000 = 34,560,000,000 bytes, about 34.6 GB.</li>
+</ol>
+<p>To check the figure, work from the other direction: one hour holds 200 × 3,600 = 720,000 rows, or 720,000 × 2,000 = 1.44 × 10^9 bytes, and 24 hours of that is 24 × 1.44 GB = 34.56 GB, which matches. The calculation shows which parameters to negotiate: doubling the window to 48 hours doubles the storage to about 69.1 GB, while storing a short summary instead of the full response body, say 500 bytes per row, cuts it to 17,280,000 × 500 = 8.64 GB. It also shows why the window is a stated policy: the storage is bounded only because old keys are deleted, and the contract must say what a retry after deletion does.</p>
+</section><section class="sec" id="conditional-requests-and-concurrent-updates"><p class="kicker">§7 · ETag and If-Match</p><h2>Conditional requests and concurrent updates</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Lost update</dfn> A concurrency failure in which two clients read the same version, both write, and the second write silently overwrites the first.</p></aside>
+<p>Idempotency keys protect a client from its own repeated requests; a different failure arises when two clients change the same resource. In a lost update, two clients read version 4 of a record, each makes a change, and both write back; the second write silently overwrites the first, and neither client is told. The source notes cover the general mechanism in the glossary entry on optimistic and pessimistic concurrency control, and this section applies it to the HTTP contract, which goes beyond the notes.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Optimistic concurrency control</dfn> Letting writers proceed without locks and checking at write time, usually by version number, that the data has not changed since it was read.</p></aside>
+<p>Optimistic concurrency control lets every client proceed without locking and checks at write time that the data has not changed since it was read, usually by comparing a version number. The alternative, pessimistic control, locks the record before changing it so that other writers wait; it suits heavy contention but does not fit an API well, because a lock held between a client's read and its later write would last as long as the client takes, which the provider does not control.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>ETag</dfn> Short for entity tag: a response header identifying one version of a resource's representation, such as <code>ETag: "v4"</code>.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Conditional request</dfn> A request the server performs only if a stated precondition holds, such as <code>If-Match: "v4"</code>; a failed precondition produces <code>412 Precondition Failed</code>.</p></aside>
+<p>HTTP expresses the optimistic check with an ETag, short for entity tag, a response header that identifies one version of a resource's representation, such as <code>ETag: "v4"</code>. A client that wants to update the resource sends the tag back in an <code>If-Match</code> header, making the update a conditional request, one the server performs only if a stated precondition holds. If the current version no longer matches, the server refuses with <code>412 Precondition Failed</code>, and the client re-reads the resource, reapplies its change and tries again. A provider that wants to forbid unconditional updates altogether can answer them with <code>428 Precondition Required</code>. The illustrative exchange below shows the second of two concurrent editors being stopped.</p>
+<figure class="code"><figcaption>HTTP</figcaption><div class="scroll"><pre><code>GET /documents/42 HTTP/1.1
+
+HTTP/1.1 200 OK
+ETag: "v4"                                 <span class="c"> # both editors read version 4</span>
+
+PUT /documents/42 HTTP/1.1
+If-Match: "v4"                             <span class="c"> # editor A: apply only if still at version 4</span>
+...
+HTTP/1.1 200 OK
+ETag: "v5"                                 <span class="c"> # A's write succeeds and creates version 5</span>
+
+PUT /documents/42 HTTP/1.1
+If-Match: "v4"                             <span class="c"> # editor B: still believes version 4 is current</span>
+...
+HTTP/1.1 412 Precondition Failed           <span class="c"> # B's change is refused instead of overwriting A's</span></code></pre></div></figure>
+<p>The glossary entry describes the same check with the version carried in the request body and a <code>409 Conflict</code> response. Both forms are in use; <code>412</code> is the code HTTP defines for a failed precondition sent in a header, and <code>409</code> is the usual choice when the version travels in the body. On the server, the check must be part of the write itself, for example <code>UPDATE documents SET body = ?, version = version + 1 WHERE id = ? AND version = ?</code>, with zero rows affected meaning the precondition failed. Reading the version, comparing it in application code and then writing in a separate statement reproduces the race the check exists to prevent, which is the failure mode the glossary entry records.</p>
+<p>The same headers serve two other purposes. On reads, a client sends <code>If-None-Match: "v4"</code> and receives <code>304 Not Modified</code> with no body if its cached copy is current, which saves bandwidth. On creates, <code>PUT</code> with <code>If-None-Match: *</code> means "create only if nothing exists here", which makes a create with a client-chosen URL safe to retry. A conditional <code>PUT</code> is also the third idempotency mechanism from "Idempotency keys", with one difference in what the client sees: a retry of an update that in fact succeeded receives <code>412</code>, because the version has moved on, so the client must re-read to discover that its own change is the one that was applied.</p>
+</section><section class="sec" id="pagination"><p class="kicker">§8 · Checklist item 25</p><h2>Pagination</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Pagination</dfn> Splitting a large result into pages that a client fetches one request at a time.</p></aside>
+<p>Idempotency keys and conditional requests act on one resource at a time; collection reads raise item 25 of the self-checklist, how clients page through large result sets. Pagination is the splitting of a large result into pages that a client fetches one request at a time, and it is part of the contract because it bounds the work of every list request and determines what a client sees when the list changes underneath it.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Offset pagination</dfn> Addressing a page by its position, as in <code>LIMIT 50 OFFSET 100</code>, which makes the database read and discard every skipped row.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Keyset pagination</dfn> Fetching the rows after the last key the client saw, as in <code>WHERE id &gt; :last ORDER BY id LIMIT 50</code>, so every page starts with an index seek.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cursor</dfn> An opaque token returned with a page that encodes the position of its last row; the client sends it back to get the next page.</p></aside>
+<p>Offset pagination addresses a page by its position, as in <code>?page=3&amp;size=50</code>, which the server translates into <code>LIMIT 50 OFFSET 100</code>. It is simple and lets a user jump to any page number, but the database cannot jump to row 100: it must walk the sorted index from the start, read the skipped rows and discard them. Keyset pagination instead asks for the rows after the last key the client saw, as in <code>WHERE id &gt; :last ORDER BY id LIMIT 50</code>, so every page starts with an index seek to a known key. The client does not handle the key directly; the API returns an opaque cursor, a token encoding the position, and the client sends it back to get the next page. The contract below is illustrative.</p>
+<figure class="code"><figcaption>HTTP</figcaption><div class="scroll"><pre><code>GET /orders?limit=50 HTTP/1.1
+
+HTTP/1.1 200 OK
+{
+  "items": [ ... 50 orders, newest first ... ],
+  "next_cursor": "eyJjIjoiMjAyNi0xMS0wNFQxMDoxNTowMloiLCJpIjo5ODEyMn0"  <span class="c"> # opaque to the client</span>
+}
+
+GET /orders?limit=50&amp;cursor=eyJjIjoiMjAyNi0xMS0wNFQxMDoxNTowMloiLCJpIjo5ODEyMn0 HTTP/1.1</code></pre></div></figure>
+<figure class="code"><figcaption>SQL</figcaption><div class="scroll"><pre><code><span class="c">-- The cursor decodes to the sort key of the last row returned: created_at and id.</span>
+<span class="c">-- Index required: (created_at DESC, id DESC); id breaks ties so the order is total.</span>
+SELECT id, created_at, total
+FROM orders
+WHERE (created_at, id) &lt; (:last_created_at, :last_id)   <span class="c">-- resume strictly after the last row seen</span>
+ORDER BY created_at DESC, id DESC                        <span class="c">-- must match the index and the cursor's key</span>
+LIMIT 50;                                                <span class="c">-- page size; no OFFSET, so no rows are skipped over</span></code></pre></div></figure>
+<p>Three details in the sketch carry the correctness of the design. The sort key must be unique, which is why <code>id</code> follows <code>created_at</code>: the glossary entry's failure mode is paging on a non-unique column alone, so that rows sharing a timestamp at a page boundary are skipped or shown twice. The cursor is opaque, here base64-encoded JSON, so the provider can change what it encodes without breaking clients; it should also record the sort order and filters it was issued for, and be signed or validated, so that a client cannot combine a cursor with a different query. The end of the list is signalled by the absence of <code>next_cursor</code>, rather than by a total count, because counting every matching row costs as much as reading them all.</p>
+<h3 class="worked"><span>Worked example</span>the cost of deep pages</h3>
+<p>The keyset pagination glossary entry compares page 2,000 under the two schemes with a page size of 50. The arithmetic below recomputes it.</p>
+<ol>
+<li>Page 2,000 starts after (2,000 − 1) × 50 = 99,950 rows, so offset pagination issues <code>LIMIT 50 OFFSET 99950</code>.</li>
+<li>The database reads the 99,950 skipped rows and then the 50 returned rows, 99,950 + 50 = 100,000 rows in total, to return 50.</li>
+<li>Keyset pagination seeks directly to the last key and reads 50 rows, the same as for page 1.</li>
+</ol>
+<p>The glossary entry writes the offset for page 2,000 as <code>OFFSET 100000</code>; the offset is 99,950, and 100,000 is the number of rows read including the page itself, so the entry's cost figure stands while its offset is out by one page. The comparison grows when a client pages through the whole list, as an export job does. Under offset pagination page k reads 50k rows, so 2,000 pages read 50 × (1 + 2 + … + 2,000) = 50 × (2,000 × 2,001 ÷ 2) = 50 × 2,001,000 = 100,050,000 rows. Under keyset pagination they read 2,000 × 50 = 100,000 rows. The ratio is 100,050,000 ÷ 100,000 = 1,000.5, so the full traversal costs about a thousand times as much with offsets, and the cost grows with the square of the number of pages rather than linearly.</p>
+<h3 class="worked"><span>Worked example</span>a list that changes during paging</h3>
+<p>Cost is one reason to prefer cursors; the self-checklist gives the other, that cursor pagination stays correct while data changes. Take a newest-first list paged 50 at a time, and number the items by their rank when the client fetched page 1, so page 1 contained items 1 to 50.</p>
+<ol>
+<li>Before the client asks for page 2, three new items are inserted at the top of the list. Every existing item moves down three ranks.</li>
+<li>Offset pagination requests <code>OFFSET 50</code>, which now returns the items in current ranks 51 to 100. Those are the items originally ranked 51 − 3 = 48 to 100 − 3 = 97.</li>
+<li>Items 48, 49 and 50 therefore appear on page 2 a second time.</li>
+<li>If instead three items from page 1 had been deleted, every later item would move up three ranks, <code>OFFSET 50</code> would return the items originally ranked 54 to 103, and items 51, 52 and 53 would never be shown.</li>
+<li>Keyset pagination resumes after the key of item 50 in both cases, so it returns items 51 to 100 with no repeats and no gaps. The three new items are not shown in this pass; a client sees them when it starts again from the top.</li>
+</ol>
+<p>The trade-off the glossary entry records is the price of that correctness: with cursors a reader cannot jump to an arbitrary page number. Interfaces that need numbered pages, such as an admin table, can use offsets over small or stable result sets, while feeds, sync endpoints and exports should use cursors.</p>
+</section><section class="sec" id="versioning-and-evolution"><p class="kicker">§9 · Checklist item 24</p><h2>Versioning and evolution</h2>
+<p>The subtopics on resources, errors, idempotency and pagination design a contract at one moment; item 24 of the self-checklist asks how it will change without breaking the clients that already use it. The source notes list versioning as a contract decision without describing it, so this section is drawn from established practice.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Breaking change</dfn> A change to a contract that makes a correctly written existing client fail or behave wrongly.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Backward compatibility</dfn> The property of a new version that every client written against the old version still works.</p></aside>
+<p>A breaking change is a change to the contract that makes a correctly written existing client fail or behave wrongly. Backward compatibility is the property of a new version that every client written against the old version still works. Removing or renaming a field, changing a field's type, making an optional input required, changing a default, tightening validation, changing which error a situation produces, and changing pagination semantics are all breaking. Adding an endpoint, adding an optional input, and adding a field to a response are normally not.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Tolerant reader</dfn> A client that reads only the fields it needs and ignores everything else, so that additions to a contract do not break it.</p></aside>
+<p>Whether additions are safe depends on clients following the tolerant reader pattern, a name Martin Fowler gave in 2011 to the practice of reading only the fields a client needs and ignoring everything else. It applies to APIs the robustness principle that Jon Postel wrote into early Internet protocol specifications around 1980: be conservative in what you send and liberal in what you accept. A client that rejects responses containing unknown fields, or that handles an enumeration with a <code>switch</code> that fails on unknown values, turns every addition into a breaking change. Adding a new value to an enumeration, such as a new order status, is the common case: it is additive for the provider and breaking for any client without a default branch, so a contract that intends to add values should say from the start that clients must handle unknown ones.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Hyrum's law</dfn> With enough users of an API, all of its observable behaviours will be depended on by somebody, whatever the contract promises.</p></aside>
+<p>Even a disciplined contract does not capture everything clients rely on. Hyrum's law, named after Hyrum Wright at Google, states that with a sufficient number of users of an API, all observable behaviours of the system will be depended on by somebody, whatever the contract promises. Response field order, the precise wording of an error message, the default sort order of a list and the typical latency of a call all become de facto contract once enough clients exist. The practical consequences are to document what is guaranteed and what is not, to avoid exposing incidental behaviour, for example by making cursors opaque rather than readable offsets, and to treat any observable change as potentially breaking when the client base is large.</p>
+<p>When a breaking change is unavoidable, the provider runs two versions side by side and moves clients from one to the other. The version can be placed in the URL path, <code>/v1/orders</code> and <code>/v2/orders</code>, which is visible, easy to route and cache, and coarse, since the whole API changes version at once. It can be placed in a header or media type, <code>Accept: application/vnd.example.v2+json</code>, which keeps URLs stable at the cost of being invisible in logs and links. A third scheme, which Stripe uses, names versions by date and pins each account to the version current when it first integrated, so the provider can make many small breaking changes while each client upgrades on its own schedule. In gRPC the contract evolves through Protocol Buffers field numbers: a field is identified on the wire by its number rather than its name, so a removed field's number is marked <code>reserved</code> and never reused, and a breaking change becomes a new package, <code>orders.v2</code>.</p>
+<p>Retiring an old version is a process with its own signals in HTTP. The diagram below shows the lifecycle of a version.</p>
+<figure class="diagram"><figcaption>Diagram</figcaption><div class="scroll"><pre><code> v1 active ──(v2 released)──► v1 deprecated ──(sunset date reached, usage near zero)──► v1 sunset
+                               Deprecation and Sunset                                    410 Gone, with a link
+                               headers on every v1 response                              to migration notes</code></pre></div></figure>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Deprecation</dfn> The stage at which a version still works but clients are told to move off it, signalled by the <code>Deprecation</code> header (RFC 9745).</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Sunset</dfn> The point at which a deprecated version stops working, announced in advance by the <code>Sunset</code> header (RFC 8594); later requests receive <code>410 Gone</code>.</p></aside>
+<p>Read the diagram left to right as the obligations at each stage. Deprecation means the version still works but clients are told to move; the <code>Deprecation</code> response header, standardised in RFC 9745 (2025), marks deprecated responses, and the <code>Sunset</code> header from RFC 8594 (2019) gives the date after which the version will stop working. Sunset is the point at which it stops, and requests then receive <code>410 Gone</code>. The arrow between the two stages carries a condition as well as a date, because the provider should measure traffic per version and per client and contact the remaining users before switching the old version off. The same expand-and-contract sequence, adding the new form, migrating every user, and only then removing the old form, is the one zero-downtime database migrations use.</p>
+</section><section class="sec" id="rate-limits-and-quotas"><p class="kicker">§10 · Checklist item 28</p><h2>Rate limits and quotas</h2>
+<p>The last interface question, item 28 of the self-checklist, asks what limits apply to each client and how they are enforced. Limits belong in the contract because clients must be designed to stay within them and to recover when they exceed them.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Rate limiting</dfn> Capping how many requests a client may make over time.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Token bucket</dfn> A rate-limiting algorithm in which a bucket refills at r tokens per second up to a capacity of b, each request consumes one token, and an empty bucket rejects requests; over t seconds a client can send at most b + r·t requests.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Burst size</dfn> The capacity b of a token bucket: the number of requests a client can send at once after a period of idleness.</p></aside>
+<p>Rate limiting caps how many requests a client may make over time. The common algorithm is the token bucket, which comes from network traffic engineering: each client has a bucket that refills at a fixed rate of r tokens per second up to a capacity of b tokens, and each request consumes one token, so a request that finds the bucket empty is rejected. The capacity b is the burst size, the number of requests a client can send at once after a period of idleness, and the rate r bounds its sustained traffic. Over any interval of t seconds a client can send at most b + r·t requests. The two parameters are kept separate because real traffic is uneven: one page load in an app may trigger a dozen calls within a few hundred milliseconds while the client's average rate stays low. A limit over a longer period, such as 10,000 requests per day, is usually called a quota; it controls total consumption rather than instantaneous load, and many APIs apply both.</p>
+<p>On the contract side, a rejected request receives <code>429 Too Many Requests</code>, defined in RFC 6585, with a <code>Retry-After</code> header saying when to try again. Many APIs also report the client's remaining allowance on every response; the IETF's httpapi working group has a draft standardising these as <code>RateLimit</code> header fields, while many providers still use their own <code>X-RateLimit-*</code> names. The contract should also state what a limit is keyed on, which may be an API key, a user, an IP address or an endpoint, and whether expensive operations cost more than one token.</p>
+<h3 class="worked"><span>Worked example</span>what a token bucket admits</h3>
+<p>The rate-limiting glossary entry gives an API that allows 100 requests per second with a bucket of 200. The calculation below traces what one client can send and how a common implementation mistake changes it.</p>
+<ol>
+<li>A client that has been idle has a full bucket of 200 tokens and can send 200 requests at once.</li>
+<li>Over t seconds it can send at most 200 + 100t requests. In the first second that is 200 + 100 × 1 = 300 requests; over 10 seconds it is 200 + 100 × 10 = 1,200.</li>
+<li>After emptying the bucket, the client must be idle for 200 ÷ 100 = 2 seconds to refill it completely.</li>
+<li>Assumption: the API runs on 4 instances behind a load balancer, and each instance enforces the limit with its own local bucket instead of a shared one. That is the failure mode the glossary entry records.</li>
+<li>Each instance admits 100 requests per second with a burst of 200, so a client whose requests are spread across all four can sustain 4 × 100 = 400 requests per second, burst 4 × 200 = 800, and send 4 × 300 = 1,200 requests in its first second.</li>
+</ol>
+<p>The check on step 5 is that it is step 2 multiplied by 4: 4 × (200 + 100 × 1) = 1,200. The effective limit grows with the number of instances, so scaling the service out silently loosens every client's limit. A global limit needs shared state, typically a counter in Redis updated atomically per request, which costs a network hop, or an approximation in which each instance enforces its share of the limit. The burst size also has to be chosen against the capacity behind the limiter and not only against one client's needs: the burst-size note's example of 1,000 clients with a burst of 50 reconnecting together after an outage produces 1,000 × 50 = 50,000 requests almost at once.</p>
+</section><section class="sec" id="common-mistakes"><p class="kicker">Review</p><h2>Common mistakes</h2>
+<p>The first mistake is designing the API as a list of endpoints and stopping there. It happens because the HLD step of an interview, and the first draft of most real designs, legitimately stops at endpoints, methods and response shapes, and that level of detail feels complete. What is correct is to treat the endpoint list as the first layer of the contract and to answer, for each operation that matters, the behavioural questions in items 23 to 28 of the self-checklist: what a retry does, how a list is paged, how concurrent updates interact, what errors mean and what limits apply. In an interview, go into those details where they change the design, such as idempotency for payments or cursors for a feed.</p>
+<p>The second mistake is making <code>POST</code> retries "safe" with an idempotency key that is generated per attempt, or with a table that records only that a key was seen. It happens because both versions pass a simple test in which one request is sent twice with a pause in between. A per-attempt key deduplicates nothing, and a seen-only table blocks the duplicate but leaves the client that timed out without the response it lost. What is correct is a key generated once by the client and reused on every retry, scoped to the account and operation, stored atomically with the effect, and paired with the stored status and body and a fingerprint of the request, as set out in "Idempotency keys".</p>
+<p>The third mistake is paging with offsets, or with a cursor on a non-unique column, for lists that are long or that change. It happens because <code>LIMIT</code> and <code>OFFSET</code> are the first pagination tool most developers learn, and the problems only appear at depth or under concurrent writes, which small test datasets do not exercise. What is correct is keyset pagination on a sort key made unique with a tiebreaker such as <code>id</code>, exposed through an opaque cursor, with offsets reserved for small or stable collections where users need page numbers.</p>
+<p>The fourth mistake is treating every addition to a contract as non-breaking. It happens because additions are harmless for tolerant readers, and providers reason about the clients they intended rather than the clients that exist. A new enumeration value breaks clients with exhaustive switches, tighter validation breaks clients that sent what used to be accepted, and Hyrum's law means that even undocumented behaviour has dependants. What is correct is to state in the contract from the start that clients must ignore unknown fields and handle unknown enumeration values, to classify each change against the list of breaking changes in "Versioning and evolution", and to measure per-version usage before removing anything.</p>
+<p>The fifth mistake is enforcing a rate limit separately on each instance. It happens because a local token bucket is simple, fast and needs no shared infrastructure, and with one instance it is correct. What is correct is to recognise that the effective limit is then multiplied by the number of instances, as the worked example in "Rate limits and quotas" shows, and to use a shared counter or an explicit per-instance share of the global limit.</p>
+</section><section class="sec" id="practice-questions"><p class="kicker">Exercises</p><h2>Practice questions</h2>
+<p>The questions that follow mix recall, calculation and application across the whole guide. Each answer is collapsed beneath its question; open it once you have worked out your own answer.</p>
+<div class="practice"><div class="qa"><p class="qlabel">Question 1 · recall</p><p class="q">Which HTTP methods are idempotent, and why does a second <code>DELETE /orders/9</code> that returns <code>404</code> not contradict the claim that <code>DELETE</code> is idempotent?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p><code>GET</code>, <code>HEAD</code>, <code>OPTIONS</code>, <code>PUT</code> and <code>DELETE</code> are idempotent; <code>POST</code> and <code>PATCH</code> are not in general. RFC 9110 defines idempotency by the intended effect on server state, not by the response. After one <code>DELETE</code> the order is gone, and after two it is still gone, so the effect is the same; the different status code reports the current state and does not change it. Returning <code>204</code> on the repeat is an equally conforming choice that makes retries indistinguishable from first attempts, and the contract should state which one the API uses.</p></div></details></div><div class="qa"><p class="qlabel">Question 2 · calculation</p><p class="q">A request passes through four services, and each of the four callers on the path makes up to 2 attempts at the next hop. The base load is 500 user requests per second. If the deepest service fails every call, how many calls per second does it receive, and what would a single retrying layer with a 10% retry budget reduce that to?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>With k retrying layers making n attempts each, the deepest service receives up to n^k calls per user request. Here that is 2^4 = 16, so 500 × 16 = 8,000 calls per second against a failing service. Restricting retries to one layer gives at most 2 calls per user request, or 1,000 per second, and a 10% retry budget caps the total at 500 + 0.10 × 500 = 550 calls per second.</p></div></details></div><div class="qa"><p class="qlabel">Question 3 · calculation</p><p class="q">An export job pages through 50,000 rows, 100 rows per page, using offset pagination. What offset does page 500 use, how many rows does that page read, and how many rows does the whole export read compared with keyset pagination?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>There are 50,000 ÷ 100 = 500 pages. Page 500 uses an offset of (500 − 1) × 100 = 49,900 and reads 49,900 + 100 = 50,000 rows to return 100. Page k reads 100k rows, so the export reads 100 × (1 + 2 + … + 500) = 100 × (500 × 501 ÷ 2) = 100 × 125,250 = 12,525,000 rows. Keyset pagination reads 500 × 100 = 50,000 rows, so offsets cost 12,525,000 ÷ 50,000 = 250.5 times as much.</p></div></details></div><div class="qa"><p class="qlabel">Question 4 · calculation</p><p class="q">A token bucket allows 20 requests per second with a burst of 60. How many requests can an idle client send in its first 5 seconds? If the service runs on 3 instances that each enforce the limit locally, what sustained rate and what 5-second total can a client reach?</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>With the bound b + r·t, the client can send 60 + 20 × 5 = 160 requests in 5 seconds. With three local buckets and requests spread across instances, the sustained rate is 3 × 20 = 60 requests per second and the burst is 3 × 60 = 180, so the 5-second total is 3 × 160 = 480, three times the intended limit.</p></div></details></div><div class="qa"><p class="qlabel">Question 5 · application</p><p class="q">A mobile client sends <code>POST /payments</code> with <code>Idempotency-Key: K</code> and a body charging £40. Describe the server's response in each of the following cases.</p><ol class="parts" type="a"><li><p>The connection drops, and the client retries with the same key and body after the first request has finished successfully.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The server finds the key row in the <code>completed</code> state with a matching fingerprint and replays the stored <code>201</code> status and body verbatim, so the client learns the payment exists and no second charge is made.</p></div></details></li><li><p>The retry arrives while the first request is still being processed.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The key row is <code>in_flight</code>, so the server answers <code>409 Conflict</code>, or waits briefly and re-checks; it must not start a second charge. The client retries later and receives the replayed result.</p></div></details></li><li><p>Because of a client bug, the same key arrives with a body charging £400.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The fingerprint does not match the stored one, so the server answers <code>422 Unprocessable Content</code>. Replaying the £40 result would tell the client that a £400 charge succeeded when it was never made.</p></div></details></li><li><p>The same key arrives three days later, after the server's 24-hour dedup window.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>The key has been pruned, so the request is treated as new and a second charge is made, which is why the window must exceed the longest client retry horizon and why the contract must state the window and this behaviour.</p></div></details></li></ol></div><div class="qa"><p class="qlabel">Question 6 · open-ended, combining subtopics</p><p class="q">Design the order API for an online shop that has a web client, iOS and Android apps, and an internal warehouse service. Cover the surface and style, order placement, payment confirmation, order history and one change you expect to make later.</p><details class="ans"><summary><span>Answer</span></summary><div class="ans-body"><p>A complete answer combines the subtopics as follows.</p>
+<ul>
+<li>Surface and style: name the entities first, <code>Customer</code>, <code>Order</code>, <code>OrderItem</code>, <code>Product</code> and <code>Payment</code>, then expose REST over HTTP to the three customer-facing clients, with <code>POST /orders</code>, <code>GET /orders/{id}</code>, <code>GET /customers/{id}/orders</code> and <code>POST /orders/{id}:cancel</code> or a cancellations sub-resource; use gRPC between the order service and the warehouse service, where both sides are internal and generated code enforces the contract. If the three clients' screens diverge, a GraphQL layer in front of the services is an option, with query cost limits.</li>
+<li>Order placement: <code>POST /orders</code> is not idempotent, so require an <code>Idempotency-Key</code> generated once per checkout attempt, scoped to the customer, stored with the response and a fingerprint, and kept for a stated window such as 24 hours. A client-generated order identifier could serve as a natural key with a unique constraint instead, which is the cheaper mechanism when the client can supply an identity.</li>
+<li>Payment confirmation: the payment provider reports outcomes by webhook, so the receiving endpoint verifies signatures, deduplicates on the provider's event identifier and reconciles periodically; if placing an order triggers slow work, <code>POST /orders</code> can return <code>202 Accepted</code> with an operation resource the apps poll.</li>
+<li>Errors and concurrency: return problem details with stable <code>type</code> URIs such as <code>insufficient-stock</code>, mark <code>429</code> and <code>503</code> as retryable with <code>Retry-After</code>, and protect address or quantity edits with <code>ETag</code> and <code>If-Match</code>, answering <code>412</code> on a stale version.</li>
+<li>Order history: <code>GET /customers/{id}/orders</code> uses keyset pagination on <code>(created_at, id)</code> with an opaque cursor, because the list grows and changes while a user scrolls.</li>
+<li>Evolution and limits: state from the start that clients must ignore unknown fields and handle unknown order statuses, so that adding a status such as <code>partially_shipped</code> is not breaking; version breaking changes in the path or by date and retire old versions with <code>Deprecation</code> and <code>Sunset</code> headers; and apply a per-customer token bucket enforced with a shared counter, returning <code>429</code> with <code>Retry-After</code>.</li>
+</ul></div></details></div></div>
+</section><section class="sec" id="review-checklist"><p class="kicker">Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, you should be able to define an API contract and explain why it costs more to change than the code behind it; say how much of the contract to specify at the HLD and LLD stages; list the safe and idempotent HTTP methods and explain why idempotency is defined by effect rather than by response; derive an API surface from core entities and explain why it comes before the data model; compare REST, gRPC, GraphQL and events and describe the <code>202 Accepted</code> long-running operation pattern; sort failures into permanent, transient and ambiguous groups and write a problem-details body; calculate retry amplification as n^k and explain how single-layer retries, retry budgets and deadline propagation bound it; state the rules for a correct idempotency key, draw its three states with the response for each, and size a dedup window; prevent lost updates with <code>ETag</code>, <code>If-Match</code> and <code>412</code>; calculate the rows read by offset and keyset pagination and show how offsets repeat or skip items when the list changes; classify a change as breaking or not and describe the deprecation and sunset lifecycle; and calculate what a token bucket admits over a period, including the effect of enforcing it per instance. A reader who can do all of these has covered the material.</p></section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script>
+
+</body></html>
