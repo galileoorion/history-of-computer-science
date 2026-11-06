@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><title>Trade-offs Study Guide</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style><meta content="A system design study guide on comparing architectural alternatives, quantifying trade-offs, failure behavior, operational cost, and revisiting decisions." name="description"/><link href="https://tech.attilakulik.com/study-guide/trade-offs/" rel="canonical"/><link href="/favicon.svg" rel="icon" type="image/svg+xml"/></head><body>
+<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">system design trade-offs</span></h1>
+<p class="lede">Map threats and trust boundaries, control access, protect data across its life cycle, and verify system design trade-offs decisions.</p>
+<ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
+<details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#frame-the-decision-before-choosing-components"><span class="tk">§2</span><span>Frame the decision before choosing components</span></a></li><li><a href="#compare-alternatives-on-the-same-dimensions"><span class="tk">§3</span><span>Compare alternatives on the same dimensions</span></a></li><li><a href="#quantify-the-consequence-of-an-assumption"><span class="tk">§4</span><span>Quantify the consequence of an assumption</span></a></li><li><a href="#follow-costs-across-component-boundaries"><span class="tk">§5</span><span>Follow costs across component boundaries</span></a></li><li><a href="#include-failure-security-operations-and-change-cost"><span class="tk">§6</span><span>Include failure, security, operations, and change cost</span></a></li><li><a href="#record-the-choice-and-define-a-revision-trigger"><span class="tk">§7</span><span>Record the choice and define a revision trigger</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
+<nav aria-label="Contents" class="rail"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#frame-the-decision-before-choosing-components"><span class="tk">§2</span><span>Frame the decision before choosing components</span></a></li><li><a href="#compare-alternatives-on-the-same-dimensions"><span class="tk">§3</span><span>Compare alternatives on the same dimensions</span></a></li><li><a href="#quantify-the-consequence-of-an-assumption"><span class="tk">§4</span><span>Quantify the consequence of an assumption</span></a></li><li><a href="#follow-costs-across-component-boundaries"><span class="tk">§5</span><span>Follow costs across component boundaries</span></a></li><li><a href="#include-failure-security-operations-and-change-cost"><span class="tk">§6</span><span>Include failure, security, operations, and change cost</span></a></li><li><a href="#record-the-choice-and-define-a-revision-trigger"><span class="tk">§7</span><span>Record the choice and define a revision trigger</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main>
+<section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Frame an architectural choice using the user outcome, constraints, workload, and quality targets it must satisfy.</li>
+<li>Compare feasible alternatives against the same criteria and identify the benefit and cost of each.</li>
+<li>Calculate how an assumption about load, cache effectiveness, or dependency availability changes a decision.</li>
+<li>Explain how caching, replication, partitioning, and asynchronous work move costs between system properties.</li>
+<li>Include correctness, failure behavior, security, operations, and change cost when assessing an alternative.</li>
+<li>Record a decision with its assumptions, rejected alternatives, evidence, and conditions for revisiting it.</li>
+</ol>
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines a trade-off, the targets a design must meet, and the uncertainty present when a choice is made.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Trade-off</dfn> A choice that improves a valued outcome while accepting a cost, risk, or reduced capability elsewhere under stated conditions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Objective</dfn> A result the design is intended to achieve, such as a user-visible response time or a recovery target.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Constraint</dfn> A boundary an acceptable solution must respect, such as a legal obligation, fixed budget, required integration, or correctness rule.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Alternative</dfn> A plausible design option that can be compared with others against the same objectives and constraints.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Assumption</dfn> A claim used to make a decision before it has been confirmed or measured, such as a peak load or tolerated data delay.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Workload</dfn> The mix and rate of operations, data sizes, access patterns, and traffic peaks a design is expected to handle.</p></aside>
+<p>A system design decision is justified by linking an alternative to an objective and showing what it costs. Keeping a second copy of frequently read data may reduce response time and database work while allowing that copy to become stale. Deferring work may shorten the time before a request is acknowledged while delaying completion of the requested action. These are trade-offs only after the affected operation, tolerated behavior, workload, and failure case have been named. Some changes improve several properties at once; the task is to compare the available choices, not to assume every benefit must have an equal penalty.</p>
+<p>The common confusion is to treat “faster,” “more scalable,” or “more reliable” as complete arguments. Each claim needs a measurement and a context. An option that serves search well may be unacceptable for inventory reservation, and a design that works at average traffic may fail at a peak. Trade-offs are relationships among requirements and alternatives, not fixed rankings of technologies.</p>
+</section><section class="sec" id="frame-the-decision-before-choosing-components"><p class="kicker">§2 · Decision context</p><h2>Frame the decision before choosing components</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Functional requirement</dfn> A behavior the system must provide, including the result or state change that an actor can observe.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Quality target</dfn> A measurable condition under which a behavior must work, such as a latency percentile, availability percentage, or maximum data-loss interval.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Latency percentile</dfn> A response-time threshold below which a stated share of operations completes; p99 is the threshold for 99% of the measured population.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Availability</dfn> The fraction of a defined time window or eligible requests in which a system delivers its required result.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Invariant</dfn> A rule that must remain true across every permitted state change, such as never confirming more reservations than available stock.</p></aside>
+<p>Begin with a user outcome and its non-negotiable rules. An online shop may require that a customer can place an order, that confirmed orders do not oversell stock, and that checkout remains responsive at an agreed peak rate. The first is behavior, the second is a correctness constraint, and the third needs a measured quality target. Record the current workload, likely growth, and what happens when a dependency fails. Without that frame, alternatives are compared on features that may not matter to the user.</p>
+<p>The diagram shows how requirements narrow the choices before a component is selected.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">User outcome + invariant + quality target + workload
+                         ↓
+               feasible alternatives
+                         ↓
+             measured costs and risks
+                         ↓
+                    decision
+</code></pre></div></figure>
+<p>Read the first line as inputs to the decision, not as outputs of a chosen architecture. If the invariant forbids acknowledging an unreserved order, an option that returns success before reservation is complete does not become acceptable merely because it is faster. A hard constraint eliminates an option; a negotiable target can be revised only through an explicit product decision.</p>
+<p>Uncertainty belongs in this frame. Mark estimates as assumptions, give each a source or a way to measure it, and identify which ones could reverse the choice. A projected tenfold increase in reads matters differently from a projected tenfold increase in writes. Use a representative peak workload rather than applying a universal request-rate threshold to every database or queue.</p>
+</section><section class="sec" id="compare-alternatives-on-the-same-dimensions"><p class="kicker">§3 · Compare options</p><h2>Compare alternatives on the same dimensions</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Feasible option</dfn> An alternative that satisfies every hard constraint under the stated assumptions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Pareto dominance</dfn> A relationship in which one option is at least as good as another on every relevant measured dimension and better on at least one, under the same assumptions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Baseline</dfn> The simplest or current design used as a reference for measuring the effect of a proposed change.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replication</dfn> Keeping copies of the same data on multiple nodes for purposes such as read capacity or recovery.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replica</dfn> One node or copy that holds replicated data, possibly behind the authoritative writer.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cache</dfn> A copy of data kept where repeated reads can be served without consulting the authoritative store each time.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Origin</dfn> The authoritative store or service that supplies data when a cache cannot answer a read.</p></aside>
+<p>List at least a baseline and a credible alternative. Hold the workload, measurement window, failure model, and user outcome constant so that differences have a cause. Compare latency, throughput, consistency, durability, availability, security, delivery time, operating effort, and cost only where they are relevant; adding a dimension with no decision impact creates noise. Eliminate infeasible options first. Pareto dominance can then remove an option that is worse across all known dimensions, while acknowledging that an unmeasured cost might change the conclusion.</p>
+<p>The table compares three ways to serve a frequently read product description. Its entries are conditional consequences, not universal performance claims.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Likely benefit</th>
+<th>New obligation or cost</th>
+<th>When to test it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read the primary store</td>
+<td>One authoritative copy and a simple read path.</td>
+<td>The primary serves every read and may saturate.</td>
+<td>Test first when the estimated and measured load is modest.</td>
+</tr>
+<tr>
+<td>Read a replica</td>
+<td>More read capacity and isolation from the primary's read load.</td>
+<td>Replication lag may return an older value; failover and replica health need handling.</td>
+<td>Test when reads dominate and the operation tolerates the observed lag.</td>
+</tr>
+<tr>
+<td>Read a cache</td>
+<td>Fewer origin reads and potentially lower response time.</td>
+<td>Invalidation, cold starts, extra memory, and stale values need explicit rules.</td>
+<td>Test when hot keys or latency measurements justify another copy.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The first row is a useful baseline because it reveals whether extra moving parts are needed. A replica or cache should be selected for a measured need and given a freshness rule; neither is automatically better. The same comparison method applies to a single service versus several services, immediate versus deferred work, and one region versus multiple regions.</p>
+</section><section class="sec" id="quantify-the-consequence-of-an-assumption"><p class="kicker">§4 · Quantify effects</p><h2>Quantify the consequence of an assumption</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Peak rate</dfn> The operation rate during the busiest period the design is expected to serve.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cache hit ratio</dfn> The fraction of eligible reads answered by a cache without consulting the origin.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Headroom</dfn> Capacity left unused at expected load so the system can absorb variation or a partial failure.</p></aside>
+<p>A numerical comparison does not require a detailed forecast. It needs enough arithmetic to expose where an option stops working. Separate read and write rates, use the same time window for both, and label capacity figures as measurements or assumptions. A cache hit ratio is especially important because a small change near an origin's limit can turn a healthy design into an overloaded one.</p>
+<h3 class="worked"><span>Worked example</span>a cache that protects the origin</h3>
+<p>Consider a product-read path with an assumed peak of 2,000 reads per second. Assume load testing shows that the origin can sustain 600 reads per second at the required latency, and assume an 80% cache hit ratio at the peak mix. Misses reach the origin at <code>2,000 × (1 − 0.80) = 400 reads/s</code>. The origin has <code>600 − 400 = 200 reads/s</code> of headroom. Check: <code>2,000 × 0.80 = 1,600</code> reads/s are served from cache, and <code>1,600 + 400 = 2,000</code> total reads/s.</p>
+<p>The minimum hit ratio that merely avoids exceeding the measured origin limit is <code>1 − 600 ÷ 2,000 = 0.70</code>, or 70%. At 70%, misses are <code>2,000 × 0.30 = 600 reads/s</code>, leaving zero headroom. If the cache becomes unavailable, all <code>2,000 reads/s</code> may reach an origin measured for <code>600 reads/s</code>, an excess of <code>2,000 − 600 = 1,400 reads/s</code>. The design therefore needs a failure response, such as limiting requests or serving a safe degraded result, and a freshness rule for cached descriptions. The calculation supports using the cache under the assumptions; it does not prove that the cache failure path is safe.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Sensitivity analysis</dfn> Recomputing a decision under changed assumptions to find which values can reverse it.</p></aside>
+<p>Repeat the arithmetic when the read rate, origin capacity, or hit ratio changes. If the hit ratio falls to an assumed 60%, misses become <code>2,000 × 0.40 = 800 reads/s</code>, exceeding the measured limit by <code>800 − 600 = 200 reads/s</code>. That 60% case shows why cache effectiveness should be measured on the actual key distribution rather than selected from a general rule.</p>
+</section><section class="sec" id="follow-costs-across-component-boundaries"><p class="kicker">§5 · Mechanism costs</p><h2>Follow costs across component boundaries</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Consistency</dfn> The rule describing which completed writes a read is allowed to observe.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partitioning</dfn> Dividing data into disjoint groups so different nodes own different records or keys.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Asynchronous processing</dfn> Performing work after the initiating request has continued or returned, usually through a durable message or job.</p></aside>
+<p>Each mechanism moves a cost rather than simply adding capacity. Replication can improve read service and recovery while creating lag or adding coordination to a write. Partitioning can spread writes and storage while making cross-partition queries and transactions harder. Asynchronous processing can reduce time spent waiting in the initiating request while delaying the final outcome and adding retries, duplicate handling, and queue monitoring. A cache can reduce origin work while adding another consistency boundary. These consequences depend on the particular operation and implementation; <a href="https://www.postgresql.org/docs/current/high-availability.html">PostgreSQL's high-availability documentation</a> distinguishes synchronous and asynchronous replication by their commit and failover behavior.</p>
+<p>The diagram shows how moving work off the request path changes the meaning of success.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Synchronous:  client → API → validate → reserve stock → confirm order → response
+Asynchronous: client → API → durable job → response: accepted
+                                     └→ worker → reserve stock → final outcome
+</code></pre></div></figure>
+<p>In the first line, the response can report the completed reservation if the calls succeed. In the second, the immediate response can only promise that work was accepted for processing; the client needs a way to learn the final outcome. Whether that change is acceptable is a functional decision, not merely a latency optimization. For payment and inventory, an “accepted” state must not be displayed as a confirmed purchase.</p>
+<p>Choose consistency and recovery behavior per operation. A product popularity count may tolerate delayed updates; an order confirmation may require a current stock decision. A replica can answer the first read but may be unsuitable for the second. Synchronous replication can protect acknowledged writes from some failovers while adding commit latency and coupling writes to replica health; asynchronous replication can keep writes moving but may lose the most recent acknowledged data after a failure. The allowable loss and outage must be specified before the replication mode can be called a good trade.</p>
+</section><section class="sec" id="include-failure-security-operations-and-change-cost"><p class="kicker">§6 · Whole-system costs</p><h2>Include failure, security, operations, and change cost</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Failure mode</dfn> A specific way a component or interaction can stop meeting its required behavior.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Blast radius</dfn> The users, requests, or data affected when a failure occurs.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Operational cost</dfn> The continuing work and resources needed to deploy, monitor, repair, and evolve an option, in addition to its direct infrastructure bill.</p></aside>
+<p>An option should be evaluated in the states it creates when something is slow or unavailable. A synchronous dependency can make the caller fail when the dependency fails; an optional dependency can be omitted or replaced with an agreed fallback. A cache failure can overload the origin. A partitioning scheme can confine a failure to one group of users, but only if routing and shared services do not rejoin those groups into a single failure domain. Identify the user-visible response, the affected population, and the signal that detects each mode.</p>
+<h3 class="worked"><span>Worked example</span>two required dependencies</h3>
+<p>Consider a request that succeeds only when two required services both respond correctly. Assume each service is available for 99.9% of requests and, solely for this calculation, assume their failures are independent. The probability both succeed is <code>0.999 × 0.999 = 0.998001</code>, or 99.8001%. The failure fraction is <code>1 − 0.998001 = 0.001999</code>, or 0.1999%. Check: <code>99.8001% + 0.1999% = 100%</code>. This is an illustrative request-success calculation, not a time-based downtime promise. If failures share a network, database, or release, independence does not hold; measure the composed user journey instead of multiplying component percentages.</p>
+<p>Security and correctness rules may eliminate a superficially faster option. An authorization timeout cannot silently become permission to proceed, and an unrecorded stock reservation cannot be presented as confirmed if the invariant requires durable reservation. Privacy choices also affect trade-offs: storing less personal data can reduce risk and future deletion work, though it may limit personalization. These are design requirements to name explicitly rather than costs to hide in a performance comparison.</p>
+<p>Count operational cost over the likely life of the system. A second datastore adds migrations, backup and restore procedures, monitoring, access control, incident paths, and staff knowledge. A service split adds network calls and independent deployment and versioning; it may also reduce the blast radius of a change when ownership and isolation are real. A simpler baseline often wins until a measured bottleneck or ownership need justifies the new boundaries.</p>
+</section><section class="sec" id="record-the-choice-and-define-a-revision-trigger"><p class="kicker">§7 · Decision records</p><h2>Record the choice and define a revision trigger</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Architecture decision record (ADR)</dfn> A short record of an important design choice, its context, alternatives, rationale, consequences, and conditions that could prompt reconsideration.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Reversibility</dfn> How much time, data migration, coordination, or user disruption would be required to undo a decision.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Revision trigger</dfn> A measurable condition or new requirement that prompts the decision to be reviewed.</p></aside>
+<p>Write down the selected alternative, rejected alternatives, assumptions, measured evidence, user-visible consequences, and remaining risks. A decision record preserves why a choice made sense at the time; later evidence can supersede it without rewriting history. <a href="https://martinfowler.com/bliki/ArchitectureDecisionRecord.html">Martin Fowler's description of architecture decision records</a> emphasizes context, alternatives, rationale, and consequences.</p>
+<p>The diagram shows how a decision remains connected to evidence after implementation.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Requirements → alternatives → decision → implementation → measurement
+      ↑              ↑                                  │
+      └──────── revised assumptions or targets ←────────┘
+</code></pre></div></figure>
+<p>Read the loop as an invitation to revise a choice when measured behavior changes, not as permission to change an agreed requirement silently. A reversible cache configuration can be tested and rolled back quickly. A partition key or public API contract can be expensive to change because data and clients depend on it, so it deserves more evidence before commitment. A revision trigger might be sustained origin reads above the measured safe rate, cache hit ratio below the needed level, an untested failover path, or a new requirement for immediate visibility. Assign ownership for measuring the trigger and for deciding what to do when it fires.</p>
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Review</p><h2>Common mistakes</h2>
+<p>Comparing technologies without a shared workload. A database, queue, or cache can look superior when each is evaluated on a different traffic mix or failure condition. Fix the user journey, peak load, measurement point, and correctness rules before comparing options.</p>
+<p>Turning an illustrative threshold into a universal rule. “Partition above a certain writes-per-second number” ignores record size, indexes, hardware, transactions, hot keys, and latency targets. Measure the relevant workload and use thresholds as hypotheses to test, not as architecture laws.</p>
+<p>Counting the benefit but hiding the new failure mode. A cache lowers origin traffic while creating stale reads and a cold-start load spike; a queue shortens the initiating request while delaying completion. Describe the new user-visible state and test the failure path before accepting the option.</p>
+<p>Treating every objective as equally negotiable. An order invariant, authorization rule, or required deletion obligation cannot be traded away merely to improve latency. Separate hard constraints from targets the product can renegotiate, then compare only feasible options.</p>
+<p>Recording a decision without a revision condition. A diagram and a list of pros and cons explain the present choice but do not tell a future team when it stops fitting. Record the assumptions, measure the quantities that could change them, and name who reviews the decision.</p>
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Exercises</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation, and application across the guide; each answer is collapsed beneath its question to be opened after working out an answer.</p>
+<h3 class="qlabel">Question 1 · distinction</h3>
+<p class="q">For checkout, classify “an order cannot be confirmed without reserved stock,” “p99 response time should be under 500 ms at the agreed peak load,” and “peak reads are expected to be 2,000 per second.” Which statement may eliminate an alternative outright, and which should be verified as an assumption?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The stock rule is a correctness invariant and, if mandatory, eliminates any option that confirms before reservation. The p99 statement is a quality target that needs a measurement rule and agreement about whether it can change. The peak-read statement is a workload assumption until supported by observed traffic or a credible forecast. All three matter to a design, but they play different roles in accepting or rejecting an alternative.</p>
+</div></details>
+<h3 class="qlabel">Question 2 · calculation</h3>
+<p class="q">At an assumed peak of 3,000 reads/s, an origin can sustain 900 reads/s at the required latency. What minimum cache hit ratio avoids exceeding that origin limit, and how many reads/s reach the origin at an assumed 75% hit ratio?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The maximum miss fraction is <code>900 ÷ 3,000 = 0.30</code>, so the minimum hit ratio is <code>1 − 0.30 = 0.70</code>, or 70%. At a 75% hit ratio, misses are <code>3,000 × (1 − 0.75) = 750 reads/s</code>, leaving <code>900 − 750 = 150 reads/s</code> below the measured limit. Check: the cache serves <code>3,000 × 0.75 = 2,250 reads/s</code>, and <code>2,250 + 750 = 3,000</code>.</p>
+</div></details>
+<h3 class="qlabel">Question 3 · application</h3>
+<p class="q">A team proposes returning “order confirmed” as soon as a job has been queued, before stock reservation. What trade-off has been described incorrectly, and what contract could make the queued design honest?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The proposal treats earlier acknowledgement as earlier completion. If confirmation requires reserved stock, the queued design violates a functional invariant rather than merely changing latency. It could return “accepted for processing,” expose a pending state, and provide a way to retrieve or receive the final confirmed or rejected outcome. That revised contract needs product approval and tests for duplicate jobs and failed reservations.</p>
+</div></details>
+<h3 class="qlabel">Question 4 · misconception</h3>
+<p class="q">Why does adding a read replica not guarantee both fresher reads and faster writes?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The replica is another copy. If it receives changes asynchronously, reads may lag behind accepted writes; if the primary waits for it before acknowledging writes, the write path gains a network and replica-health dependency. The actual effect depends on replication mode, read routing, and workload. The design must state which operations may read from a replica and what data loss or delay is acceptable.</p>
+</div></details>
+<h3 class="qlabel">Question 5 · open-ended</h3>
+<p class="q">A product catalogue grows from modest traffic to a read-heavy global workload. Describe how you would compare a primary-only design, read replicas, and a cache; include failure behavior, security or privacy, operating cost, and a trigger for revisiting the choice.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>First define the catalogue reads, peak rate, p99 target, acceptable freshness, write rate, and geographic distribution. Load-test the primary baseline. Compare replicas and cache against the same workload, measuring origin load, end-to-end latency, lag or staleness, failover behavior, and total operating effort. For a cache, test cold starts and origin overload; for replicas, test lag and promotion. Keep private or personalized catalogue fields within their access rules and avoid copying unnecessary data to public caches. Record the selected option and revisit it if measured p99, origin saturation, hit ratio, replica lag, or regional demand crosses an agreed threshold.</p>
+</div></details>
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, state the outcome, hard constraints, quality targets, workload, and assumptions for a choice; compare feasible alternatives on common dimensions; calculate where a capacity or reliability assumption changes the result; describe the costs introduced by copies, partitions, and queues; include failure, security, privacy, and operating consequences; and record the decision with evidence and a measurable revision trigger. A reader who can do all of these has covered the material.</p>
+</section>
+</main></div><script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script></body></html>
