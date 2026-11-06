@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><title>Security and Privacy Study Guide</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style><meta content="A system design study guide on threat modeling, access control, data protection, abuse defenses, audit logs, and security and privacy verification." name="description"/><link href="https://tech.attilakulik.com/study-guide/security-and-privacy/" rel="canonical"/><link href="/favicon.svg" rel="icon" type="image/svg+xml"/></head><body>
+<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">security and privacy</span></h1>
+<p class="lede">Map threats and trust boundaries, control access, protect data across its life cycle, and verify security and privacy decisions.</p>
+<ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
+<details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#map-assets-flows-and-trust-boundaries"><span class="tk">§2</span><span>Map assets, flows, and trust boundaries</span></a></li><li><a href="#establish-identity-and-enforce-authorization"><span class="tk">§3</span><span>Establish identity and enforce authorization</span></a></li><li><a href="#protect-data-through-its-life-cycle"><span class="tk">§4</span><span>Protect data through its life cycle</span></a></li><li><a href="#validate-input-and-limit-abuse"><span class="tk">§5</span><span>Validate input and limit abuse</span></a></li><li><a href="#make-sensitive-actions-explainable"><span class="tk">§6</span><span>Make sensitive actions explainable</span></a></li><li><a href="#verify-controls-and-revisit-trade-offs"><span class="tk">§7</span><span>Verify controls and revisit trade-offs</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
+<nav aria-label="Contents" class="rail"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#map-assets-flows-and-trust-boundaries"><span class="tk">§2</span><span>Map assets, flows, and trust boundaries</span></a></li><li><a href="#establish-identity-and-enforce-authorization"><span class="tk">§3</span><span>Establish identity and enforce authorization</span></a></li><li><a href="#protect-data-through-its-life-cycle"><span class="tk">§4</span><span>Protect data through its life cycle</span></a></li><li><a href="#validate-input-and-limit-abuse"><span class="tk">§5</span><span>Validate input and limit abuse</span></a></li><li><a href="#make-sensitive-actions-explainable"><span class="tk">§6</span><span>Make sensitive actions explainable</span></a></li><li><a href="#verify-controls-and-revisit-trade-offs"><span class="tk">§7</span><span>Verify controls and revisit trade-offs</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main>
+<section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Explain how security and privacy requirements differ and where they affect a system design.</li>
+<li>Map sensitive assets, data flows, trust boundaries, and likely threats before choosing controls.</li>
+<li>Distinguish authentication from authorization and design access checks for users, services, and individual resources.</li>
+<li>Protect personal and confidential data across collection, processing, storage, sharing, backup, and deletion.</li>
+<li>Choose defenses against malformed input, injection, automated abuse, and overloaded shared resources.</li>
+<li>Design audit records and incident signals that support investigation without exposing secrets or unnecessary personal data.</li>
+<li>Trace each important risk to a design control and a test that can show whether the control works.</li>
+</ol>
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines security, privacy, and the boundaries that make their requirements concrete in a distributed system.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Security</dfn> The protection of a system and its data against unauthorized access, change, or disruption.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Privacy</dfn> The appropriate handling of information about people across its full life cycle, including what is collected, why it is used, who receives it, and when it is removed.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Asset</dfn> Something whose loss, disclosure, alteration, or unavailability would cause harm, such as an account, payment record, signing key, or service capability.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Trust boundary</dfn> A point where data or a request moves between parties or components with different authority or security assumptions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Threat model</dfn> A structured account of assets, data flows, trust boundaries, possible misuse, and the controls chosen to reduce risk.</p></aside>
+<p>Security asks whether an actor can do something harmful; privacy also asks whether a permitted use of personal data is appropriate and limited. Encryption can protect a database from disclosure, but it does not justify collecting an unnecessary field or keeping it indefinitely. Conversely, collecting little data reduces exposure but does not stop someone with a stolen session from reading what remains. Both concerns must be expressed as requirements for named journeys, stores, and operators.</p>
+<p>The common confusion is to treat security and privacy as a checklist appended after the architecture. Component boundaries, identity propagation, data copies, and retention choices determine what can be protected later. A design review therefore starts with the assets and flows, then tests each proposed control against a specific risk.</p>
+</section><section class="sec" id="map-assets-flows-and-trust-boundaries"><p class="kicker">§2 · Threat modeling</p><h2>Map assets, flows, and trust boundaries</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Attack surface</dfn> The set of interfaces and paths through which an actor can interact with or influence a system.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Threat</dfn> A plausible way an asset could be disclosed, altered, misused, or made unavailable.</p></aside>
+<p>Start with a user journey and draw the data it moves. A customer viewing an order may cross a browser-to-edge boundary, an edge-to-service boundary, and a service-to-database boundary. A background worker and a support console create additional paths to the same record. Mark where identity is established, where authorization is checked, where sensitive fields are copied, and which outside services receive them. The diagram should include logs, queues, backups, exports, and administrative tools when they carry the same data.</p>
+<p>The diagram shows a simplified order-read path and its secondary copies.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Customer browser ──encrypted channel──→ Edge/API ──authenticated call──→ Order service ──→ Order store
+                           │                 │                     │
+                           │                 ├──→ Audit events     └──→ Backup
+                           └──→ Request logs └──→ Support console access
+</code></pre></div></figure>
+<p>Read each arrow as a point where a request or data copy needs an explicit owner and policy. The browser is outside the service's trust boundary; a support console is another entry point, not automatically a trusted exception. <a href="https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html">OWASP's Threat Modeling Cheat Sheet</a> uses data flows and trust boundaries to find risks that a component diagram alone can miss.</p>
+<p>For each asset, ask how a caller could impersonate an owner, change a record, read another customer's record, exhaust a shared resource, or bypass a workflow. Rank risks by likely impact and exposure, then record the control and evidence needed for each. A threat model is revised when a new integration, data copy, or privilege changes the boundary; it is not a one-time drawing.</p>
+<h3 class="worked"><span>Worked example</span>find the missing access path</h3>
+<p>Consider an order API where the customer endpoint checks ownership before returning an order. Assume a support console reads the same order store through a separate endpoint. The asset is the customer's order history. The first path is customer → API → ownership check → store; the second is support agent → console → support API → store. Protecting only the first path leaves the second path able to bypass customer checks. The design needs a support-specific permission, a reason for access where appropriate, and an audit event for the read. Check by testing both paths with an authorized user and an unauthorized user; the result must depend on the requested order and the caller's authority, not merely on a successful login.</p>
+</section><section class="sec" id="establish-identity-and-enforce-authorization"><p class="kicker">§3 · Identity and access</p><h2>Establish identity and enforce authorization</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Authentication</dfn> The process of establishing which principal is making a request.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Principal</dfn> A user, service, or other entity whose identity can be used in an access decision.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Authorization</dfn> The decision whether a principal may perform an action on a particular resource under the current conditions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Least privilege</dfn> Granting a principal only the permissions needed for its task, for only as long as needed.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Session token</dfn> A credential presented with subsequent requests to associate them with an authenticated session.</p></aside>
+<p>An authenticated customer is not thereby authorized to read every order. The access decision must combine principal, action, and resource: “customer 12 may read order 86 because order 86 belongs to customer 12.” Checking only a role or trusting an order identifier supplied by the client leaves object-level access unprotected. Enforce the decision at a consistent server-side boundary on every relevant request, including administrative endpoints, background jobs, and alternate API paths. <a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html">OWASP's Authorization Cheat Sheet</a> recommends deny-by-default behavior and permission checks on each request.</p>
+<p>For service-to-service calls, propagate identity only when a downstream service needs it and distinguish the calling service's authority from the end user's authority. Give a worker that sends receipts permission to read the fields it needs, not broad access to all customer records. If a permission decision depends on a remote policy service, define what happens when that service is unavailable; a timeout must not silently become permission to proceed.</p>
+<p>Session design affects revocation and exposure. An opaque server-side session can be invalidated centrally; a signed self-contained token can be checked locally but may remain usable until expiry unless a revocation mechanism is added. Protect session credentials in transit and storage, set appropriate lifetimes, and rotate or revoke them after account compromise. A signed token is evidence of claims, not evidence that the request is authorized for every resource. Sensitive actions may require fresh authentication or an additional factor, according to their risk.</p>
+<p>The diagram shows the decision sequence for one protected operation.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Request → authenticate principal → load target resource → authorize action on target
+                                                           │
+                                               allow → perform action
+                                               deny  → return safe error
+</code></pre></div></figure>
+<p>The target resource must be considered before the authorization decision. A policy that checks only whether the caller has an “order reader” role cannot distinguish the caller's order from another customer's order. The result should be tested for both permitted and forbidden resource identifiers.</p>
+</section><section class="sec" id="protect-data-through-its-life-cycle"><p class="kicker">§4 · Data protection</p><h2>Protect data through its life cycle</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Personal data</dfn> Information relating to an identified or identifiable person, including data that can identify a person when combined with other available information.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data minimization</dfn> Collecting and retaining only the data needed for a specified purpose.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Retention policy</dfn> A rule that states how long a category of data is kept, why, and what happens when that period ends.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Encryption in transit</dfn> Protection of data while it moves between endpoints, commonly using Transport Layer Security (TLS).</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Encryption at rest</dfn> Protection of stored data by encrypting it with managed keys.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Key management</dfn> The creation, storage, access control, rotation, and retirement of cryptographic keys.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Pseudonymous identifier</dfn> A replacement identifier that does not directly name a person but may still be linkable to that person using other information.</p></aside>
+<p>For each data field, identify its purpose, the services that need it, every copy, and its deletion rule. A hosted payment flow, for example, can keep card details out of the shop's system altogether. A shipping address may be needed to fulfil an order but not in request logs or analytics events. Pseudonymous identifiers can support correlation without copying a full address, though they may still be personal data if re-identification remains possible. <a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-protection-principles/a-guide-to-the-data-protection-principles/data-minimisation/">The ICO's data minimisation guidance</a> expresses the principle as collecting data adequate and relevant to a purpose, and limited to what is necessary.</p>
+<p>The data-life-cycle diagram makes secondary copies visible.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Collect → process → primary store → derived views / exports
+                       │                    │
+                       ├──→ backups         └──→ downstream recipients
+                       └──→ logs and traces
+                    retention or deletion decision for every branch
+</code></pre></div></figure>
+<p>Read the branches as separate retention and access obligations. Deleting a row from the primary store does not automatically delete an export, a cache, a backup, or a log line. Some copies may need a different deletion method or a documented expiry; a requirement to erase data must name the systems in scope and the expected completion window. Legal and contractual retention requirements vary, so choose periods for the actual context rather than copying a generic number.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Password hashing</dfn> A one-way, deliberately costly transformation used to verify a password without storing a recoverable copy of it.</p></aside>
+<p>Encryption in transit protects network hops, and encryption at rest protects stored copies in its threat model. Neither helps if an overprivileged service can ask for the plaintext or if the key is kept beside an accessible data export. Restrict key use, separate keys from data where feasible, and plan rotation and recovery before an incident. Passwords need password hashing rather than reversible encryption. <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html">OWASP's Cryptographic Storage Cheat Sheet</a> describes these architectural distinctions.</p>
+<h3 class="worked"><span>Worked example</span>make retention measurable</h3>
+<p>Consider a service that creates 10 million activity events each day. Assume each stored event occupies 250 bytes before indexes and replication, and assume the agreed retention period is 30 days. Daily logical growth is <code>10,000,000 × 250 = 2,500,000,000 bytes</code>, or 2.5 GB using decimal units. A steady 30-day window holds <code>2.5 × 30 = 75 GB</code> of logical event data. Keeping a full year instead would hold <code>2.5 × 365 = 912.5 GB</code>; that is <code>912.5 ÷ 75 ≈ 12.17</code> times the 30-day window. Check: both figures use the same daily input and differ only in retained days. Indexes, replicas, and backups add storage, while the privacy requirement still needs a rule for each copy. The arithmetic makes an indefinite default visible as both a storage and exposure decision.</p>
+</section><section class="sec" id="validate-input-and-limit-abuse"><p class="kicker">§5 · Abuse defenses</p><h2>Validate input and limit abuse</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Input validation</dfn> Checking that received data has the expected form and satisfies the operation's business rules before it is used.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Injection</dfn> An attack that causes untrusted input to be interpreted as a command or query structure rather than as data.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Rate limit</dfn> A cap on the number of operations a caller may attempt in a defined period.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Quota</dfn> A longer-term allowance for a caller's use of a resource, such as daily requests or stored bytes.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Parameterized query</dfn> A database query in which untrusted values are passed as data separately from the query structure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Output encoding</dfn> Converting data for the context where it will be rendered so that it is not interpreted as executable markup or script.</p></aside>
+<p>Validate at the server boundary even when a client already validates. Types, lengths, ranges, and relationships between fields should match the operation. Validation does not replace context-specific defenses: use parameterized queries when untrusted values enter a database query, and encode output for the context in which it is rendered. A valid order identifier still requires an authorization check. <a href="https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html">OWASP's Input Validation Cheat Sheet</a> separates these controls.</p>
+<p>Abuse controls protect both users and shared capacity. Set limits around sign-in, password recovery, search, file upload, expensive exports, and external callbacks according to their different risks. Choose the key for each limit carefully: an IP address may group unrelated users, while an account-only limit may be bypassed before login. Apply limits at the relevant shared boundary and decide how clients learn that they have been limited. A limit based only on each server instance changes when the instance count changes.</p>
+<h3 class="worked"><span>Worked example</span>a per-instance limit that scales accidentally</h3>
+<p>Consider an API with four instances behind a load balancer and a stated per-caller limit of 100 requests per second. Assume each instance maintains its own independent counter and the caller's requests are spread evenly. Each instance can admit 100 requests per second, so the caller may get <code>4 × 100 = 400 requests/s</code> accepted in total. Check: at 400 requests/s spread evenly, each instance sees <code>400 ÷ 4 = 100 requests/s</code> and none exceeds its local limit. If the intended global allowance is 100 requests/s, the system needs a shared decision, consistent routing for that caller, or another design whose approximation is explicitly accepted. This example assumes even distribution; the exact observed maximum depends on routing and burst rules.</p>
+</section><section class="sec" id="make-sensitive-actions-explainable"><p class="kicker">§6 · Audit and response</p><h2>Make sensitive actions explainable</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Audit log</dfn> A protected record of security-relevant or privileged actions that captures who acted, what was affected, when, and the outcome, for a defined retention period.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Tamper evidence</dfn> A property that makes unauthorized alteration or deletion of a record detectable, even if prevention fails.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Correlation identifier</dfn> A reference carried across related requests and events so records about one operation can be joined without copying its sensitive contents.</p></aside>
+<p>An audit event for a refund, permission change, or sensitive export should identify the actor, action, target, outcome, and a correlation identifier. The log should be written on the path where the action is decided so that a successful privileged change is not invisible. Protect it with restricted write and read permissions, monitor whether event collection stops, and check for alteration. An audit log does not have to contain a copy of the affected personal record; storing a stable reference and the minimum needed context often provides accountability with less exposure.</p>
+<p>The diagram shows the separation between a business action and its investigation record.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Privileged request → authorization → state change
+                         │                │
+                         └──→ audit event ←┘ → protected store → alert / investigation
+</code></pre></div></figure>
+<p>Read the two inputs to the audit event as the decision and the resulting action. The design must define what happens if audit recording fails for a sensitive change; silently succeeding can leave the system unable to explain that change. Ordinary diagnostic logs may have a different failure policy, but both kinds of log need sensitive-data filtering. Tokens, passwords, keys, and unnecessary personal data do not belong in logs. <a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html">OWASP's Logging Cheat Sheet</a> covers event selection, data exclusion, tamper detection, and log retention.</p>
+<p>Security signals should lead to a response. Repeated denied access to many resources, sudden privilege changes, unusual exports, and failed key use can justify alerts, but thresholds need a known owner and an investigation path. Response planning should include revoking credentials, limiting an affected path, preserving evidence, and assessing which data copies may have been exposed.</p>
+</section><section class="sec" id="verify-controls-and-revisit-trade-offs"><p class="kicker">§7 · Verification</p><h2>Verify controls and revisit trade-offs</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Security test</dfn> A check that a stated protective rule holds under both permitted use and a representative misuse or failure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Privacy risk</dfn> The possibility that processing data about people causes harm even when a system is functioning as designed.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replay</dfn> Reuse of a previously valid request or message to trigger an action again when only one effect was intended.</p></aside>
+<p>Trace each material threat to a control and a test. For object-level authorization, try another user's identifier, an administrative path, and a background job. For retention, trace a test record through primary storage, caches, exports, logs, and backup expiry. For a lost secret, exercise rotation and revocation. For a payment or webhook integration, verify the sender and reject replay or unexpected state transitions. The tests should use the same boundaries shown in the threat model, including failure paths.</p>
+<p>Security and privacy can pull in different directions. More detailed logs aid investigation but retain more information about people. Longer session lifetimes reduce login friction but extend the usefulness of a stolen credential. A remote authorization check can centralize policy but add a new availability dependency. State the affected user journey, the failure or misuse being prevented, and the cost of each option, then choose a rule that can be observed and revisited. <a href="https://www.nist.gov/system/files/documents/2020/01/16/NIST%20Privacy%20Framework_V1.0.pdf">NIST's Privacy Framework</a> treats privacy risk across collection, use, storage, sharing, and disposition rather than as a property of storage alone.</p>
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Review</p><h2>Common mistakes</h2>
+<p>Treating login as permission. An authenticated caller can still request another person's record or invoke an operation outside their role. This happens when an API checks identity once at the edge and assumes downstream paths are safe. Authorize the requested action on the specific resource at every relevant entry path, with deny-by-default behavior.</p>
+<p>Encrypting everything while collecting too much. Encryption reduces some disclosure risks, but a service with legitimate decryption access can still misuse unnecessary fields. Collect data for an explicit purpose, constrain recipients, and apply a retention and deletion rule to every copy.</p>
+<p>Adding an audit log without protecting it. A log that the same administrator can rewrite, or that contains raw tokens and personal records, can fail during an investigation and create another exposure path. Restrict access, make alteration detectable, filter sensitive values, and verify that required events are recorded.</p>
+<p>Relying on input validation as the only boundary. A well-formed identifier can still target someone else's resource, and a well-formed string can still be dangerous in a query or rendered page. Validate shape and business rules, authorize separately, and use context-specific defenses such as parameterized queries and output encoding.</p>
+<p>Applying a per-instance limit as a global promise. Local counters are simple, so a new server silently multiplies the caller's allowance. Define whether the target is per instance or across the fleet, then use a shared or deliberately approximate enforcement design and test it at the expected instance count.</p>
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Exercises</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation, and application across the guide; each answer is collapsed beneath its question to be opened after working out an answer.</p>
+<h3 class="qlabel">Question 1 · distinction</h3>
+<p class="q">How can an encrypted customer database still violate a privacy requirement?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Encryption protects data against some unauthorized reads of stored copies. A system can still collect fields it does not need, use them for an undisclosed purpose, share them too broadly, or retain them beyond the agreed period. Privacy requirements govern those decisions even when storage is encrypted.</p>
+</div></details>
+<h3 class="qlabel">Question 2 · application</h3>
+<p class="q">A signed-in customer can retrieve an order by changing the numeric identifier in the URL. Which check is missing, and where should it be enforced?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The API is missing authorization for the particular order. After authenticating the caller and loading the target order, the server should verify that the caller is permitted to read that order under the current policy. The same rule must cover other paths to the order, including exports and support tools where appropriate; changing the identifier to another customer's order should be denied.</p>
+</div></details>
+<h3 class="qlabel">Question 3 · calculation</h3>
+<p class="q">A service creates 4 million personal-data events per day at an assumed 300 bytes per event before indexes and replicas. How much logical data does a 14-day retention window hold, and how much would a 90-day window hold?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Daily data is <code>4,000,000 × 300 = 1,200,000,000 bytes</code>, or 1.2 GB in decimal units. Fourteen days hold <code>1.2 × 14 = 16.8 GB</code>; 90 days hold <code>1.2 × 90 = 108 GB</code>. Check: <code>108 ÷ 16.8 ≈ 6.43</code>, matching <code>90 ÷ 14 ≈ 6.43</code>. Copies, indexes, and backups add to both figures and need their own retention treatment.</p>
+</div></details>
+<h3 class="qlabel">Question 4 · misconception</h3>
+<p class="q">Why is a 100-requests-per-second limiter on each of five API replicas not necessarily a 100-requests-per-second limit for one caller?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>If each replica counts independently and requests are distributed evenly, each can admit 100 requests/s for the same caller. The fleet can then admit up to <code>5 × 100 = 500 requests/s</code>. Check: at 500 requests/s evenly spread, each replica sees 100 requests/s. A global promise requires coordinated or caller-consistent enforcement, or an explicitly accepted approximation.</p>
+</div></details>
+<h3 class="qlabel">Question 5 · open-ended</h3>
+<p class="q">An online shop adds a support export of customer orders and a third-party analytics service. Extend its threat model, access policy, privacy rules, audit design, and verification plan.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Add the support console, export store, transfer path, and analytics recipient to the flow diagram and mark the new trust boundaries. Define which support principals may export which orders, for what purpose, with what limits and review; require resource-level checks rather than a broad “support” login. Minimize or aggregate the fields sent to analytics and set retention and deletion rules for primary data, export files, downstream copies, and logs. Record who initiated an export, its scope, time, and outcome without logging the complete contents. Test unauthorized exports, overbroad fields, expired files, downstream deletion, credential revocation, and the audit trail for a completed export.</p>
+</div></details>
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, distinguish security from privacy; map assets, flows, and trust boundaries; define identity and resource-specific authorization; minimize data and plan protection, retention, and deletion across all copies; select validation and abuse controls; design protected audit events and useful alerts; and connect each important risk to a control and a test. A reader who can do all of these has covered the material.</p>
+</section>
+</main></div><script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script></body></html>
