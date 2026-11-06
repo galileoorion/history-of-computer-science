@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><title>Functional and Non-functional Requirements Study Guide</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Schibsted+Grotesk:wght@500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style><meta content="A system design study guide on functional requirements, quality targets, scope, workload estimates, trade-offs, and verification, with worked examples and practice questions." name="description"/><link href="https://tech.attilakulik.com/study-guide/functional-and-non-functional-requirements/" rel="canonical"/><link href="/favicon.svg" rel="icon" type="image/svg+xml"/></head><body>
+<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">functional and non-functional requirements</span></h1>
+<p class="lede">Turn user journeys into testable behavior and measurable quality targets, then trace them to design decisions and evidence.</p>
+<ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 6 + exercises</li></ul>
+<details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#establish-scope-and-user-outcomes"><span class="tk">§2</span><span>Establish scope and user outcomes</span></a></li><li><a href="#specify-behavior-as-a-testable-contract"><span class="tk">§3</span><span>Specify behavior as a testable contract</span></a></li><li><a href="#translate-demand-into-capacity-requirements"><span class="tk">§4</span><span>Translate demand into capacity requirements</span></a></li><li><a href="#state-measurable-quality-targets"><span class="tk">§5</span><span>State measurable quality targets</span></a></li><li><a href="#prioritize-trace-and-verify-requirements"><span class="tk">§6</span><span>Prioritize, trace, and verify requirements</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
+<nav aria-label="Contents" class="rail"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#establish-scope-and-user-outcomes"><span class="tk">§2</span><span>Establish scope and user outcomes</span></a></li><li><a href="#specify-behavior-as-a-testable-contract"><span class="tk">§3</span><span>Specify behavior as a testable contract</span></a></li><li><a href="#translate-demand-into-capacity-requirements"><span class="tk">§4</span><span>Translate demand into capacity requirements</span></a></li><li><a href="#state-measurable-quality-targets"><span class="tk">§5</span><span>State measurable quality targets</span></a></li><li><a href="#prioritize-trace-and-verify-requirements"><span class="tk">§6</span><span>Prioritize, trace, and verify requirements</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main>
+<section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Distinguish a functional requirement, a quality requirement, and a design constraint in a system design brief.</li>
+<li>Define system boundaries, actors, user journeys, assumptions, and non-goals before choosing components.</li>
+<li>Turn a user journey into testable behavior, including state changes, failure responses, and invariants.</li>
+<li>Calculate average and peak demand from usage assumptions and use the result to state capacity targets.</li>
+<li>Express latency, availability, recovery, consistency, durability, security, and cost as measurable requirements for specific operations.</li>
+<li>Prioritize competing requirements, trace them to design decisions, and verify them with appropriate evidence.</li>
+</ol>
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines the three kinds of statement that shape a system design: required behavior, required quality, and imposed constraints.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Functional requirement</dfn> A statement of behavior the system must provide to an actor, including an observable result or state change.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Non-functional requirement</dfn> A statement of a measurable quality or operating condition under which the system must provide its behavior, such as response time, availability, or data retention.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Design constraint</dfn> A limit on the solution space imposed by an external decision or obligation, such as a required integration, deployment region, budget, or deadline.</p></aside>
+<p>“A customer can place an order” names a behavior. “At least 99.9% of eligible order attempts complete correctly within 500 ms in a rolling 30-day window” names a quality target for that behavior. “Payment must use the existing provider” limits implementation choices. A useful design connects all three: it says what must happen, under what conditions, and within which boundaries.</p>
+<p>The frequent confusion is to call any sentence without a feature verb “non-functional.” A database choice is ordinarily a proposed design decision, while a mandated database is a constraint. “Fast” is an aspiration until the operation, percentile, threshold, load, and measurement point are stated. Requirements describe what the design must satisfy; the architecture is the proposed way to satisfy it.</p>
+</section><section class="sec" id="establish-scope-and-user-outcomes"><p class="kicker">§2 · Scope and outcomes</p><h2>Establish scope and user outcomes</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>System boundary</dfn> The line separating behavior owned by the system from behavior owned by clients, people, or external services.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Actor</dfn> A person or external system that starts an interaction or receives a result.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>User journey</dfn> A sequence of interactions that produces one meaningful outcome for an actor.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Assumption</dfn> A provisional fact used for design until it is confirmed or measured.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Non-goal</dfn> A capability or scale deliberately excluded from the current design.</p></aside>
+<p>Begin with the actor and the outcome. An online shop may let a customer search for a product, reserve stock, pay, and receive an order confirmation. A warehouse system and a payment provider cross the system boundary, so the design must say which side owns each transition and what happens when an external response is delayed. Naming the boundary prevents a dependency's behavior from being mistaken for a guarantee the shop itself can make.</p>
+<p>The diagram maps a journey to the boundary and the two external dependencies.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Customer → Shop: browse → submit order → receive confirmation
+                 │             │
+                 │             ├──→ Payment provider: authorize payment
+                 └─────────────└──→ Warehouse system: reserve stock
+</code></pre></div></figure>
+<p>Read the top line as the customer-visible outcome; the lower calls are supporting work whose ownership and failure behavior need separate requirements. The diagram does not prescribe synchronous calls or a service layout. Those choices come after the outcome and quality targets are known.</p>
+<p>State assumptions and non-goals where they affect the design. For example, assuming that a customer can hold only one active basket changes the data model; excluding international delivery removes tax and shipping paths. Confirm high-impact assumptions with stakeholders or usage data before treating them as facts. A non-goal should bound the current scope, not hide an unresolved requirement.</p>
+</section><section class="sec" id="specify-behavior-as-a-testable-contract"><p class="kicker">§3 · Behavior contracts</p><h2>Specify behavior as a testable contract</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Acceptance criterion</dfn> A condition that can be checked to decide whether a requirement has been met.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>State transition</dfn> A permitted move of an entity from one defined state to another after an event or command.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Invariant</dfn> A rule that must remain true across every permitted state transition.</p></aside>
+<p>A functional requirement needs more than a feature name. Specify the trigger, required input, authorization, result, state change, and responses to expected errors. “Place order” becomes: an authenticated customer submits a basket; the system creates one order with a stable identifier, reserves available stock, records the payment outcome, and returns a confirmation only after the promised state is durable. If stock is unavailable, the customer receives a clear rejection and no payment is captured. The exact sequence is a domain decision to validate, but the requirement must resolve it.</p>
+<p>The state diagram shows the allowed order outcomes for this example.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Basket submitted → Pending → Confirmed
+                      │           │
+                      └→ Rejected  └→ Cancelled
+</code></pre></div></figure>
+<p>The branches separate rejection before confirmation from cancellation afterward. For each arrow, name who can trigger it and which side effects must occur. An invariant might say that confirmed quantity never exceeds reserved quantity; another might say that the same customer command does not create two paid orders. These rules are often more informative than a list of endpoints because they expose where concurrency, retries, and external failures threaten correctness.</p>
+<h3 class="worked"><span>Worked example</span>refine a feature request</h3>
+<p>Consider the request “customers can cancel an order.” Assume cancellation is permitted only before shipment, and assume a captured payment must be refunded. The actor is the customer; the trigger is a cancellation command carrying an order identifier. An acceptance criterion is: if the order is confirmed and not shipped, the system records a cancellation and starts a refund exactly once; if it is already shipped, the system rejects cancellation with a reason; repeating the same command returns the existing cancellation outcome. Check the requirement by testing the confirmed, shipped, and repeated-command cases. The assumptions about shipment and refunds must be agreed with the business before implementation.</p>
+</section><section class="sec" id="translate-demand-into-capacity-requirements"><p class="kicker">§4 · Demand and capacity</p><h2>Translate demand into capacity requirements</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Throughput</dfn> The rate at which a system accepts or completes operations, usually measured per second.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Peak factor</dfn> An assumed or measured ratio between a peak rate and a longer-period average rate.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Read-to-write ratio</dfn> The number of read operations divided by the number of write operations over the same workload and period.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Capacity headroom</dfn> Resources reserved above expected demand so a spike, failure, or growth does not immediately saturate the system.</p></aside>
+<p>The functional journeys identify the operations to count. Convert daily users and actions into separate read and write rates, then estimate the peak for the relevant time window. Record payload sizes, storage growth, and fan-out where they matter. An average alone is a poor capacity target because users arrive unevenly, and a single global request rate hides the component that receives disproportionate work.</p>
+<h3 class="worked"><span>Worked example</span>daily actions to peak rates</h3>
+<p>Consider a service with 2 million daily active users. Assume each user makes 12 reads and 2 writes per day; assume a peak hour whose per-second rate is four times the full-day average. Daily reads are <code>2,000,000 × 12 = 24,000,000</code>; daily writes are <code>2,000,000 × 2 = 4,000,000</code>. A day has <code>24 × 60 × 60 = 86,400</code> seconds, so average rates are <code>24,000,000 ÷ 86,400 ≈ 278 reads/s</code> and <code>4,000,000 ÷ 86,400 ≈ 46 writes/s</code>. Applying the assumed peak factor gives about <code>278 × 4 = 1,112 reads/s</code> and <code>46 × 4 = 184 writes/s</code>. Using unrounded values gives about 1,111 reads/s and 185 writes/s; those are the better sizing figures. The read-to-write ratio is <code>24,000,000 ÷ 4,000,000 = 6:1</code>. Check: the peak rate is four times each unrounded average, and the daily counts preserve the same 6:1 ratio.</p>
+<p>If a write stores 2 KB of new data, assume decimal kilobytes for this estimate. New logical data is <code>4,000,000 × 2,000 bytes = 8,000,000,000 bytes</code>, or 8 GB per day. Over 365 days that is <code>8 × 365 = 2,920 GB</code>, or 2.92 TB, before indexes, replicas, backups, and retention rules. State a headroom target and a growth horizon separately; neither follows automatically from the peak factor.</p>
+</section><section class="sec" id="state-measurable-quality-targets"><p class="kicker">§5 · Quality targets</p><h2>State measurable quality targets</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Latency percentile</dfn> A response-time threshold below which a stated proportion of measured operations completes; p99 is the threshold for 99% of the population.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Service level objective (SLO)</dfn> A target for a defined service measurement over a specified period.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Availability</dfn> The fraction of a defined time window or eligible requests in which a service provides the required correct response within its stated conditions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Recovery time objective (RTO)</dfn> The maximum acceptable time to restore service after a specified disruption.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Recovery point objective (RPO)</dfn> The maximum acceptable amount of recent data loss after a disruption, expressed as a time interval.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Consistency requirement</dfn> A rule about which committed writes a read must observe and when; it may differ by operation.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Durability requirement</dfn> A rule about which acknowledged writes must survive a stated class of failures.</p></aside>
+<p>Qualities must attach to a named operation and a measurement rule. A search response might have a p99 latency target under a stated peak load while checkout has a slower limit and stricter correctness rule. The percentile needs a population and measurement point; averaging host-level p99 values does not produce the fleet p99. An SLO for checkout should count eligible attempts and define a good result, since an HTTP success response can still hide a missing order.</p>
+<p>Reliability targets are distinct. Availability describes delivered service during the measurement window. RTO and RPO describe recovery after a specified disruption. A service can meet a monthly availability target and still lose an unacceptable amount of data, so state each separately. Consistency likewise belongs to an operation: a customer reading an accepted order may require the latest committed state, while a product popularity count may tolerate a specified delay. Durability should say whether an acknowledged order survives a process restart, zone loss, or another named event.</p>
+<p>Security and privacy also need observable rules. Specify who may perform each sensitive operation, which data may be stored, how long it is retained, when it is deleted, and whether an audit record is required. Where regulation applies, identify the actual obligation rather than writing “compliant” as a placeholder. Cost can be a constraint or a quality target, such as a maximum monthly spend at a stated workload; making that workload explicit keeps the target testable.</p>
+<p>The following comparison helps separate targets that are often conflated.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Example of a testable statement</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Latency</td>
+<td>Checkout p99 is under 500 ms at the agreed peak arrival rate.</td>
+<td>End-to-end latency distribution under representative load.</td>
+</tr>
+<tr>
+<td>Availability</td>
+<td>At least 99.9% of eligible checkout attempts are good in a rolling 30-day window.</td>
+<td>Count of good and eligible attempts at the user-facing boundary.</td>
+</tr>
+<tr>
+<td>RTO</td>
+<td>Service is restored within 30 minutes after a zone outage.</td>
+<td>Timed failover exercise.</td>
+</tr>
+<tr>
+<td>RPO</td>
+<td>No more than 5 minutes of accepted writes are lost after that outage.</td>
+<td>Reconciliation after a recovery exercise.</td>
+</tr>
+<tr>
+<td>Consistency</td>
+<td>A confirmed order is visible to its customer on the next read.</td>
+<td>Concurrent write/read and failover tests.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The evidence column turns each statement into a design obligation. A proposed cache, replica, queue, or failover path is credible only if it can be checked against the relevant rule. The example targets are illustrative and must be set from product needs and measured behavior, rather than treated as universal thresholds.</p>
+<h3 class="worked"><span>Worked example</span>interpret an availability target</h3>
+<p>Consider a time-based target of 99.9% availability over an assumed 30-day month. The unavailable share is <code>1 − 0.999 = 0.001</code>. The window has <code>30 × 24 × 60 = 43,200 minutes</code>; the allowed unavailable time is <code>43,200 × 0.001 = 43.2 minutes</code>. Check: <code>43,200 − 43.2 = 43,156.8</code> available minutes, and <code>43,156.8 ÷ 43,200 = 0.999</code>. This time budget does not equal a request-based error budget unless traffic is uniform and both definitions count the same failures.</p>
+</section><section class="sec" id="prioritize-trace-and-verify-requirements"><p class="kicker">§6 · Trace and verify</p><h2>Prioritize, trace, and verify requirements</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Priority</dfn> An agreed ordering of requirements by user impact, risk, and delivery constraints when all cannot be met at once.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Traceability</dfn> The ability to connect a requirement to the design decision and evidence that satisfy it.</p></aside>
+<p>Requirements can conflict. A strict freshness guarantee can add coordination latency; a short RTO may require standby capacity that raises cost; aggressive retention can conflict with a deletion obligation. Resolve these by identifying the affected journey, choosing the acceptable trade-off, and recording who agreed to it. Rank the core behaviors and the qualities that protect them before optimizing an edge case. An assumption with large architectural consequences should be validated early, even when its priority appears low.</p>
+<p>Trace a small set of consequential requirements through the design. For example, “a confirmed order is visible on the next read” implies an authoritative read path or a way to keep any cache current; a test should issue a write followed immediately by a read under normal operation and during failover. “Checkout p99 under 500 ms at peak” implies a measured end-to-end path and a load test with the agreed read/write mix. When a test fails, revise either the design or the requirement through an explicit product decision. Do not silently weaken the measurement rule.</p>
+<p>The diagram shows the feedback loop from statement to evidence.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">User outcome → requirement → design decision → test or measurement
+      ↑                                             │
+      └──────────── revise with evidence ──────────┘
+</code></pre></div></figure>
+<p>Read the loop as an ongoing design process, not a one-time sign-off. Measurements can overturn a peak-factor assumption, a failure drill can expose an RTO miss, and a changed product journey can alter which operations need strong consistency. Keeping the links visible makes later changes explainable.</p>
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Review</p><h2>Common mistakes</h2>
+<p>Calling a solution a requirement. A team may write “use a distributed cache” before it knows the read latency, freshness, or load target. This happens because a familiar component feels concrete. State the required outcome and quality first, then compare solutions against it; use a mandated component only when it is truly a constraint.</p>
+<p>Writing qualities as adjectives. “Highly available” and “fast” omit the affected operation, load, measurement point, and window. They cannot be tested, so design discussions settle on different hidden assumptions. Define a good result and numeric target for the journey that matters.</p>
+<p>Sizing from daily averages alone. Dividing daily requests by 86,400 is useful, but it conceals peaks, skewed keys, and background fan-out. Separate reads and writes, apply a justified peak assumption, and test the design at that mix with headroom.</p>
+<p>Omitting failure and repeated-command behavior. A happy-path requirement can pass while retries create duplicate orders or partial failures leave a payment without a confirmation. Specify state transitions, invariants, and observable error outcomes, then test those paths as part of the functional contract.</p>
+<p>Treating every quality target as global. Search, checkout, and reporting often need different freshness and latency guarantees. A single universal target either raises cost unnecessarily or leaves the important journey underprotected. Attach each target to the operation and failure class it is meant to govern.</p>
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Exercises</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation, and application across the guide; each answer is collapsed beneath its question to be opened after working out an answer.</p>
+<h3 class="qlabel">Question 1 · distinction</h3>
+<p class="q">Classify these statements: “A customer can return an item,” “Returns complete within 2 seconds at p99 under peak load,” and “The system must use the existing payment provider.”</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The first is a functional requirement because it specifies behavior. The second is a non-functional requirement because it sets a measured quality of that behavior, although the peak rate and measurement point still need values. The third is a design constraint because it restricts the permitted implementation.</p>
+</div></details>
+<h3 class="qlabel">Question 2 · application</h3>
+<p class="q">A customer submits an order, receives a timeout, and retries. Which details belong in the functional contract before an endpoint is designed?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Define whether the first attempt may have succeeded, how the retry identifies the same logical command, whether one or two orders may be created, what payment and stock state must hold, and what response the retry returns. A useful invariant is that one logical order command creates at most one paid order. Test both a timeout before the order commits and a timeout after it commits.</p>
+</div></details>
+<h3 class="qlabel">Question 3 · calculation</h3>
+<p class="q">A service has 900,000 daily users making 8 reads and 1 write each. Assuming a peak rate three times the daily average, estimate peak reads and writes per second and the read-to-write ratio.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Daily reads are <code>900,000 × 8 = 7,200,000</code> and daily writes are <code>900,000 × 1 = 900,000</code>. Dividing by 86,400 gives about 83.33 reads/s and 10.42 writes/s on average. At the assumed threefold peak, the rates are <code>83.33 × 3 ≈ 250 reads/s</code> and <code>10.42 × 3 ≈ 31.25 writes/s</code>. The ratio is <code>7,200,000 ÷ 900,000 = 8:1</code>. The peak rates retain that ratio: <code>250 ÷ 31.25 = 8</code>.</p>
+</div></details>
+<h3 class="qlabel">Question 4 · misconception</h3>
+<p class="q">Why does a 99.9% availability objective not by itself guarantee that a confirmed order survives a zone outage?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Availability measures whether the defined service result is delivered during a window. It does not state what accepted data survives a failure. The design needs a durability rule and an RPO for the zone outage, plus recovery evidence that checks the acknowledged orders against the restored state.</p>
+</div></details>
+<h3 class="qlabel">Question 5 · open-ended</h3>
+<p class="q">An online shop adds a flash sale and promises that a confirmed order is immediately visible, while product popularity counts may lag. Describe the requirements you would clarify, two design consequences, and how you would verify them.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Clarify the flash-sale peak arrival rate, read/write mix, p99 targets, inventory oversell rule, meaning of confirmation, permissible popularity-count lag, and failure behavior when payment or stock reservation is delayed. The immediate order read requires an authoritative or coherently updated read path; the popularity counter can use asynchronous updates with a bounded freshness target. Peak demand may also require admission control or capacity headroom. Verify the order invariant and read-after-confirmation behavior with concurrent requests and failover tests, then load-test at the stated peak mix while measuring end-to-end latency and counter lag.</p>
+</div></details>
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, identify actors and the system boundary; separate behavior, quality targets, and constraints; turn a journey into state transitions, errors, and invariants; calculate average and peak rates with explicit assumptions; state operation-specific latency, availability, recovery, consistency, durability, security, and cost rules; and connect each consequential requirement to a design decision and a test. A reader who can do all of these has covered the material.</p>
+</section>
+</main></div><script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script></body></html>
