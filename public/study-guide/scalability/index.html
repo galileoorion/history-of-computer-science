@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Scalability Study Guide | A History of Computer Science</title>
+<meta name="description" content="A system design study guide covering workload estimates, capacity, caching, replication, partitioning, hot keys and overload control.">
+<link rel="canonical" href="https://tech.attilakulik.com/study-guide/scalability/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style></head><body>
+<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">scalability</span></h1>
+<p class="lede">Estimate demand, find the limiting resource, scale reads and writes independently, and keep overload bounded.</p>
+<ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
+<details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#workload-and-capacity-estimates"><span class="tk">§2</span><span>Workload and capacity estimates</span></a></li><li><a href="#scaling-compute-and-routing-work"><span class="tk">§3</span><span>Scaling compute and routing work</span></a></li><li><a href="#scaling-reads-without-losing-control-of-misses"><span class="tk">§4</span><span>Scaling reads without losing control of misses</span></a></li><li><a href="#scaling-data-and-locating-hot-partitions"><span class="tk">§5</span><span>Scaling data and locating hot partitions</span></a></li><li><a href="#asynchronous-work-and-overload"><span class="tk">§6</span><span>Asynchronous work and overload</span></a></li><li><a href="#measuring-testing-and-evolving-the-design"><span class="tk">§7</span><span>Measuring, testing and evolving the design</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
+<nav class="rail" aria-label="Contents"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#workload-and-capacity-estimates"><span class="tk">§2</span><span>Workload and capacity estimates</span></a></li><li><a href="#scaling-compute-and-routing-work"><span class="tk">§3</span><span>Scaling compute and routing work</span></a></li><li><a href="#scaling-reads-without-losing-control-of-misses"><span class="tk">§4</span><span>Scaling reads without losing control of misses</span></a></li><li><a href="#scaling-data-and-locating-hot-partitions"><span class="tk">§5</span><span>Scaling data and locating hot partitions</span></a></li><li><a href="#asynchronous-work-and-overload"><span class="tk">§6</span><span>Asynchronous work and overload</span></a></li><li><a href="#measuring-testing-and-evolving-the-design"><span class="tk">§7</span><span>Measuring, testing and evolving the design</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main>
+<section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Explain scalability in terms of growing workload, required performance and additional resources.</li>
+<li>Estimate peak request rates, concurrency, storage growth and capacity headroom from stated assumptions.</li>
+<li>Choose vertical or horizontal scaling for a service and identify the shared bottleneck that limits either choice.</li>
+<li>Decide when caching, read replicas and content delivery reduce read pressure, including the effect of cache misses.</li>
+<li>Distinguish replication from partitioning and calculate the load on a hot shard.</li>
+<li>Size asynchronous workers and bounded queues, then choose a response when arrival rate exceeds processing capacity.</li>
+<li>Use measurements and load tests to decide which part of a system to scale next.</li>
+</ol>
+
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines scalability, load, capacity, throughput and latency. These terms let a design state what grows and what level of service it must preserve.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Scalability</dfn> A system's ability to accommodate growth in workload by adding resources while meeting stated performance and correctness requirements.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Load</dfn> The demand placed on a system, described by such quantities as requests per second, bytes per second, concurrent work and stored data.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Capacity</dfn> The maximum load a component can sustain under a specified workload while satisfying its performance and error targets.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Throughput</dfn> The number of completed operations per unit of time, such as successful requests per second.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Latency</dfn> The time from an operation's start to its completion, normally measured at several percentiles rather than only as an average.</p></aside>
+<p>A design scales only relative to a workload and a target. Doubling servers while response times rise beyond the agreed limit does not demonstrate useful scale. The workload must include its shape: a read, a payment write and a large file upload consume different resources even if each counts as one request. As load rises, a component reaches a limit in CPU, memory, storage I/O, network traffic, connection count or a downstream service. Adding capacity at another component leaves that limit in place.</p>
+<p>A frequent confusion is that scalability means handling any number of users. A count of registered users says little about simultaneous demand, and a system may handle more read traffic while remaining unable to handle more writes. State the operation, its peak rate and the performance target before judging whether it scales.</p>
+
+</section><section class="sec" id="workload-and-capacity-estimates"><p class="kicker">§2 · Mechanism</p><h2>Workload and capacity estimates</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Peak factor</dfn> The assumed ratio of peak arrival rate to average arrival rate over a chosen period.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Concurrency</dfn> The number of operations in progress at the same time.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Headroom</dfn> Capacity kept unused at expected peak load to absorb bursts, uneven distribution or a component failure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Little's law</dfn> In a stable system, average work in progress equals the average arrival rate multiplied by the average time each unit of work spends in the system: L = λW.</p></aside>
+<p>The first design step is to turn usage into rates for each important path. Divide daily operations by 86,400 seconds to obtain a daily average, then apply a peak factor supported by traffic history or an explicit assumption. Estimate reads and writes separately. Multiply operation count by payload size for storage and bandwidth, allowing separately for indexes, replicas, retention and protocol overhead. These are planning inputs, not universal machine limits.</p>
+<p>Concurrency depends on both arrival rate and duration. For a stable system, Little's law gives average in-flight work as arrival rate multiplied by average time in the system: <code>L = λW</code>. The units must match: requests per second times seconds gives requests. A slowdown can therefore exhaust a connection or worker pool even when the arrival rate has not changed.</p>
+<h3 class="worked"><span>Worked example</span>peak load and in-flight requests</h3>
+<p>Consider a service with 2 million daily active users, each making 12 reads and 2 writes per day. Assume the busiest hour has four times the daily average rate, and assume the average read takes 80 ms at that rate.</p>
+<p>First, daily reads are <code>2,000,000 × 12 = 24,000,000</code>, so average reads are <code>24,000,000 ÷ 86,400 ≈ 278/s</code>. Daily writes are <code>2,000,000 × 2 = 4,000,000</code>, so average writes are <code>4,000,000 ÷ 86,400 ≈ 46/s</code>. Apply the assumed peak factor to the unrounded rates: reads are <code>24,000,000 ÷ 86,400 × 4 ≈ 1,111/s</code> and writes are <code>4,000,000 ÷ 86,400 × 4 ≈ 185/s</code>. The total is <code>(24,000,000 + 4,000,000) ÷ 86,400 × 4 ≈ 1,296 requests/s</code>, which agrees with <code>1,111 + 185 = 1,296</code> after rounding.</p>
+<p>With the assumed 80 ms, or <code>0.08 s</code>, average in-flight reads are <code>1,111/s × 0.08 s ≈ 89</code>. Check the dimensions: the seconds cancel, leaving requests. If latency rises to an assumed <code>0.40 s</code> at the same arrival rate, in-flight reads become <code>1,111 × 0.40 ≈ 444</code>. That fivefold increase can saturate a fixed pool even though traffic did not grow.</p>
+
+</section><section class="sec" id="scaling-compute-and-routing-work"><p class="kicker">§3 · Mechanism</p><h2>Scaling compute and routing work</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Vertical scaling</dfn> Increasing the CPU, memory or other resources available to one machine or process.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Horizontal scaling</dfn> Adding independently running machines or processes that share a workload.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Stateless service</dfn> A service instance that does not rely on client-specific data retained in its own memory between requests.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Load balancer</dfn> A component that routes incoming work among healthy service instances according to a selection rule.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Load test</dfn> A controlled trial that applies a specified workload to measure completed operations, errors, resource use and latency.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Health check</dfn> A probe or signal used by a router to decide whether an instance can receive traffic.</p></aside>
+<p>Vertical scaling is often the simplest first response to a measured compute or memory limit, but a single machine has a finite size and remains one failure domain. Horizontal scaling increases parallel capacity when requests can be handled by interchangeable instances. Authentication sessions, uploaded files and workflow state must then live in a shared store or be otherwise available to any instance. That shared store has its own capacity limit. Adding API instances can increase its connection and query load until it becomes the bottleneck.</p>
+<p>The diagram shows how requests reach interchangeable instances and then converge on a shared database.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Clients → load balancer → API instance A ─┐
+                        → API instance B ─┼→ database
+                        → API instance C ─┘
+</code></pre></div></figure>
+<p>Read the arrows from left to right. The API tier can gain capacity by adding instances, but every instance still uses the same database; its write and connection limits must be checked separately. A load balancer also needs a redundant deployment and health checks if requests are to survive an instance failure.</p>
+<h3 class="worked"><span>Worked example</span>sizing an API pool</h3>
+<p>Consider a peak of 2,400 requests per second. Assume a load test shows one instance meets its latency target at up to 500 requests per second, and assume the pool must remain within that tested limit after any one instance fails.</p>
+<p>The arithmetic minimum while every instance is healthy is <code>ceil(2,400 ÷ 500) = 5</code> instances. With one failed instance, the minimum is <code>ceil(2,400 ÷ 500) + 1 = 6</code> total instances: five survivors each handle <code>2,400 ÷ 5 = 480/s</code>. If seven instances are provisioned, normal load is <code>2,400 ÷ 7 ≈ 343/s</code>, or <code>343 ÷ 500 ≈ 69%</code> of the tested per-instance rate. After one fails, each survivor handles <code>2,400 ÷ 6 = 400/s</code>, or 80% of that rate. The check is <code>6 × 500 = 3,000/s</code>, above the 2,400/s target. The percentages describe use of a tested request-rate limit; they do not establish CPU utilisation.</p>
+
+</section><section class="sec" id="scaling-reads-without-losing-control-of-misses"><p class="kicker">§4 · Mechanism</p><h2>Scaling reads without losing control of misses</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cache</dfn> A faster copy of data or a computed result kept so repeated reads avoid slower work.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cache hit ratio</dfn> The fraction of cache lookups served from the cache rather than its backing system.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Read replica</dfn> A database copy that receives updates from a primary and can serve reads independently.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replica lag</dfn> The delay between a write being accepted by the primary and becoming visible on a replica.</p></aside>
+<p>A cache helps when requests repeat for the same key while its entry is valid. A high volume of mostly unique searches can produce few hits, while a smaller volume concentrated on popular product pages can produce many. On a miss, the application still calls the backing store. It must size that store for plausible miss spikes, including expiry of popular entries and cache failure. Expiration or invalidation also sets the staleness the product can tolerate.</p>
+<p>A read replica can spread database reads, but it must receive every relevant write. It therefore increases read capacity and can aid failover; it does not multiply primary write capacity. A read that must reflect a just-completed write may need to use the primary or another mechanism with the required consistency.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Content delivery network</dfn> A geographically distributed set of edge servers that serves cached content near clients and reduces requests and bytes sent to an origin.</p></aside>
+<p>Static assets can be served from a content delivery network so their bytes bypass the application and origin for most requests.</p>
+<p>The diagram shows two ways to remove work from the primary read path.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Client → edge cache ──hit──────────────→ response
+                 └──miss→ API → cache ─hit→ response
+                                   └──miss→ read replica or primary
+</code></pre></div></figure>
+<p>The upper paths return a cached answer. Each miss moves farther toward the backing store, so a falling hit ratio increases downstream traffic even when client traffic stays constant.</p>
+<h3 class="worked"><span>Worked example</span>cache misses at peak</h3>
+<p>Consider <code>20,000</code> reads per second and assume an 85% hit ratio for a cache in front of a database. Hits are <code>20,000 × 0.85 = 17,000/s</code>, and misses are <code>20,000 × (1 − 0.85) = 3,000/s</code>. Check: <code>17,000 + 3,000 = 20,000/s</code>. If the cache is unavailable, as many as <code>20,000/s</code> can reach the backing path, which is <code>20,000 ÷ 3,000 ≈ 6.7</code> times the normal miss rate. The design needs a fallback capacity plan, admission control or a degraded response for that event.</p>
+
+</section><section class="sec" id="scaling-data-and-locating-hot-partitions"><p class="kicker">§5 · Mechanism</p><h2>Scaling data and locating hot partitions</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replication</dfn> Keeping copies of the same data on multiple nodes for read distribution, durability or failover.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partitioning</dfn> Dividing data into disjoint subsets so different nodes own different records or keys; database partitioning across nodes is also called sharding.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partition key</dfn> The field or computed value used to assign a record and its operations to a partition.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Hot key</dfn> A key whose request rate is high enough to overload the partition or resource that owns it.</p></aside>
+<p>Replication copies work and data; partitioning divides them. When a single write leader reaches its sustained capacity, adding followers generally does not remove that leader's write work. Partitioning can spread writes and storage, provided the key distributes traffic and common operations stay within one partition. Each partition can then be replicated for resilience. Cross-partition queries, joins and transactions cost more because several owners must participate.</p>
+<p>A hash can distribute many ordinary keys evenly yet still leave one very popular key hot. Measure requests and bytes per partition and per leading key, not only record counts. For a hot key, possible remedies include splitting its work into independently addressable subkeys, moving it to dedicated capacity or changing the algorithm so one request does less fan-out. Each remedy changes read assembly or ordering, so its correctness cost must be stated.</p>
+<p>The diagram separates partitioning from replication: records are divided across two leaders, then each leader's records are copied to a follower.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">key → partition rule ┬→ shard A leader → shard A follower
+                     └→ shard B leader → shard B follower
+</code></pre></div></figure>
+<p>Read across a branch to see replication and compare the branches to see partitioning. A follower can serve suitable reads or take over after failure; a new shard changes which leader owns writes.</p>
+<h3 class="worked"><span>Worked example</span>a hot customer key</h3>
+<p>Consider 16 shards and 16,000 requests per second. Assume one customer generates 20% of requests and the remaining 80% distributes evenly by key among the shards. Average load is <code>16,000 ÷ 16 = 1,000/s</code>. The hot customer generates <code>16,000 × 0.20 = 3,200/s</code>; ordinary traffic contributes <code>16,000 × 0.80 ÷ 16 = 800/s</code> to each shard. Its shard therefore receives <code>3,200 + 800 = 4,000/s</code>, four times the average. The other 15 receive <code>800/s</code> each. Check: <code>4,000 + 15 × 800 = 16,000/s</code>.</p>
+<p>Assume the hot customer's work can be divided evenly across four subkeys that land on four distinct shards. Each of those shards then receives <code>3,200 ÷ 4 + 800 = 1,600/s</code>, or 1.6 times average; the other 12 remain at <code>800/s</code>. Check: <code>4 × 1,600 + 12 × 800 = 16,000/s</code>. Reads that need all of that customer's data now assemble four subkeys, and any operation requiring one total order needs additional coordination.</p>
+
+</section><section class="sec" id="asynchronous-work-and-overload"><p class="kicker">§6 · Mechanism</p><h2>Asynchronous work and overload</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Queue</dfn> A buffer that holds work until a consumer can process it, separating the producer's timing from the consumer's timing.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Backpressure</dfn> A mechanism that keeps incoming work within downstream capacity by slowing, limiting or rejecting producers or admissions.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Load shedding</dfn> Deliberately rejecting lower-priority or excess work to protect successful service for admitted work.</p></aside>
+<p>Moving non-immediate work to a queue shortens the foreground request, but it does not create processing capacity. Workers must drain the queue at least as fast as the long-run arrival rate; otherwise backlog and waiting time grow. A bounded queue makes overload visible before memory or storage is exhausted. Producers then need a policy: slow down, retry later with a delay, receive a rejection, or receive a reduced service. Retries require limits and spacing because immediate retries add more traffic to an overloaded path.</p>
+<p>The diagram shows the feedback loop that is required when producers can outrun consumers.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Producer → admission limit → bounded queue → workers → dependency
+              ↑                   │
+              └── reject or slow ─┘
+</code></pre></div></figure>
+<p>Follow the top line for admitted work. When the queue approaches its bound, the lower path feeds a slowing or rejection decision back toward producers; simply adding queue space postpones the same capacity problem.</p>
+<h3 class="worked"><span>Worked example</span>backlog and recovery</h3>
+<p>Consider an arrival rate of 3,000 jobs per second and worker capacity of 2,000 jobs per second. Assume those rates remain constant for ten minutes. The net backlog growth is <code>3,000 − 2,000 = 1,000 jobs/s</code>; over <code>10 × 60 = 600 s</code>, it is <code>1,000 × 600 = 600,000 jobs</code>. Check: arrivals are <code>3,000 × 600 = 1,800,000</code> and completions are <code>2,000 × 600 = 1,200,000</code>, leaving 600,000.</p>
+<p>Assume arrivals then fall to 1,500 jobs per second while capacity remains 2,000. The queue drains at <code>2,000 − 1,500 = 500 jobs/s</code>, so clearing 600,000 jobs takes <code>600,000 ÷ 500 = 1,200 s</code>, or 20 minutes. That recovery time may be unacceptable even if the queue has room, so admission limits or extra consumer capacity must be planned before the burst.</p>
+
+</section><section class="sec" id="measuring-testing-and-evolving-the-design"><p class="kicker">§7 · Mechanism</p><h2>Measuring, testing and evolving the design</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Saturation</dfn> How close a resource is to its usable limit under the current workload.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Tail latency</dfn> Response time at a high percentile, such as the 99th percentile, that describes slower requests hidden by the mean.</p></aside>
+<p>Measure request rate, success rate and latency by operation, alongside saturation of CPU, memory, database connections, I/O, cache, queue and downstream quotas. A percentile must be calculated from the request distribution for the relevant interval; averaging per-host percentiles does not produce a fleet percentile. Record the workload mix and key skew in load tests so a test reflects expensive operations and hot customers, not only uniform requests. Test both the normal peak and the failure or miss path that consumes reserved headroom.</p>
+<p>Change one bottleneck at a time and repeat the measurement. A service might first need a larger instance, then more stateless instances, then read relief, and only later write partitioning. The order is conditional on measured limits. Define a trigger before each step, such as a rising database write latency at a known write rate, and verify that the change improves the end-to-end target rather than merely moving saturation elsewhere.</p>
+
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Review</p><h2>Common mistakes</h2>
+<p>The first mistake is treating average daily traffic as the peak. Daily division is easy to calculate, so the estimate looks precise, but traffic arrives unevenly. Use an observed or explicitly assumed peak factor and test bursts at the rate the system must actually admit.</p>
+<p>The second mistake is adding API instances when the database is saturated. The instances can accept more requests and create more database connections, which worsens the shared limit. Identify the resource with rising latency or rejection and scale, reduce or isolate that work.</p>
+<p>The third mistake is assuming a cache or replica is free capacity for every read. A cache miss still reaches the backing path, and a replica may lag behind accepted writes. Measure the hit ratio and miss storm, and route consistency-sensitive reads to a path that meets their requirement.</p>
+<p>The fourth mistake is choosing a partition key from even record counts alone. A popular key can send several times average traffic to one shard even when storage is balanced. Size from traffic per key and partition, then decide whether to split or isolate the hot work.</p>
+<p>The fifth mistake is using an unbounded queue as the overload plan. When producers exceed consumers, waiting time grows even if storage is plentiful. Bound admission, set a response at the limit and size recovery from the net drain rate.</p>
+
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Exercises</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation and application across the whole guide; each answer is collapsed beneath its question to be opened once the reader has worked out an answer.</p>
+<h3 class="qlabel">Question 1 · distinction</h3>
+<p class="q">How do vertical scaling, horizontal scaling, replication and partitioning differ in the resource they add or the work they distribute?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Vertical scaling enlarges one machine. Horizontal scaling adds machines to share work. Replication places copies of the same data on nodes, usually adding read paths and resilience while still sending writes to the relevant leader. Partitioning assigns different records to different owners, allowing write load and storage to be divided if keys are balanced.</p>
+</div></details>
+<h3 class="qlabel">Question 2 · calculation</h3>
+<p class="q">A service receives 10 million requests per day. Assume peak traffic is six times the daily average and average response time at peak is 150 ms. Estimate peak requests per second and average in-flight requests.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Average rate is <code>10,000,000 ÷ 86,400 ≈ 115.74/s</code>. Peak rate is <code>115.74 × 6 ≈ 694.44/s</code>. Convert <code>150 ms</code> to <code>0.15 s</code>; Little's law gives <code>694.44/s × 0.15 s ≈ 104.17</code>, so about 104 requests are in flight on average at peak. A check using unrounded values gives <code>10,000,000 × 6 × 0.15 ÷ 86,400 ≈ 104.17</code>.</p>
+</div></details>
+<h3 class="qlabel">Question 3 · calculation</h3>
+<p class="q">A database receives 12,000 reads per second. What load reaches it with a cache hit ratio of 75%, and what is the multiplier if every request misses?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Misses are <code>12,000 × (1 − 0.75) = 3,000/s</code>; hits are <code>12,000 × 0.75 = 9,000/s</code>. Check: <code>9,000 + 3,000 = 12,000/s</code>. All misses send <code>12,000/s</code>, which is <code>12,000 ÷ 3,000 = 4</code> times the normal database read rate.</p>
+</div></details>
+<h3 class="qlabel">Question 4 · application</h3>
+<p class="q">A read replica has spare CPU, but checkout sometimes reads an order immediately after creating it and reports that the order does not exist. Explain the mechanism and propose a routing change.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The replica receives writes after the primary, so replica lag can make the new order temporarily invisible. Route the immediate read to the primary, or use a read mechanism that waits for the relevant replication position. Keep eventually consistent browsing reads on replicas if their staleness contract permits it.</p>
+</div></details>
+<h3 class="qlabel">Question 5 · open-ended</h3>
+<p class="q">An online shop's promotion triples traffic. Product pages slow down, checkout writes remain correct but queue, one popular seller accounts for 30% of new orders, and email jobs accumulate. Describe the measurements, capacity changes and overload controls needed across these paths.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Measure peak reads and writes separately, latency by endpoint, cache hit ratio and miss rate, database read and write saturation, traffic by seller key, and email arrival, completion and oldest-job age. Product pages may benefit from an edge or application cache for repeated content, with the origin protected when it misses. Increase interchangeable API capacity only if that tier is saturated, and check the database connection budget after doing so. Keep checkout's correctness path on the authoritative writer; reduce its write cost or partition by a key that does not put the seller's 30% on one shard. If seller ownership requires one partition, isolate that seller or split independently safe work and state the ordering cost. Size email workers from the provider's real completion rate, bound the queue and slow or reject admissions before it grows without limit. Load-test the promotion and one-instance failure at the proposed peak, then confirm the end-to-end targets.</p>
+</div></details>
+
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, a reader should be able to define scalability against a workload and target; calculate average and peak rates, concurrency, headroom and queue growth with units; distinguish scaling a process from scaling a shared database; explain when caching and read replicas help and what happens on a miss or stale read; choose between replication and partitioning and calculate hot-shard load; set a bounded overload response; and use measurements and realistic tests to choose the next change. A reader who can do all of these has covered the material.</p>
+
+</section>
+</main></div><script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script></body></html>
