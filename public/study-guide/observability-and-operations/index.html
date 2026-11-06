@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Observability and Operations Study Guide | A History of Computer Science</title>
+<meta name="description" content="A system design study guide on service objectives, metrics, logs, traces, telemetry costs, alerting, safe releases, capacity and recovery.">
+<link rel="canonical" href="https://tech.attilakulik.com/study-guide/observability-and-operations/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style></head><body>
+<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">observability and operations</span></h1>
+<p class="lede">Measure user outcomes, connect metrics, logs and traces, respond to alerts, release safely, and verify capacity and recovery.</p>
+<ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
+<details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#define-outcomes-and-reliability-targets"><span class="tk">§2</span><span>Define outcomes and reliability targets</span></a></li><li><a href="#connect-metrics-logs-and-traces-to-the-request-path"><span class="tk">§3</span><span>Connect metrics, logs, and traces to the request path</span></a></li><li><a href="#keep-the-telemetry-pipeline-useful-and-affordable"><span class="tk">§4</span><span>Keep the telemetry pipeline useful and affordable</span></a></li><li><a href="#detect-problems-and-make-alerts-actionable"><span class="tk">§5</span><span>Detect problems and make alerts actionable</span></a></li><li><a href="#release-and-change-the-system-safely"><span class="tk">§6</span><span>Release and change the system safely</span></a></li><li><a href="#plan-capacity-and-prove-recovery"><span class="tk">§7</span><span>Plan capacity and prove recovery</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
+<nav class="rail" aria-label="Contents"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#define-outcomes-and-reliability-targets"><span class="tk">§2</span><span>Define outcomes and reliability targets</span></a></li><li><a href="#connect-metrics-logs-and-traces-to-the-request-path"><span class="tk">§3</span><span>Connect metrics, logs, and traces to the request path</span></a></li><li><a href="#keep-the-telemetry-pipeline-useful-and-affordable"><span class="tk">§4</span><span>Keep the telemetry pipeline useful and affordable</span></a></li><li><a href="#detect-problems-and-make-alerts-actionable"><span class="tk">§5</span><span>Detect problems and make alerts actionable</span></a></li><li><a href="#release-and-change-the-system-safely"><span class="tk">§6</span><span>Release and change the system safely</span></a></li><li><a href="#plan-capacity-and-prove-recovery"><span class="tk">§7</span><span>Plan capacity and prove recovery</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main>
+<section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Explain how observability supports operating a system and distinguish a user-visible failure from a healthy-looking component.</li>
+<li>Define a service level indicator, a service level objective, and an error budget for a named user journey, then calculate the budget from traffic and target.</li>
+<li>Choose metrics, structured logs, and distributed traces to answer different diagnostic questions across a request path.</li>
+<li>Design a telemetry pipeline that preserves useful detail while controlling label cardinality, sampling, retention, and sensitive data.</li>
+<li>Choose actionable alerts, external checks, health probes, and runbooks that connect a detected problem to a response.</li>
+<li>Compare staged release methods and plan compatible configuration and schema changes that can be reversed safely.</li>
+<li>Use capacity tests, recovery objectives, and restoration drills to verify that operational promises are achievable.</li>
+</ol>
+
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines observability, operations, telemetry, and a user journey. These terms connect system signals to the outcomes that users actually experience.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Observability</dfn> The ability to infer a system's internal behaviour from its outputs well enough to explain an unexpected state or failure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Operations</dfn> The continuing work of measuring, changing, protecting, and restoring a running system so its stated behaviour remains dependable.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Telemetry</dfn> Measurements and event records emitted by software and infrastructure, commonly as metrics, logs, and traces.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>User journey</dfn> A sequence of actions that delivers a user outcome, such as finding a product and placing an order, potentially across several services.</p></aside>
+<p>A design becomes observable when the signals let an operator connect an affected journey to the component or data transition responsible for it. Operations then uses that evidence to choose an action: stop a rollout, reduce admission, repair an integration, or restore data. A component's CPU graph can be normal while an order is paid but never confirmed, so operational design must start from the required outcome and trace inward to the resources that support it.</p>
+<p>The common confusion is to equate observability with collecting every possible log. Large volumes of records can still leave a failure unexplained if they lack a shared request identity, omit the decisive state transition, or measure only internal health. Useful signals answer a question and lead to an action; collection volume alone does neither.</p>
+
+</section><section class="sec" id="define-outcomes-and-reliability-targets"><p class="kicker">§2 · Outcomes and targets</p><h2>Define outcomes and reliability targets</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Service level indicator (SLI)</dfn> A measured quantity that represents a defined aspect of service behaviour, such as the fraction of eligible requests that complete correctly within a latency limit.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Service level objective (SLO)</dfn> A target for an SLI over a stated measurement window.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Error budget</dfn> The permitted number or fraction of events that may fail an SLO's good-event rule within its measurement window.</p></aside>
+<p>An SLI needs a population and a good-event rule. For checkout, a good event might mean that an eligible attempt reaches a durable order confirmation within a stated duration; merely returning HTTP 200 would not prove that the order exists. The measurement point matters too. A server-side SLI can miss failures at the edge or in a client, while a scheduled test journey can cover only the path it exercises. Define exclusions narrowly so a dependency outage is not hidden by removing its failed requests from the denominator.</p>
+<p>The diagram shows how the outcome rule is applied before the target is evaluated.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Eligible user attempts → outcome and latency check → good / not good
+                                              ↓
+                                  SLI over a window → compare with SLO
+</code></pre></div></figure>
+<p>Read left to right: first decide which attempts count, then classify each result, then aggregate over the same window used by the objective. A service dashboard can display the resulting ratio, but the rule that classifies an event must be specified before the dashboard is trusted.</p>
+<h3 class="worked"><span>Worked example</span>a request-based error budget</h3>
+<p>Consider an API with 50 million eligible requests in a 30-day window and an SLO that 99.9% are good. The allowed bad fraction is <code>1 − 0.999 = 0.001</code>. The error budget is <code>50,000,000 × 0.001 = 50,000</code> bad requests. Check: <code>50,000,000 − 50,000 = 49,950,000</code> good requests, and <code>49,950,000 ÷ 50,000,000 = 0.999</code>.</p>
+<p>Assume 20,000 bad requests have already occurred in that window. The spent share is <code>20,000 ÷ 50,000 = 0.40</code>, or 40%, leaving <code>50,000 − 20,000 = 30,000</code> bad requests before the target is missed. This arithmetic is specific to a request-based SLI; a time-based availability objective needs a time denominator instead.</p>
+
+</section><section class="sec" id="connect-metrics-logs-and-traces-to-the-request-path"><p class="kicker">§3 · Diagnostic signals</p><h2>Connect metrics, logs, and traces to the request path</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Metric</dfn> A numerical measurement aggregated over time, such as request rate, error count, queue age, or connection-pool saturation.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Structured log</dfn> An event record with named fields that can be searched and correlated without parsing free-form prose.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Distributed trace</dfn> A record of one operation's path through services, made of timed spans that represent individual units of work.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Correlation ID</dfn> An identifier carried across requests, events, logs, and traces so records belonging to one logical operation can be joined.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Tail latency</dfn> Response time at a high percentile, such as the 99th percentile, that exposes slow requests hidden by an average.</p></aside>
+<p>Metrics show whether a problem is widespread and when it began. Logs explain discrete decisions and failures, such as a payment result being marked unknown. A trace shows where one slow or failed request spent time across the dependency graph. The correlation ID joins these views. Instrument entry points and asynchronous handoffs so the ID survives a queue; record the outcome of important state transitions, not only incoming requests.</p>
+<p>This comparison helps select the signal that answers a particular question.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Question it answers well</th>
+<th>Limitation to plan for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Metric</td>
+<td>How often and how broadly is a condition occurring?</td>
+<td>Aggregation can hide one affected key or one incorrect transition.</td>
+</tr>
+<tr>
+<td>Structured log</td>
+<td>What decision or state change occurred for this operation?</td>
+<td>Searching high-volume records can be expensive and slow.</td>
+</tr>
+<tr>
+<td>Distributed trace</td>
+<td>Which calls and waits shaped this operation's latency?</td>
+<td>Sampling may omit the particular failed request.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The signals complement rather than replace one another. A rising checkout tail latency can lead to a trace of a slow database call, then to a log explaining which lock or query failed; the metric still shows whether the issue affects all checkouts or one route.</p>
+<p>The diagram follows a request and its identifiers through two services and a queue.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Client → API span ────────→ inventory span → database span
+            │                    │
+            ├→ request metric    └→ decision log
+            └→ queued event with correlation ID → worker span → outcome log
+</code></pre></div></figure>
+<p>Follow the top line for synchronous calls and the lower line for delayed work. The queued event carries the correlation ID because a later worker is part of the same logical journey even though it runs in a different process and at a different time.</p>
+<p>A high percentile should be calculated from the combined request distribution for the chosen window. Averaging the p99 values of individual hosts does not produce a fleet p99, because each host may have different traffic volume and latency shape.</p>
+
+</section><section class="sec" id="keep-the-telemetry-pipeline-useful-and-affordable"><p class="kicker">§4 · Telemetry design</p><h2>Keep the telemetry pipeline useful and affordable</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Metric label</dfn> A named dimension attached to a metric series, such as route, status class, or region, that permits filtering and grouping.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cardinality</dfn> The number of distinct values or combinations a label set can take, which determines how many separate time series must be stored.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Sampling</dfn> Keeping a selected subset of high-volume telemetry, often traces or logs, while preserving a defined basis for interpretation.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Retention</dfn> The period for which collected telemetry remains available before it is deleted or moved to cheaper storage.</p></aside>
+<p>Instrumentation sends events through collectors and processing stages to storage. This path has its own failure modes: buffers can fill, sampling can discard the only evidence of a rare event, and high-cardinality labels can overwhelm a metrics store. Keep labels bounded, reserve request IDs for logs and traces rather than metric labels, and choose a retention period from diagnosis and audit needs. Avoid putting secrets or personal data into telemetry; access and deletion rules apply to these stores as well as to primary data.</p>
+<p>The diagram shows where volume and privacy controls belong.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Service signals → collector → filter / redact / sample → metric, log, trace stores
+                       │                    │
+                       └→ bounded buffer    └→ retention and access policy
+</code></pre></div></figure>
+<p>Read left to right: the service emits the evidence, the collector limits and routes it, and each store keeps only what its use requires. If this pipeline fails, the service should have a defined behaviour, and loss of operational evidence should itself be visible through an independent signal.</p>
+<h3 class="worked"><span>Worked example</span>label combinations</h3>
+<p>Consider a request metric labeled by 3 methods, 5 routes, 4 status classes, and 10 instances. Assume every combination occurs. Its upper-bound series count is <code>3 × 5 × 4 × 10 = 600</code>. If a user identifier with 100,000 distinct values is added and, as a worst-case assumption, each user occurs in every existing combination, the bound becomes <code>600 × 100,000 = 60,000,000</code> series. Check: the new dimension multiplies the original count by <code>60,000,000 ÷ 600 = 100,000</code>. Real counts depend on which combinations occur, but a per-user metric label is still an unbounded growth path; put the identifier in a protected log or trace field when it is genuinely needed.</p>
+
+</section><section class="sec" id="detect-problems-and-make-alerts-actionable"><p class="kicker">§5 · Detection and response</p><h2>Detect problems and make alerts actionable</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Synthetic monitoring</dfn> Scheduled execution of a controlled user journey from outside the service to check a critical path even when real traffic is absent.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Invariant alert</dfn> An alert on a condition that must hold in the system's data or workflow, such as every paid order eventually reaching a terminal state.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Health check</dfn> A probe that reports whether an instance is running or able to receive traffic; liveness governs restarting it, while readiness governs routing new work to it.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Runbook</dfn> A maintained procedure linked to an alert that describes how to confirm, contain, repair, and verify a specific failure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Burn rate</dfn> The rate at which an SLO's error budget is being consumed relative to the rate that would use the whole budget evenly over the window.</p></aside>
+<p>An alert should identify an actionable condition, an owner, and a response. User-visible errors, sustained SLO burn, and broken invariants are stronger paging signals than an isolated CPU threshold. Resource saturation remains useful for diagnosis and capacity planning. A synthetic journey catches a failed path at low traffic and can cover the public edge; it must use safe test data and be excluded from business volume. Liveness probes should not restart every instance because one shared database is slow, and readiness should answer whether an instance can usefully accept traffic rather than test every possible dependency.</p>
+<p>The diagram connects detection to response and verification.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Real traffic + synthetic checks + invariants → alert → owner and runbook
+                                                  ↓
+                                   contain → repair → verify outcome
+                                                  ↓
+                                          update signals and procedure
+</code></pre></div></figure>
+<p>Read the top line as the detection path. The lower loop closes only when the operator confirms the user outcome has recovered and updates the runbook or instrumentation so the next incident is easier to diagnose.</p>
+<h3 class="worked"><span>Worked example</span>interpreting error-budget burn</h3>
+<p>Consider a 99.9% request-success SLO. Its allowed bad fraction is <code>1 − 0.999 = 0.001</code>, or 0.1%. Assume a recent interval has 10,000 eligible requests and 100 bad results, so the observed bad fraction is <code>100 ÷ 10,000 = 0.01</code>, or 1%. The burn rate is <code>0.01 ÷ 0.001 = 10</code>. Check: 1% is ten times 0.1%.</p>
+<p>If the request rate and bad fraction remain constant, a fresh 30-day budget would be consumed in <code>30 ÷ 10 = 3 days</code>. This is a projection under the constant-rate assumption, not a promise about how much budget remains now. An alert can use burn measured over more than one window so a brief spike and a sustained failure are treated differently.</p>
+
+</section><section class="sec" id="release-and-change-the-system-safely"><p class="kicker">§6 · Change safety</p><h2>Release and change the system safely</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Canary release</dfn> A rollout that directs a small, measured share of traffic to a new version before widening exposure if its outcomes remain acceptable.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Rolling deployment</dfn> Replacement of running instances in batches so old and new versions coexist temporarily.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Blue-green deployment</dfn> Keeping an old and a new environment ready, then switching the chosen traffic route between them, usually for a rapid reversal if needed.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Feature flag</dfn> A runtime control that changes a code path without a new deployment; a kill switch is a flag reserved for quickly disabling risky behaviour.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Infrastructure as code</dfn> Version-controlled definitions of infrastructure and configuration that can be reviewed and applied reproducibly.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Expand–migrate–contract</dfn> A compatible sequence for changing stored data: add the new structure, move data and readers while old and new versions coexist, then remove the old structure in a later step.</p></aside>
+<p>Release design is part of operations because a bad change can affect every healthy component at once. A canary limits initial exposure and compares user outcomes, latency, and correctness signals with the old version. A rolling deployment limits how many instances are replaced together but still requires old and new code to share data safely. Blue-green can make traffic reversal quick, but a single switch to all users does not limit the initial blast radius. Feature flags separate deployment from activation; an emergency flag must be reachable when the affected dependency is failing. Infrastructure as code makes the intended environment reviewable, and emergency manual changes must be reconciled back into it.</p>
+<p>The diagram shows a staged release with a measured decision before widening traffic.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Old version ←──── 99% of traffic       New version ← 1% of traffic
+       │                                    │
+       └──────── compare outcomes ─────────┘
+                           ↓
+             widen, hold, or route back to old version
+</code></pre></div></figure>
+<p>The two branches see different shares of the same live workload. Compare like-for-like routes and users where possible, and include business outcomes: a version returning HTTP 200 with a missing order is not a successful canary. Schema and message changes need compatibility across both versions; expand–migrate–contract delays irreversible removal until older instances and data are accounted for.</p>
+<h3 class="worked"><span>Worked example</span>initial canary exposure</h3>
+<p>Consider a service receiving 20,000 requests per second. Assume the canary receives exactly 1% for five minutes and every canary request is affected by a new defect. Its rate is <code>20,000 × 0.01 = 200 requests/s</code>; five minutes is <code>5 × 60 = 300 s</code>, so at most <code>200 × 300 = 60,000</code> requests follow the faulty version during that interval. Check: the full service receives <code>20,000 × 300 = 6,000,000</code> requests, and <code>60,000 ÷ 6,000,000 = 0.01</code>. The cap holds only if routing really stays at 1%, and the defect must produce a signal the comparison can detect before traffic widens.</p>
+
+</section><section class="sec" id="plan-capacity-and-prove-recovery"><p class="kicker">§7 · Capacity and recovery</p><h2>Plan capacity and prove recovery</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Capacity planning</dfn> Estimating future demand and comparing it with measured component limits and the headroom needed for bursts or failures.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Load test</dfn> A controlled application of realistic traffic to measure throughput, latency, and failure behaviour at expected and excess load.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Recovery time objective (RTO)</dfn> The longest acceptable time from a specified disruption until a required function is restored.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Recovery point objective (RPO)</dfn> The greatest acceptable age of recoverable data at the time of a specified disruption, which bounds potential data loss in time.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Restoration drill</dfn> A timed exercise that restores retained data into a usable system and checks both completeness and application behaviour.</p></aside>
+<p>Operations closes the design loop by comparing actual traffic with the assumptions used to size the system. Forecast peak demand, include work caused by retries and recovery, and load-test the same traffic mix and key skew that production sees. The capacity limit is the rate at which the user-visible target still holds, not the rate at which a process merely remains alive. Keep room for a node or zone loss if that fault is within the availability goal.</p>
+<p>Backups and replicas solve different problems. A replica can take traffic after a node failure but also copies a mistaken deletion. A protected backup and retained change history make recovery from corruption possible, while a restoration drill establishes how long it actually takes and which writes survive. RTO and RPO must be stated for a named scenario and compared with measurements from drills, not inferred from the existence of backups.</p>
+<p>The diagram shows the operating loop from measurement to verified recovery.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Measured demand → forecast → load test → capacity decision → running service
+       ↑                                              │
+       └──── outcome and saturation measurements ─────┘
+
+Backup → isolated restore → correctness checks → measured RTO and RPO
+</code></pre></div></figure>
+<p>The upper loop revises capacity as demand changes. The lower path tests whether stored recovery material can become a working service within the required time and data-loss bounds.</p>
+<h3 class="worked"><span>Worked example</span>capacity after one instance fails</h3>
+<p>Consider a forecast peak of 900 requests per second. Assume a tested instance meets the latency target at no more than 350 requests per second, and assume one instance may fail while the peak continues. With all instances healthy, the arithmetic minimum is <code>ceil(900 ÷ 350) = 3</code>. To keep serving after one fails, provision <code>3 + 1 = 4</code> instances. Each of the three survivors then receives <code>900 ÷ 3 = 300 requests/s</code>, below the tested 350. Check: <code>3 × 350 = 1,050 requests/s</code>, above the 900 target, whereas two survivors would offer only <code>2 × 350 = 700 requests/s</code>. This assumes traffic can be redistributed evenly and the shared dependencies can handle the same peak.</p>
+
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Review</p><h2>Common mistakes</h2>
+<p>The first mistake is defining success as an HTTP 200 response. It happens because server status is easy to count, while completion of a business transition may occur later. Define the good event at the user outcome, including latency and correctness, and measure it from a point that sees the relevant failures.</p>
+<p>The second mistake is labeling a metric with a user or request identifier. It happens because the label makes a dashboard filter convenient for one investigation, but it multiplies the number of stored series by a large and growing population. Keep bounded dimensions on metrics and use protected logs or traces for individual identities.</p>
+<p>The third mistake is paging on every resource spike or every nonzero invariant count without a response policy. It happens because thresholds are easy to set, but a transient fluctuation or an expected in-flight state may not need a person. Alert on sustained user impact or a genuinely broken invariant, assign an owner, and link a tested runbook.</p>
+<p>The fourth mistake is treating a small canary's clean HTTP error rate as proof of a safe release. It happens because the new code may return plausible but incorrect data, or the canary may not exercise the affected route. Compare business outcomes and coverage, and keep old and new data formats compatible until the rollout is complete.</p>
+<p>The fifth mistake is treating backups as verified recovery. A snapshot may be unreadable, incomplete, inaccessible during an outage, or too slow to restore. Restore into an isolated environment, check application invariants, and measure the actual RTO and RPO.</p>
+
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Exercises</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation and application across the whole guide, and each answer is collapsed beneath its question to be opened once the reader has worked out an answer.</p>
+<h3 class="qlabel">Question 1 · distinction</h3>
+<p class="q">A checkout alert shows a rising bad-request ratio. What different questions should a metric, a trace, and a structured log answer during diagnosis?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The metric shows how many eligible checkouts fail, when the increase began, and which bounded route or region dimensions are affected. A trace follows one affected checkout through its services and shows where time or failure occurred. A structured log records the decision or state transition at that point, using the same correlation ID so the event can be tied to the trace and the original request.</p>
+</div></details>
+<h3 class="qlabel">Question 2 · calculation</h3>
+<p class="q">An API receives 8 million eligible requests in a measurement window and has a 99.95% good-request SLO. How many bad requests can it tolerate, and what fraction of the budget has been used after 1,200 bad requests?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The bad fraction is <code>1 − 0.9995 = 0.0005</code>. The budget is <code>8,000,000 × 0.0005 = 4,000</code> bad requests. After 1,200, the used fraction is <code>1,200 ÷ 4,000 = 0.30</code>, or 30%; <code>4,000 − 1,200 = 2,800</code> remain. Check: <code>8,000,000 − 4,000 = 7,996,000</code> good requests, and <code>7,996,000 ÷ 8,000,000 = 0.9995</code>.</p>
+</div></details>
+<h3 class="qlabel">Question 3 · calculation</h3>
+<p class="q">A metric has 6 route labels, 3 status classes, 4 regions, and 5 instances. Assuming every combination occurs, how many series does it produce? What happens if a label with 20,000 distinct customer IDs is added and every combination occurs?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The original count is <code>6 × 3 × 4 × 5 = 360</code> series. The customer label raises the upper bound to <code>360 × 20,000 = 7,200,000</code> series. Check: <code>7,200,000 ÷ 360 = 20,000</code>, the factor introduced by that label. Actual counts depend on which combinations occur, but the risk follows from the multiplicative bound.</p>
+</div></details>
+<h3 class="qlabel">Question 4 · application</h3>
+<p class="q">A canary returns HTTP 200 and has normal latency, but some orders are missing their confirmation event. Which release signals and response should change?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Count durable order confirmations and missing confirmation events as outcome or invariant signals, segmented by version so the canary can be compared with the old version. Stop widening the canary and route its traffic back if the missing-event condition is confirmed. Preserve the event records or repair path needed to reconcile affected orders, and do not remove old schema or message support until both versions and the backlog are accounted for.</p>
+</div></details>
+<h3 class="qlabel">Question 5 · open-ended</h3>
+<p class="q">An online shop expects a seasonal traffic peak, sometimes loses its recommendations service, and needs to deploy a new order schema without stopping checkout. Describe the observability, alerting, rollout, capacity, and recovery decisions that should be made together.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Define good checkout and browsing events, their measurement window, and the permitted bad-event budget. Emit request rate, error and duration metrics; bounded resource saturation metrics; a correlated trace across checkout; and structured logs for order state changes. Alert on user impact and broken order invariants, with an owner and a runbook. Keep recommendations optional with a visible fallback signal, and test the missing dependency under peak load. Forecast the seasonal peak, load-test its traffic mix and one-instance loss, and leave capacity headroom for that failure. Add the new schema compatibly, backfill and verify it, then canary new code while comparing order outcomes against the old version; remove the old structure only after every instance has moved. Maintain protected backups, rehearse a restore, and measure recovery time and surviving writes against scenario-specific RTO and RPO targets.</p>
+</div></details>
+
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, a reader should be able to define observability and operations from user outcomes; specify an SLI, SLO, and error budget and recompute the budget; choose metrics, logs, traces, and correlation fields for a distributed journey; estimate metric cardinality and plan sampling and retention; connect external checks and invariant alerts to an actionable runbook; stage a release and compatible schema change with outcome-based comparison; and plan capacity and verify recovery with load and restoration tests. A reader who can do all of these has covered the material.</p>
+
+</section>
+</main></div><script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script></body></html>
