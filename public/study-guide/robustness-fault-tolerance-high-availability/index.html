@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Robustness, Fault Tolerance and High Availability Study Guide | A History of Computer Science</title>
+<meta name="description" content="A system design study guide on reliability targets, correctness, timeouts, safe retries, failover, backups and tested recovery.">
+<link rel="canonical" href="https://tech.attilakulik.com/study-guide/robustness-fault-tolerance-high-availability/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+</style></head><body>
+<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">robustness, fault tolerance, and high availability</span></h1>
+<p class="lede">Define reliability targets, contain failures, preserve correctness across retries and failover, and prove recovery works.</p>
+<ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
+<details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#set-reliability-targets-and-failure-boundaries"><span class="tk">§2</span><span>Set reliability targets and failure boundaries</span></a></li><li><a href="#preserve-correctness-at-request-boundaries"><span class="tk">§3</span><span>Preserve correctness at request boundaries</span></a></li><li><a href="#contain-slow-dependencies-and-overload"><span class="tk">§4</span><span>Contain slow dependencies and overload</span></a></li><li><a href="#retry-safely-after-uncertain-outcomes"><span class="tk">§5</span><span>Retry safely after uncertain outcomes</span></a></li><li><a href="#use-redundancy-and-failover-without-losing-data"><span class="tk">§6</span><span>Use redundancy and failover without losing data</span></a></li><li><a href="#restore-verify-and-improve-the-recovery-path"><span class="tk">§7</span><span>Restore, verify, and improve the recovery path</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
+<nav class="rail" aria-label="Contents"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#set-reliability-targets-and-failure-boundaries"><span class="tk">§2</span><span>Set reliability targets and failure boundaries</span></a></li><li><a href="#preserve-correctness-at-request-boundaries"><span class="tk">§3</span><span>Preserve correctness at request boundaries</span></a></li><li><a href="#contain-slow-dependencies-and-overload"><span class="tk">§4</span><span>Contain slow dependencies and overload</span></a></li><li><a href="#retry-safely-after-uncertain-outcomes"><span class="tk">§5</span><span>Retry safely after uncertain outcomes</span></a></li><li><a href="#use-redundancy-and-failover-without-losing-data"><span class="tk">§6</span><span>Use redundancy and failover without losing data</span></a></li><li><a href="#restore-verify-and-improve-the-recovery-path"><span class="tk">§7</span><span>Restore, verify, and improve the recovery path</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main>
+<section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Distinguish robustness, fault tolerance, and high availability by the failure each addresses and the guarantee it preserves.</li>
+<li>Define availability, recovery time, and recovery point targets for a particular operation and failure scenario.</li>
+<li>Protect correctness when inputs are invalid, requests race, or an operation's outcome is unknown.</li>
+<li>Combine timeouts, bounded concurrency, circuit breaking, and load shedding to contain a slow dependency.</li>
+<li>Design retries so transient failures can recover without duplicating effects or overwhelming a service.</li>
+<li>Explain the detection, promotion, fencing, and routing steps of failover, including the data-loss trade-off in replication.</li>
+<li>Verify recovery and data safety with independent checks, fault injection, and backup restoration.</li>
+</ol>
+
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines a fault, a failure, robustness, fault tolerance, high availability, and availability. These terms separate the event that goes wrong from the behaviour the system promises when it does.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Fault</dfn> A defect or adverse condition within or around a system, such as a crashed process, a slow network link, a malformed request, or a full disk.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Failure</dfn> An observable departure from a system's required behaviour, such as returning a wrong answer, timing out, losing a confirmed write, or becoming unreachable.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Robustness</dfn> The ability to handle invalid inputs, concurrency, resource limits, and unexpected conditions without violating the system's correctness rules.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Fault tolerance</dfn> The ability to preserve a specified function or correctness guarantee despite faults in one or more components.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>High availability</dfn> A design goal of keeping specified functions accessible for a large fraction of requests or time, including during component failure and repair.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Availability</dfn> The measured fraction of eligible requests that complete correctly within a stated time target, or the measured fraction of an agreed time window during which that condition holds; the measurement convention must be named.</p></aside>
+<p>A malformed order should be rejected without corrupting stored orders: that is robustness. A server may crash while another takes over and preserves acknowledged orders: that is fault tolerance. If customers can still place orders within the stated response target through most of the measurement window, the service meets a high availability goal. These properties overlap, but a service can be available while returning incorrect answers, or preserve every write while taking hours to recover.</p>
+<p>A common confusion is to equate redundancy with all three properties. A second server can take traffic after a crash, but it cannot correct invalid state, detect every failure, or guarantee that a write reached the replacement. Each guarantee needs its own mechanism and measurement.</p>
+
+</section><section class="sec" id="set-reliability-targets-and-failure-boundaries"><p class="kicker">§2 · Reliability targets</p><h2>Set reliability targets and failure boundaries</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Service level objective (SLO)</dfn> A numerical target for a service measure over a defined window, such as the share of checkout attempts completed correctly within a time limit over 30 days.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Recovery time objective (RTO)</dfn> The longest acceptable time from a specified disruption until the affected function is restored.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Recovery point objective (RPO)</dfn> The greatest acceptable age of the latest recoverable state at the moment of a specified disruption, which bounds potential data loss in time.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Failure domain</dfn> A set of components that can be lost together because they share a cause, such as one host, availability zone, network, cloud account, or software release.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Availability zone</dfn> A physically separate deployment area within a region, used as one possible boundary for infrastructure failures.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Single point of failure</dfn> A component whose loss alone makes a required function unavailable because no other component can take over its role.</p></aside>
+<p>An availability target must name the operation, success condition, response limit, measurement window, and excluded or included traffic. A target for browsing can differ from one for committing an order. RTO and RPO must also name the scenario: loss of one process, a database primary, an availability zone, or an entire region can require different recovery mechanisms. A target is a design input; a drill supplies the measured result.</p>
+<p>The diagram shows why two instances in one failure domain do not protect against every outage.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">                    ┌─ zone A: API 1 ─┐
+Client → router ─────┤                 ├→ database in zone A
+                    └─ zone A: API 2 ─┘
+                         zone A fails → both APIs and database lost
+</code></pre></div></figure>
+<p>Read across the shared zone label: adding API instances protects against one process failing, but a zone loss still removes the whole path. Spreading the required components across independent domains changes which faults can be tolerated; a shared router or database can remain a single point of failure.</p>
+<h3 class="worked"><span>Worked example</span>an availability budget</h3>
+<p>Consider a 30-day measurement window and assume an operation has a time-based availability target of 99.9%. The window contains <code>30 × 24 × 60 = 43,200 minutes</code>. The unavailable fraction is <code>1 − 0.999 = 0.001</code>, so the budget is <code>43,200 × 0.001 = 43.2 minutes</code>. Check: <code>43,200 − 43.2 = 43,156.8</code> available minutes, and <code>43,156.8 ÷ 43,200 = 0.999</code>.</p>
+<p>If the target is 99.99%, the unavailable fraction is <code>1 − 0.9999 = 0.0001</code>, giving <code>43,200 × 0.0001 = 4.32 minutes</code>. This arithmetic does not by itself define how partial failures count; the SLO must say whether a slow or incorrect request consumes the budget.</p>
+
+</section><section class="sec" id="preserve-correctness-at-request-boundaries"><p class="kicker">§3 · Correctness</p><h2>Preserve correctness at request boundaries</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Invariant</dfn> A condition that must remain true across every permitted state transition, such as a confirmed order having one authoritative payment result.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Atomic operation</dfn> A state change that either takes effect as one unit or does not take effect, so competing requests cannot observe a partial result.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Concurrency control</dfn> A rule or mechanism that decides how overlapping operations on the same state interact, using transactions, conditional updates, locks, or version checks.</p></aside>
+<p>Robustness starts before a machine fails. Validate incoming data at the boundary, enforce business invariants at the authoritative state change, and reject impossible transitions. Input validation alone is insufficient: two valid requests can race and both try to reserve the final item. An atomic conditional update or transaction must make one succeed and the other receive a clear conflict. The database constraint remains useful even when application validation is present, because every write path must obey it.</p>
+<p>The diagram traces two valid requests racing for one remaining unit.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Request A ─┐
+           ├→ atomic update: decrement only if stock &gt; 0 → one success
+Request B ─┘                                      └────────→ one conflict
+</code></pre></div></figure>
+<p>The requests converge at one atomic decision. Checking stock in a separate read and then decrementing later would permit both requests to see the same unit; the protected transition makes the outcome depend on a single authoritative write.</p>
+<p>An error response must also describe the state honestly. If a payment call times out after the remote side may have committed it, the result is unknown, not a confirmed failure. Recording that uncertainty and resolving it later is safer than declaring failure and starting an unrelated second charge. This leads to the retry rules below.</p>
+
+</section><section class="sec" id="contain-slow-dependencies-and-overload"><p class="kicker">§4 · Failure containment</p><h2>Contain slow dependencies and overload</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Timeout</dfn> A limit on how long a caller waits for an attempt or resource acquisition before it stops waiting.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Deadline</dfn> The latest time by which the entire request must complete, passed through dependent calls as a remaining time budget.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Bulkhead</dfn> An enforced cap on the threads, connections, in-flight calls, or other resources one class of work may hold.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Circuit breaker</dfn> A control that stops most calls to a dependency after repeated failures or slow responses, then permits a limited number of probes to test recovery.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Load shedding</dfn> Deliberately rejecting excess or lower-priority work when the service cannot complete it within its target.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Graceful degradation</dfn> Serving a stated reduced function when an optional dependency is unavailable, while preserving required correctness and security controls.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Little's law</dfn> For stable throughput, average work in progress equals the arrival rate multiplied by average time in the system: L = λW.</p></aside>
+<p>A slow dependency holds caller resources even when it has not returned an error. A timeout bounds each wait, and a propagated deadline stops later services from doing work after the original request can no longer use the result. A bulkhead limits how many callers can be trapped at once. A circuit breaker then reduces traffic to a dependency already known to be unhealthy. Load shedding limits total admitted work before queues and latency grow without bound. These controls cover different quantities, so one does not replace the others.</p>
+<p>The diagram shows an optional recommendation service isolated from an order path.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Client → API ───────────────→ order store → response
+          └→ capped calls → recommendation service
+                └→ timeout or open breaker → omit recommendations
+</code></pre></div></figure>
+<p>The lower branch may fail or slow without taking every API worker. The fallback is valid because recommendations are optional. Authorisation, order totals, and payment status cannot be replaced by guesses merely to preserve a successful response.</p>
+<h3 class="worked"><span>Worked example</span>a slow dependency and a fixed pool</h3>
+<p>Consider an API offered 200 requests per second, each calling an optional dependency. Assume that dependency normally takes <code>50 ms = 0.05 s</code>, and that the API has 200 request workers. For a stable system, Little's law gives required average in-flight calls as arrival rate times response time: <code>200/s × 0.05 s = 10</code> calls. If the dependency slows to an assumed <code>5 s</code> while arrivals continue, sustaining that rate would require <code>200/s × 5 s = 1,000</code> concurrent calls. Check: <code>1,000 ÷ 10 = 100</code>, matching the latency increase from <code>0.05</code> to <code>5 s</code>.</p>
+<p>The 200-worker pool cannot supply 1,000 concurrent calls, so throughput will fall and a queue will grow; the 1,000 figure is demand implied by the offered rate, not an observed steady state. A bulkhead of, say, an assumed 20 concurrent recommendation calls caps this optional branch at one tenth of the request-worker count, while a timeout releases permits and a fallback lets other requests proceed.</p>
+
+</section><section class="sec" id="retry-safely-after-uncertain-outcomes"><p class="kicker">§5 · Safe retries</p><h2>Retry safely after uncertain outcomes</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Retry</dfn> A new attempt at an operation after a previous attempt did not produce a usable result for the caller.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Idempotency</dfn> A property of an operation for which repeating it has the same intended effect as one execution, within a stated scope and period.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Idempotency key</dfn> A stable identifier supplied with repeated attempts so the receiver can return the first operation's recorded outcome instead of performing the effect again.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Exponential backoff with jitter</dfn> A retry schedule whose delay grows between attempts and includes randomness, reducing synchronized retry waves.</p></aside>
+<p>Timeout does not prove that the remote operation failed. A request can commit just before the response is lost. Retry a write only when the operation is naturally idempotent or the receiver durably deduplicates attempts with the same idempotency key. The deduplication record and effect must be coordinated so two concurrent attempts cannot both pass a check. External effects, such as sending an email after a database commit, need their own duplicate protection.</p>
+<p>Choose one layer to retry, distinguish transient failures from permanent rejections, cap attempts, and stop when the request deadline is exhausted. Backoff with jitter spreads retries in time; it does not create spare capacity. Under sustained overload, rejecting or deferring work is more useful than adding attempts.</p>
+<p>The diagram traces the uncertain outcome of a write and its safe retry.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Client ── key K, create order ──→ server ── commit ──→ order store
+Client ←── response lost ──────── network
+Client ── key K, retry ─────────→ server ── look up K ─→ original result
+</code></pre></div></figure>
+<p>Read the second request as a query for the first attempt's outcome. It must not create another order. A new key would represent a new operation and could duplicate the effect.</p>
+<h3 class="worked"><span>Worked example</span>retry amplification</h3>
+<p>Consider three sequential service layers, each configured for at most three attempts per call, including the first attempt. Assume every attempt fails in a way each layer considers retryable. The top layer makes <code>3</code> attempts to the middle layer; each middle attempt makes <code>3</code> attempts to the bottom layer's caller; each of those makes <code>3</code> attempts to the final dependency. The final dependency can receive <code>3 × 3 × 3 = 27</code> calls for one original request. Check by grouping: the first two layers produce <code>3 × 3 = 9</code> calls, and <code>9 × 3 = 27</code> at the bottom. Keeping retries at one chosen boundary caps this multiplication and makes the overall deadline easier to enforce.</p>
+
+</section><section class="sec" id="use-redundancy-and-failover-without-losing-data"><p class="kicker">§6 · Failover</p><h2>Use redundancy and failover without losing data</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Redundancy</dfn> Extra components or copies arranged so a specified fault can occur without ending a required function.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replication</dfn> Copying state to another node so it can serve reads, preserve data, or assume responsibility after failure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Failover</dfn> Moving a workload or leadership role from a failed or unreachable component to a replacement.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Split brain</dfn> A state in which two nodes simultaneously act as the sole owner of a role and can create conflicting histories.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Fencing</dfn> A mechanism that prevents an old owner from changing protected state after a replacement has taken over, for example by rejecting writes with an obsolete generation number.</p></aside>
+<p>Stateless application instances can usually fail over by stopping traffic to an unhealthy instance and routing it to another with spare capacity. Stateful failover also needs a replacement with suitable data. The transfer has four steps: detect that the old owner cannot serve, choose a successor, prevent the old owner from writing, and redirect clients. A slow or partitioned old owner may still be alive, so detection alone cannot make two writers safe. Fencing must be enforced where the protected state is changed.</p>
+<p>The diagram shows a leader replacement with a fenced old owner.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">Clients → router → leader A ── replicated state ─→ standby B
+                    │ failure suspected             │ promoted
+                    └─ old writes rejected ← generation advances
+Clients → router ───────────────────────────→ leader B
+</code></pre></div></figure>
+<p>Follow the first line before failover and the last line after it. The generation change rejects writes from A even if it resumes; routing B without that guard would risk split brain. The router and the replacement's capacity also need independent failure protection.</p>
+<p>Asynchronous replication acknowledges a write before its copy reaches the standby, so a promotion can lose recently acknowledged writes. Waiting for a durable copy before acknowledging reduces that risk but adds coordination latency and may block writes if the required copy is unavailable. Neither a replica nor automatic promotion protects against a mistaken delete or corrupting application write that is faithfully copied to every node.</p>
+<h3 class="worked"><span>Worked example</span>recovery time and potential data loss</h3>
+<p>Consider a primary failure. Assume detection takes 8 seconds, successor selection and fencing take 7 seconds, and client redirection plus warm-up take 20 seconds. Recovery takes <code>8 + 7 + 20 = 35 seconds</code>. Check: the three stages account for the whole interruption, so a 30-second RTO would be missed by 5 seconds under these assumptions.</p>
+<p>Assume the primary accepted 1,000 writes per second and its standby was 0.2 seconds behind when the primary failed. If that lag consists of acknowledged writes that exist only on the failed primary, the potential loss is <code>1,000/s × 0.2 s = 200 writes</code>. The multiplication checks the units, but actual loss depends on which writes reached durable storage and which replica is promoted; a measured replication position is needed to establish the real RPO.</p>
+
+</section><section class="sec" id="restore-verify-and-improve-the-recovery-path"><p class="kicker">§7 · Recovery</p><h2>Restore, verify, and improve the recovery path</h2>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Backup</dfn> A retained copy of data from which state can be restored after loss or corruption.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Point-in-time recovery</dfn> Restoration to a selected moment by combining a base backup with a retained sequence of changes up to that moment.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Synthetic check</dfn> A controlled request issued from outside the service to verify that a user-visible operation still works.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Fault injection</dfn> A controlled test that removes or degrades a component to observe the system's actual failure and recovery behaviour.</p></aside>
+<p>Replication is for continued service after an infrastructure fault. A backup retained outside the affected failure domain is for recovering from deleted or corrupted data, including mistakes that replicas copy. A restoration test must prove that the data is readable, that the application can use it, and that the process completes within its RTO. For a time-based backup schedule, the interval since the last recoverable point informs the RPO; the duration of the restore informs the RTO.</p>
+<p>The diagram places the two recovery objectives on opposite sides of a disruption.</p>
+<figure class="diagram"><figcaption>System flow</figcaption><div class="scroll"><pre><code class="language-text">last recoverable state ── possible lost work ── failure ── detection and restore ── service resumes
+                         ←────── RPO ──────→           ←──────── RTO ────────→
+</code></pre></div></figure>
+<p>Read leftward from failure to the last recoverable state for the data-loss window, and rightward to restored service for the interruption. A fast restart can have a poor RPO, while a slow restore can retain every write.</p>
+<p>Monitor actual successful operations, error and latency rates, replication position, failover progress, queue age, and correctness invariants. An external synthetic check can detect outages that internal monitoring misses because it shares the failing system. Exercise process loss, slow dependencies, duplicate requests, primary promotion, and backup restoration, then compare measured recovery and data loss with their targets. Changes to software are another failure source: a staged rollout limits the fraction of traffic exposed to a bad release, but a restore still needs to account for incompatible data changes.</p>
+
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Review</p><h2>Common mistakes</h2>
+<p>The first mistake is equating a fast response with a correct one. It happens because availability dashboards often count only HTTP status and latency. A successful response that lost an acknowledged write or bypassed an invariant is a failure under a correctness-aware SLO; define success to include the required outcome.</p>
+<p>The second mistake is treating a second instance as complete failover. Both instances may share a database, router, region, or bad release, and a standby may lack capacity or current data. Map failure domains and test the whole path through detection, fencing, routing, and warm-up.</p>
+<p>The third mistake is retrying every timeout. A timeout leaves the outcome uncertain, and retries at several layers multiply load. Use one bounded retry point, a shared deadline, and idempotency for effects that could otherwise be duplicated.</p>
+<p>The fourth mistake is letting a slow optional dependency occupy all request workers. It happens because the dependency is still returning success, so error-based alarms and breakers may remain quiet. Apply a deadline and an independent concurrency cap, observe slow-call rate, and use a stated fallback for the optional function.</p>
+<p>The fifth mistake is calling replicas a backup. Replicas reproduce deletes and corruption as well as valid writes. Retain protected backups or change logs in a separate failure domain and practise restoring them to a usable state.</p>
+
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Exercises</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation and application across the whole guide, and each answer is collapsed beneath its question to be opened once the reader has worked out an answer.</p>
+<h3 class="qlabel">Question 1 · distinction</h3>
+<p class="q">An API rejects a malformed order without changing state, survives one API instance crashing, and serves checkout during that crash. Which observations demonstrate robustness, fault tolerance, and high availability?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Rejecting the malformed order without state change demonstrates robustness. Preserving the checkout function when an instance crashes demonstrates fault tolerance to that fault. Serving checkout during the crash contributes to high availability; whether the system meets a specific availability target still requires measurement over the stated window and latency limit.</p>
+</div></details>
+<h3 class="qlabel">Question 2 · calculation</h3>
+<p class="q">An operation has a time-based 99.95% availability target over 30 days. How many minutes of unavailability does that permit?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>The window is <code>30 × 24 × 60 = 43,200 minutes</code>. The unavailable fraction is <code>1 − 0.9995 = 0.0005</code>, so the budget is <code>43,200 × 0.0005 = 21.6 minutes</code>. Check: <code>43,200 − 21.6 = 43,178.4</code> available minutes, and <code>43,178.4 ÷ 43,200 = 0.9995</code>.</p>
+</div></details>
+<h3 class="qlabel">Question 3 · calculation</h3>
+<p class="q">A primary accepts 2,000 writes per second, and a standby is 150 ms behind when the primary fails. Under the assumption that every write in that interval exists only on the primary, how many acknowledged writes could be lost by promoting the standby?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Convert <code>150 ms</code> to <code>0.15 s</code>. The potential loss is <code>2,000 writes/s × 0.15 s = 300 writes</code>. The seconds cancel, leaving writes. This is an estimate under the stated assumption; inspect durable replication positions to determine actual loss.</p>
+</div></details>
+<h3 class="qlabel">Question 4 · application</h3>
+<p class="q">A payment request times out after the provider may have committed a charge. What should the service record and how can it retry safely?</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Record the attempt as having an unknown outcome rather than as a definite failure. Reuse the same provider idempotency key when retrying or query the provider for that attempt's result. Keep local state tied to one logical payment and reconcile it against the provider's authoritative result before confirming a new charge or reporting success.</p>
+</div></details>
+<h3 class="qlabel">Question 5 · open-ended</h3>
+<p class="q">An online shop uses one database primary and two API instances in one zone. During a promotion, the old primary sometimes resumes, recommendations become slow, and a mistaken delete is copied to the standby. Propose changes that address correctness, availability, and recovery, and say how to test them.</p>
+<details class="ans"><summary>Answer</summary><div class="ans-body"><p>Set separate success and recovery targets for browsing and checkout, including a rule for acknowledged orders. Place API capacity and a database standby across suitable independent failure domains, and verify that the router can move traffic with enough capacity left. Promote one primary at a time and enforce fencing at the write resource so the old primary cannot resume writes. Bound recommendation calls with timeouts, a bulkhead, and a breaker, and omit recommendations when the optional service fails; checkout correctness controls remain required. Keep protected backups and a change log for point-in-time recovery from the delete, because replication copies it. Test a slow recommendation dependency, an API loss, primary promotion while a request is in flight, attempted stale-primary writes, and a timed restore. Measure user-visible interruption and the set of acknowledged writes that survive each test.</p>
+</div></details>
+
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, a reader should be able to distinguish robustness, fault tolerance, and high availability; state a measurable success condition and calculate an availability budget; set RTO and RPO for a named failure; enforce invariants when requests race or outcomes are uncertain; bound waiting, concurrency, retries, and admitted load; explain each step of a fenced failover and its potential data-loss window; and prove recovery with independent checks and a tested restore. A reader who can do all of these has covered the material.</p>
+
+</section>
+</main></div><script>
+(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) { l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) { a.addEventListener('click', function () { a.closest('details').open = false; }); });
+})();
+</script></body></html>
