@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Big Data Study Guide | A History of Computer Science</title>
+<meta name="description" content="A Big Data study guide on workload shape, storage layout, distributed computation, stream processing, data quality, governance, and architecture choices, with worked examples and practice questions.">
+<link rel="canonical" href="https://tech.attilakulik.com/study-guide/big-data/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: reading column, sticky section rail, margin-ruled definitions, collapsible answers. */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #fcfcfb;
+  --ink: #1b2022;
+  --ink-2: #4a5458;
+  --rule: #d9dedc;
+  --accent: #0e6a70;
+  --accent-soft: #e2efee;
+  --code-bg: #eef1f0;
+  --comment: #6c7a78;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+    --accent: #5fc3c8; --accent-soft: #15292b;
+    --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111517; --sheet: #161b1d; --ink: #e2e7e8; --ink-2: #a3aeb1; --rule: #2b3336;
+  --accent: #5fc3c8; --accent-soft: #15292b;
+  --code-bg: #1d2427; --comment: #8a9a9c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.62;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 1000px) { .shell { grid-template-columns: minmax(0, 1fr); gap: 0; } .rail { display: none; } }
+
+/* masthead */
+.mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
+.mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.mast .eyebrow a:hover { border-bottom-color: currentColor; }
+.mast .eyebrow a:focus-visible, .guide-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; margin: 52px 0 0; padding: 22px 0 0; border-top: 1px solid var(--rule); font: 500 13px/1.5 var(--font-mono); }
+.guide-nav a { color: var(--accent); text-decoration: none; }
+.guide-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.mast h1 .verb { color: var(--accent); }
+.mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 13px/1.4 var(--font-mono); color: var(--ink-2); margin: 4px 0 0; padding: 0; list-style: none; }
+.meta b { color: var(--ink); font-weight: 500; }
+.ans summary:focus-visible, .rail a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* rail */
+.rail { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+.rail p { font: 600 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 12px; }
+.rail ol, .mtoc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rail a, .mtoc a { display: grid; grid-template-columns: 34px 1fr; gap: 6px; padding: 6px 8px; border-radius: 6px; color: var(--ink-2); text-decoration: none; font: 500 14px/1.3 var(--font-display); }
+.rail a:hover, .mtoc a:hover { background: var(--accent-soft); color: var(--ink); }
+.rail a.on { color: var(--accent); background: var(--accent-soft); }
+.tk { font: 500 12px/1.5 var(--font-mono); color: var(--accent); }
+.mtoc { display: none; margin-top: 24px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+.mtoc summary { cursor: pointer; padding: 12px 14px; font: 600 13px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.mtoc ol { padding: 0 6px 10px; }
+@media (max-width: 1000px) { .mtoc { display: block; } }
+
+/* content */
+main { min-width: 0; max-width: 72ch; }
+.sec { padding-block: 40px 8px; border-bottom: 1px solid var(--rule); }
+.sec:last-child { border-bottom: 0; }
+.kicker { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+h2 { font: 700 clamp(26px, 3.6vw, 34px)/1.15 var(--font-display); letter-spacing: -0.015em; margin: 0 0 18px; text-wrap: balance; }
+h3 { font: 600 21px/1.25 var(--font-display); margin: 34px 0 12px; text-wrap: balance; }
+h3.worked span { display: block; font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+p { margin: 0 0 16px; }
+ol, ul { padding-left: 1.4em; margin: 0 0 16px; }
+li { margin-bottom: 6px; }
+li::marker { font-family: var(--font-mono); color: var(--accent); font-size: .9em; }
+code { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+em { font-style: italic; }
+
+/* definitions */
+.def { margin: 22px 0; padding: 12px 0 12px 18px; border-left: 3px solid var(--accent); display: grid; gap: 4px; }
+.def-tag { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.def p { margin: 0; font-size: 16.5px; }
+.def dfn { font-style: normal; font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+.def + .def { margin-top: -10px; }
+
+/* code and diagrams */
+figure { margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); min-width: 0; }
+figcaption { font: 500 11px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+.scroll { overflow-x: auto; }
+pre { margin: 0; padding: 14px 16px; }
+pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+.diagram pre code { color: var(--accent); }
+.diagram.flow svg { display: block; width: 100%; height: auto; background: var(--sheet); }
+.diagram.flow .flow-node { fill: var(--sheet); stroke: var(--accent); stroke-width: 2; }
+.diagram.flow .flow-node.process, .diagram.flow .flow-node.output { fill: var(--accent-soft); }
+.diagram.flow .flow-link { fill: none; stroke: var(--accent); stroke-width: 2; }
+.diagram.flow .flow-link.dashed { stroke-dasharray: 6 5; }
+.diagram.flow .flow-arrowhead { fill: var(--accent); }
+.diagram.flow .flow-label { fill: var(--ink); font: 600 15px var(--font-display); text-anchor: middle; }
+
+.c { color: var(--comment); font-style: italic; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font: 400 14px/1.45 var(--font-display); }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font: 600 12px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); background: var(--accent-soft); }
+tr:last-child td { border-bottom: 0; }
+
+/* practice questions: the question carries the weight, the answer stays quiet until opened */
+.practice { display: grid; gap: 0; margin-top: 8px; }
+.qa { padding: 26px 0 22px; border-top: 1px solid var(--rule); }
+.qlabel { font: 600 11.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 10px; }
+.q { font: 500 19px/1.5 var(--font-body); color: var(--ink); margin: 0 0 14px; }
+.parts { padding-left: 1.4em; margin: 0; }
+.parts li { margin-bottom: 14px; }
+.parts li p { margin: 0 0 8px; font-size: 18px; }
+.ans { margin: 0; }
+.ans summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12.5px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2);
+  padding: 7px 10px 7px 8px; border-radius: 6px;
+}
+.ans summary::-webkit-details-marker { display: none; }
+.ans summary::before { content: "+"; display: inline-grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--rule); border-radius: 4px; font-size: 12px; line-height: 1; }
+.ans[open] summary::before { content: "−"; }
+.ans summary:hover { color: var(--ink); background: var(--accent-soft); }
+.ans-body { padding: 6px 0 2px 16px; margin: 4px 0 0 8px; border-left: 1px solid var(--rule); color: var(--ink-2); font-size: 16px; }
+.ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
+@media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
+
+/* common mistakes: one card per mistake with labelled cause, consequence and fix */
+.mistakes { list-style: none; padding: 0; margin: 8px 0 16px; display: grid; gap: 14px; counter-reset: m; }
+.mistake { counter-increment: m; margin: 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); padding: 16px 18px 6px; }
+.mistake h3 { margin: 0 0 12px; font-size: 19px; display: flex; gap: 10px; align-items: baseline; }
+.mistake h3::before { content: counter(m, decimal-leading-zero); font: 500 12px/1 var(--font-mono); color: var(--accent); }
+.mistake dl { margin: 0; display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 6px 14px; }
+.mistake dt { font: 600 11px/1.9 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.mistake dt.fix { color: var(--accent); }
+.mistake dd { margin: 0 0 10px; font-size: 16px; }
+.mistake dd a, .checklist a { color: var(--accent); }
+@media (max-width: 560px) { .mistake dl { grid-template-columns: minmax(0, 1fr); gap: 0; } .mistake dd { margin-bottom: 12px; } }
+.checklist { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
+.checklist li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; margin: 0; }
+.checklist li::before { content: ""; width: 16px; height: 16px; margin-top: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
+.checklist .sref { font: 500 12px/1 var(--font-mono); color: var(--ink-2); white-space: nowrap; }
+</style></head><body><div class="shell" id="top"><header class="mast"><span class="eyebrow"><a href="/study-guide/">Study guide</a> · Data systems</span><h1>Study guide: <span class="verb">Big Data</span></h1><p class="lede">Plan data storage and processing from workload requirements, then check correctness, freshness, and cost.</p><ul class="meta"><li><b>Updated</b> 8 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul><details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#workload-and-data-shape"><span class="tk">§2</span><span>Workload and data shape</span></a></li><li><a href="#storage-and-data-layout"><span class="tk">§3</span><span>Storage and data layout</span></a></li><li><a href="#distributed-computation"><span class="tk">§4</span><span>Distributed computation</span></a></li><li><a href="#batch-and-stream-processing"><span class="tk">§5</span><span>Batch and stream processing</span></a></li><li><a href="#data-quality-and-governance"><span class="tk">§6</span><span>Data quality and governance</span></a></li><li><a href="#choosing-an-architecture"><span class="tk">§7</span><span>Choosing an architecture</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header><nav class="rail" aria-label="Contents"><p>Contents</p><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#workload-and-data-shape"><span class="tk">§2</span><span>Workload and data shape</span></a></li><li><a href="#storage-and-data-layout"><span class="tk">§3</span><span>Storage and data layout</span></a></li><li><a href="#distributed-computation"><span class="tk">§4</span><span>Distributed computation</span></a></li><li><a href="#batch-and-stream-processing"><span class="tk">§5</span><span>Batch and stream processing</span></a></li><li><a href="#data-quality-and-governance"><span class="tk">§6</span><span>Data quality and governance</span></a></li><li><a href="#choosing-an-architecture"><span class="tk">§7</span><span>Choosing an architecture</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></nav><main><section class="sec" id="learning-objectives"><p class="kicker">· · Start here</p><h2>Learning objectives</h2>
+<ol>
+<li>Explain when data size, arrival rate, and variety make a single-machine design impractical.</li>
+<li>Choose a data layout that supports reliable storage and efficient queries.</li>
+<li>Trace how a distributed job partitions work, exchanges data, and recovers from failure.</li>
+<li>Distinguish batch processing from stream processing and reason about event time and late data.</li>
+<li>Calculate storage, transfer, and processing costs from explicit assumptions.</li>
+<li>Apply data quality, privacy, and access controls across a data pipeline.</li>
+<li>Choose an architecture from workload requirements and explain its trade-offs.</li>
+</ol>
+</section><section class="sec" id="core-concepts"><p class="kicker">§1 · Definitions</p><h2>Core concepts</h2>
+<p>This section defines Big Data, distributed systems, records and datasets, and two common processing modes.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Big Data</dfn> Data whose size, arrival rate, or diversity makes the required storage or processing difficult with a single machine and conventional methods. The boundary depends on the workload and available hardware, rather than a fixed number of bytes.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Distributed system</dfn> A collection of networked computers that cooperate on a task while each computer has its own memory, storage, and potential failures.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Record</dfn> One unit of stored or transmitted data, such as one order or one sensor reading.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Dataset</dfn> A defined collection of records with an intended meaning and structure, such as orders or sensor readings.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Batch processing</dfn> Processing a bounded collection of records, often on a schedule.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Stream processing</dfn> Processing records as they arrive from an ongoing, potentially unbounded sequence.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Vertical scaling</dfn> Increasing the capacity of one computer by adding resources such as memory, processors, or faster storage.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Horizontal scaling</dfn> Increasing capacity by adding computers that divide storage or work.</p></aside>
+<p>An online shop might produce orders, page visits, and inventory updates. Its order dataset may fit on one machine while the page-visit dataset does not, or a small dataset may still need distributed processing to meet a short response deadline. A distributed system divides storage and computation among machines, but coordination, network transfers, and partial failures become part of the design. Batch and stream processing describe how work is organized; either can operate on data held across many machines.</p>
+<p>Vertical scaling changes the capacity of a single failure and scheduling boundary. It is often a sensible first step when data fits comfortably on one machine, because it avoids splitting a job and exchanging results over a network. Horizontal scaling can add aggregate capacity beyond one machine's limit, but a job benefits only when its work can be divided. A calculation that must proceed through one serial step remains limited by that step, regardless of how many idle workers are available. The design question is therefore which parts of the workload can run independently and which parts require shared state or communication.</p>
+<p>The same dataset can support very different workloads. A historical report may scan every event once a day, a product page may look up one item thousands of times per second, and a fraud check may need a recent summary within seconds. Their record counts alone do not identify the right design. Storage layout, computation, and the time allowed for an answer all matter. A system may keep one durable copy of the input and create several derived views because no single layout makes all those access patterns efficient.</p>
+<p>The common confusion is to treat Big Data as a synonym for a particular product or a threshold such as one terabyte. It describes a mismatch between workload requirements and a simple design. A larger machine may solve some workloads more cheaply than a cluster, while other workloads need distribution for their rate, availability, or geographic reach.</p>
+</section><section class="sec" id="workload-and-data-shape"><p class="kicker">§2 · Study section</p><h2>Workload and data shape</h2>
+<p>Before choosing technology, describe what arrives, how quickly it arrives, and what questions must be answered. The amount of stored data affects capacity; the arrival rate affects how data is received; the required answer time affects processing and lookup methods. Different record shapes also affect how easily data can be validated and analyzed.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Schema</dfn> A description of a dataset's fields, types, and constraints.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Query</dfn> A request to retrieve or calculate an answer from stored data.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Throughput</dfn> The amount of data or number of operations a system handles per unit of time.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Latency</dfn> The elapsed time from a request or event to the corresponding result.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Structured data</dfn> Records arranged in predictable fields and types, such as rows of orders with an ID, timestamp, and price.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Unstructured data</dfn> Content without a uniform field layout, such as images or free-form text.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Cardinality</dfn> The number of distinct values in a field, such as the number of different customer IDs.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Selectivity</dfn> The fraction of records a query keeps after applying a filter; a highly selective filter keeps relatively few records.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data freshness</dfn> The delay between a real-world change and its appearance in the dataset or result used by a reader.</p></aside>
+<p>A schema makes it possible to reject malformed records and to interpret a field consistently across jobs. Structured records are straightforward to filter by field; unstructured content usually needs extraction or specialized preparation before the same kind of query is possible. Throughput and latency must be stated separately: a nightly job may process billions of records but return no immediate answer, while a live dashboard may require a result within seconds at a much lower total rate.</p>
+<p>For a useful workload description, name the expected and peak arrival rates, average and largest record sizes, the period for which data must be retained, and the number of readers. State whether queries select a few records or summarize most of them. Cardinality helps predict whether a field is a useful grouping rule: a date field with a manageable number of dates can divide files into useful groups, while a unique event ID can create an impractically large number of groups if used directly. Selectivity helps estimate how much work a filter avoids. A query that keeps one record in a million benefits from a lookup structure or a way to skip irrelevant groups; a query that keeps half the dataset may be better served by reading records in sequence.</p>
+<p>Data freshness differs from query latency. A dashboard can answer a request in 50 milliseconds while showing data from yesterday; its query latency is short but its freshness is poor. Conversely, a job can incorporate an event immediately and still take several seconds to answer a complex query. Specify both limits separately. Also decide whether late or corrected input should revise prior answers, because that decision affects storage and processing long after the first result appears.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Queue</dfn> A buffer that holds incoming records until a consumer can process them.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Backlog</dfn> Records waiting in a queue or processing system because they have arrived faster than they were handled.</p></aside>
+<p>Peak rates matter more than averages when deciding whether a receiver needs spare capacity or a place to queue records. If a feed averages 10,000 records per second but reaches 40,000 during a sale, a design sized only for the average will accumulate work. A queue can absorb a temporary burst if later processing has enough spare capacity to catch up; if the sustained input rate exceeds the processing rate, the backlog grows without bound. The workload description should therefore include how long a peak lasts and how soon delayed records must be processed.</p>
+<p>Record size should be measured as a distribution, not only as an average. A few unusually large records can exceed message or memory limits even when the daily byte total is manageable. Likewise, growth estimates should describe what causes growth: more users, more events per user, additional fields, or longer retention. Each cause may affect a different part of the system. More users can increase the number of active keys in a stream job, while longer retention mainly increases storage and the range of historical scans. Measurements from representative busy periods are more useful than a single quiet-day sample.</p>
+<h3 class="worked"><span>Worked example</span>Estimating daily input</h3>
+<p>Consider an event feed with 10,000 records per second. Assume each encoded record averages 500 bytes and the rate stays constant for 24 hours. One day contains 24 × 60 × 60 = 86,400 seconds. The feed therefore produces 10,000 × 86,400 = 864,000,000 records per day, or 864,000,000 × 500 = 432,000,000,000 bytes per day. In decimal units, that is 432 GB per day. As a check, 10,000 × 500 = 5,000,000 bytes per second, and 5,000,000 × 86,400 gives the same daily total. This is input volume before copies, extra lookup data, temporary files, or compression.</p>
+<p>Assume this feed reaches 40,000 records per second for one hour each day, replacing one hour at the usual 10,000-record rate. The extra records are (40,000 − 10,000) × 3,600 = 108,000,000. They add 108,000,000 × 500 = 54,000,000,000 bytes, or 54 GB, making that day's total 432 + 54 = 486 GB. The peak input rate is 40,000 × 500 = 20,000,000 bytes per second, four times the usual rate. The daily total and peak rate answer different capacity questions: one concerns storage growth, while the other concerns the receiver's ability to keep up during the busiest hour.</p>
+</section><section class="sec" id="storage-and-data-layout"><p class="kicker">§3 · Study section</p><h2>Storage and data layout</h2>
+<p>Once the workload is known, records need a durable location and a layout that lets jobs read only what they need. A common design separates the stored files from the computers that process them. Data is divided across storage units so capacity and read work can grow, while additional copies protect against hardware failure.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Ingestion</dfn> The process of receiving data from producers and placing it into a system for storage or processing.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Object storage</dfn> A storage service that addresses whole objects by keys and keeps their bytes and metadata separately from the computers that process them.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data lake</dfn> A collection of datasets stored in files or objects, often retaining raw data alongside cleaned and derived data.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partition</dfn> A subset of a dataset selected by a rule, such as date or customer region, so that work can target only relevant records.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replication</dfn> Keeping additional copies of data so it remains available if a copy is lost or a machine fails.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Columnar format</dfn> A file layout that stores values from the same field together, allowing a query to read selected fields without scanning every field of every record.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Compression</dfn> Encoding data with fewer bytes, usually in exchange for processor work during writing and reading.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Partition pruning</dfn> Skipping partitions whose recorded values cannot satisfy a query's filter.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Compaction</dfn> Combining many small data files into fewer larger files while preserving their logical records.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Catalog</dfn> A record of available datasets, their schemas, locations, and other information needed to find and interpret them.</p></aside>
+<p>The physical layout should be selected from actual query filters. If reports routinely ask for a date range, date partitions let partition pruning exclude other dates. If reports often ask for one customer across many dates, date partitions alone may still require reading numerous files; a second layout or a dedicated lookup store may be justified. Partitions should be neither so broad that every query reads most data nor so narrow that each one contains tiny files. Compaction reduces the overhead of opening thousands of files and can improve compression, but it consumes resources and may temporarily need extra space.</p>
+<p>The catalog makes raw files discoverable as named datasets and records what their columns mean. Keeping files without a dependable catalog can leave readers unable to tell which version is current, which fields are valid, or whether two datasets use the same units. A data lake therefore needs management as well as inexpensive storage. Keeping the original input can support reprocessing after a bug is found, while cleaned and derived datasets avoid repeating expensive preparation for every reader. The distinction between raw and published data should be visible in names, permissions, and lineage.</p>
+<p>The diagram shows how records move through ingestion into dated partitions and then into a query job.</p>
+<figure class="diagram flow"><figcaption>Storage flow</figcaption><div class="scroll"><svg viewBox="0 0 870 280" style="min-width:760px" role="img" aria-labelledby="storage-flow-title storage-flow-desc" xmlns="http://www.w3.org/2000/svg"><title id="storage-flow-title">Storage flow</title><desc id="storage-flow-desc">Record producers send records to ingestion. Ingestion writes three date partitions. Each partition can be read by the query job.</desc><defs><marker id="storage-flow-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path class="flow-arrowhead" d="M0 0L8 4L0 8Z"/></marker></defs><path class="flow-link" d="M190 140 H239" marker-end="url(#storage-flow-arrow)"/><path class="flow-link" d="M385 140 C424 140 429 50 469 50" marker-end="url(#storage-flow-arrow)"/><path class="flow-link" d="M385 140 H469" marker-end="url(#storage-flow-arrow)"/><path class="flow-link" d="M385 140 C424 140 429 230 469 230" marker-end="url(#storage-flow-arrow)"/><path class="flow-link" d="M635 50 C670 50 669 122 699 122" marker-end="url(#storage-flow-arrow)"/><path class="flow-link" d="M635 140 H699" marker-end="url(#storage-flow-arrow)"/><path class="flow-link" d="M635 230 C670 230 669 158 699 158" marker-end="url(#storage-flow-arrow)"/><g><rect class="flow-node " x="24" y="110" width="166" height="60" rx="9"/><text class="flow-label"><tspan x="107" y="145">Record producers</tspan></text></g><g><rect class="flow-node process" x="240" y="110" width="145" height="60" rx="9"/><text class="flow-label"><tspan x="312.5" y="145">Ingestion</tspan></text></g><g><rect class="flow-node " x="470" y="20" width="165" height="60" rx="9"/><text class="flow-label"><tspan x="552.5" y="55">Date partition A</tspan></text></g><g><rect class="flow-node " x="470" y="110" width="165" height="60" rx="9"/><text class="flow-label"><tspan x="552.5" y="145">Date partition B</tspan></text></g><g><rect class="flow-node " x="470" y="200" width="165" height="60" rx="9"/><text class="flow-label"><tspan x="552.5" y="235">Date partition C</tspan></text></g><g><rect class="flow-node output" x="700" y="110" width="145" height="60" rx="9"/><text class="flow-label"><tspan x="772.5" y="145">Query job</tspan></text></g></svg></div></figure>
+<p>Read the arrows from left to right. A query for one date can read one partition; a query across all dates reads all three. Partitioning reduces unnecessary reads only when the partition rule matches a common filter. A poor rule can create many tiny files or put most records in one partition, making jobs slower or uneven. Columnar files further reduce reads when a query needs only a few fields, and compression reduces storage and transfer at the cost of decoding. Replication improves durability but increases physical storage and does not replace a backup against accidental deletion or corruption.</p>
+<p>For example, a row-oriented representation of orders places each order's ID, date, customer, items, and amount together. It is convenient when a request needs a complete order. A columnar representation groups amounts together and dates together, so a query computing total sales by date need not read item descriptions or delivery addresses. Columnar compression can also work well when adjacent values are similar. Writing and updating individual records may be less convenient, however, because a change can affect several separately stored columns. The right layout follows the balance of reads, writes, and updates.</p>
+<p>Copies solve a different problem from historical recovery. If a disk fails, a surviving copy may keep the data readable. If a job overwrites correct data with incorrect data, all current copies may reflect that change. Independent backups or preserved earlier versions allow recovery to an earlier state. Their value depends on testing restoration, because an unreadable or incomplete backup does not provide a recovery path. Retention rules should cover both working data and backups; otherwise old copies can outlive the policy that justified storing them.</p>
+<h3 class="worked"><span>Worked example</span>Accounting for storage copies</h3>
+<p>Take the constant-rate case of 432 GB of daily input. Assume compression reduces the stored bytes to 40% of input and the system keeps three full copies. One stored copy uses 432 × 0.40 = 172.8 GB. Three copies use 172.8 × 3 = 518.4 GB per day. For a 30-day retention period, the total is 518.4 × 30 = 15,552 GB, or 15.552 TB in decimal units. The check is that replication multiplies the compressed size, while compression does not change the logical number of records. File descriptions, lookup data, and temporary processing space would add to this estimate.</p>
+<p>Assume a daily transformation also writes a cleaned copy equal to 60% of each day's compressed input and retains it for the same 30 days with three copies. One day's cleaned logical data is 172.8 × 0.60 = 103.68 GB; its physical copies use 103.68 × 3 = 311.04 GB. Thirty days add 311.04 × 30 = 9,331.2 GB, or 9.3312 TB. The combined stored data is 15.552 + 9.3312 = 24.8832 TB. This check matters because derived datasets can make a storage estimate based only on raw input much too low.</p>
+</section><section class="sec" id="distributed-computation"><p class="kicker">§4 · Study section</p><h2>Distributed computation</h2>
+<p>With data spread across machines, a job can assign independent parts to workers. Some operations, such as counting records in each partition, can be completed mostly where the records are read. Grouping records by a field requires moving records so that all values for the same key meet at a worker. That movement often costs more than the arithmetic itself.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Worker</dfn> A computer or process that executes an assigned part of a distributed job.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Map operation</dfn> A transformation applied independently to input records or partitions to produce intermediate records.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Shuffle</dfn> The network exchange that groups intermediate records by key or otherwise redistributes them among workers.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Reduce operation</dfn> A calculation that combines records sharing a key, such as summing sales by product.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data skew</dfn> An uneven distribution of records or work across partitions or keys, leaving some workers much busier than others.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Checkpoint</dfn> A durable record of job state or progress from which processing can resume after failure.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Directed acyclic graph (DAG)</dfn> A set of processing steps connected by one-way dependencies without a path that loops back to an earlier step.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Stage</dfn> A group of job tasks that can run without waiting for a network exchange from another group.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Join</dfn> An operation that combines records from two datasets using matching keys.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Failure domain</dfn> A set of components that can fail together because they share a dependency, such as a machine, power supply, or network location.</p></aside>
+<p>A distributed job can be represented as a DAG: read inputs, filter records, transform fields, group by key, and write results. The dependencies tell the scheduler which tasks can run together. A map operation on each input partition can run in parallel within a stage, while the reduce stage waits for the shuffle to deliver its assigned keys. More workers help when many independent tasks are ready and the input and network can feed them. They help less when the job has a long serial dependency chain, when only a few partitions exist, or when a single machine holds the slowest key.</p>
+<p>Joins make data movement especially visible. If two datasets are already distributed by the same join key, matching records may meet without a large exchange. Otherwise, one or both sides must move. When one side is small, it can sometimes be copied to each worker so the larger side stays in place. When both sides are large, redistributing by key may be necessary. The decision depends on the actual size after filtering, available worker memory, and the cost of network transfer. Measuring only the size of source files can mislead if filters remove most rows before the join.</p>
+<p>The diagram traces a grouped count through mapping, network exchange, and reduction.</p>
+<figure class="diagram flow"><figcaption>Distributed count</figcaption><div class="scroll"><svg viewBox="0 0 1050 310" style="min-width:880px" role="img" aria-labelledby="distributed-count-title distributed-count-desc" xmlns="http://www.w3.org/2000/svg"><title id="distributed-count-title">Distributed count</title><desc id="distributed-count-desc">Input partitions are processed by two map workers. Their output is shuffled by key, sent to two reduce workers, and combined into the result.</desc><defs><marker id="distributed-count-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path class="flow-arrowhead" d="M0 0L8 4L0 8Z"/></marker></defs><path class="flow-link" d="M175 155 C198 155 202 70 224 70" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M175 155 C198 155 202 240 224 240" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M375 70 C405 70 412 145 439 145" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M375 240 C405 240 412 165 439 165" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M590 155 C623 155 632 70 659 70" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M590 155 C623 155 632 240 659 240" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M810 70 C838 70 847 145 874 145" marker-end="url(#distributed-count-arrow)"/><path class="flow-link" d="M810 240 C838 240 847 165 874 165" marker-end="url(#distributed-count-arrow)"/><g><rect class="flow-node " x="20" y="125" width="155" height="60" rx="9"/><text class="flow-label"><tspan x="97.5" y="160">Input partitions</tspan></text></g><g><rect class="flow-node process" x="225" y="40" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="300" y="75">Map worker 1</tspan></text></g><g><rect class="flow-node process" x="225" y="210" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="300" y="245">Map worker 2</tspan></text></g><g><rect class="flow-node process" x="440" y="125" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="515" y="160">Shuffle by key</tspan></text></g><g><rect class="flow-node process" x="660" y="40" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="735" y="75">Reduce worker A</tspan></text></g><g><rect class="flow-node process" x="660" y="210" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="735" y="245">Reduce worker B</tspan></text></g><g><rect class="flow-node output" x="875" y="125" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="950" y="160">Result</tspan></text></g></svg></div></figure>
+<p>Each map worker emits a key and a value. The shuffle sends equal keys to the same reduce worker, which combines their values. A heavily used key can leave one reduce worker with far more work than the others, so adding workers alone may not shorten the job. Frameworks can retry failed tasks, but output writes must be designed so a retry does not duplicate a result. Checkpoints shorten recovery by avoiding a full restart; how much work is replayed depends on when progress is recorded.</p>
+<p>For sums and counts, each map worker can often combine its local values before the shuffle. If one worker sees a million purchases of product A, it can send one pair containing A and the local count instead of a million pairs. That reduces network bytes without changing the total, because addition can combine partial results in any grouping. This shortcut does not apply to every calculation. An average, for example, requires a sum and a count from each worker; averaging worker averages directly gives the wrong result when workers have different record counts. The form of the intermediate data must preserve the information needed for a correct final answer.</p>
+<p>Data skew can appear even when input files are evenly sized. Imagine one product accounts for half of all purchases. A shuffle that sends each product to one reducer concentrates half the records on one worker. Possible responses include combining local values before the shuffle, splitting the heavy key across several workers and combining partial answers later, or choosing a different division of work. The appropriate response depends on the calculation: a large join may need a different treatment from a count. Measure the largest partition and the slowest task, because an average task duration hides the worker that determines completion time.</p>
+<p>Task retry is useful when a worker stops, but the data needed for retry must remain available outside that worker's failure domain. If the only copy of an input partition is on a failed machine, moving the task elsewhere cannot recover it. Durable input, replicated storage, or a way to read the source again lets another worker repeat the computation. The scheduler also needs to know whether an output is safe to repeat. A temporary intermediate file can be discarded and rebuilt, while a payment or external notification may need a key that prevents repeated effects before retry. Recovery design therefore follows both the data's location and the side effects of each stage.</p>
+<h3 class="worked"><span>Worked example</span>Counting by key</h3>
+<p>Consider four purchase records with product IDs A, B, A, and A, split evenly between two map workers. The first worker emits <code>(A, 1)</code> and <code>(B, 1)</code>; the second emits <code>(A, 1)</code> and <code>(A, 1)</code>. The shuffle sends three A values together and one B value separately. Reduction computes A = 1 + 1 + 1 = 3 and B = 1. The final counts add to 3 + 1 = 4, matching the four input records. That equality is a useful check when each input record contributes exactly one count.</p>
+<h3 class="worked"><span>Worked example</span>Why partial averages need counts</h3>
+<p>Consider two workers calculating the average order value. The first holds two orders worth 10 and 20 units, so its local sum is 10 + 20 = 30, its count is 2, and its local average is 30 ÷ 2 = 15. The second holds one order worth 90 units, so its sum is 90, its count is 1, and its local average is 90. Averaging the two local averages gives (15 + 90) ÷ 2 = 52.5, which is wrong because it gives the workers equal weight. Combining sums and counts gives (30 + 90) ÷ (2 + 1) = 120 ÷ 3 = 40. The check is to calculate directly from all three orders: (10 + 20 + 90) ÷ 3 = 40.</p>
+</section><section class="sec" id="batch-and-stream-processing"><p class="kicker">§5 · Study section</p><h2>Batch and stream processing</h2>
+<p>Batch processing works over a known slice of data, such as yesterday's orders. Stream processing maintains results as new records arrive. Both can use distributed computation, but an unbounded stream needs explicit rules for when a result is considered ready and what happens when an old event arrives late.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Event time</dfn> The time at which an event happened according to its record.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Processing time</dfn> The time at which a processing system handles an event.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Window</dfn> A bounded interval used to group events in an otherwise unbounded stream.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Watermark</dfn> A system's estimate that events earlier than a given event-time point are unlikely to arrive, used to decide when to emit or finalize window results.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Idempotent operation</dfn> An operation whose repeated execution has the same intended effect as one execution.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Exactly-once result</dfn> A result in which each logical input event has one intended effect on the published output, even if processing or writes are retried.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Aggregate</dfn> A value calculated from several records, such as a count or sum, often maintained for each key or time window.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>State</dfn> Information retained between records so a processor can continue a calculation, such as the current count for a time window.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Replay</dfn> Reading previously received events again, commonly to recover after failure or rebuild a result.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>At-least-once delivery</dfn> A delivery rule under which every accepted event is eventually made available to the consumer, but an event may be delivered more than once.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Backpressure</dfn> A response to overload that slows or limits incoming work when downstream processing cannot keep up.</p></aside>
+<p>A batch has a natural end: once all chosen records have been read, a final result can be written. A stream has no natural end, so windows and state give the job finite units of work. A fixed five-minute window assigns each event to one five-minute interval. An overlapping window could, for example, calculate a ten-minute total every five minutes, so one event contributes to two published totals. State must be kept for every open window and key, which means the number of active keys and the late-event allowance affect memory and checkpoint size.</p>
+<p>Replay is useful when code changes or a failed worker must rebuild its state, but it also means the output may see the same logical event again. At-least-once delivery protects against silent loss during uncertain failures by permitting duplicates. An idempotent operation turns those repeated deliveries into one intended output effect. If the output store cannot support a suitable idempotent write, the system may need a coordinated commit or a later process that identifies duplicates. The delivery guarantee and the published-result guarantee should be described separately.</p>
+<p>The diagram shows how an arriving event becomes part of an event-time window before a result is published.</p>
+<figure class="diagram flow"><figcaption>Event-time processing</figcaption><div class="scroll"><svg viewBox="0 0 1050 300" style="min-width:900px" role="img" aria-labelledby="event-time-flow-title event-time-flow-desc" xmlns="http://www.w3.org/2000/svg"><title id="event-time-flow-title">Event-time processing</title><desc id="event-time-flow-desc">Arriving events have their timestamps read, are assigned to event-time windows, and update aggregate state. The result is published, with watermark progress governing when a window is ready.</desc><defs><marker id="event-time-flow-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path class="flow-arrowhead" d="M0 0L8 4L0 8Z"/></marker></defs><path class="flow-link" d="M180 90 H219" marker-end="url(#event-time-flow-arrow)"/><path class="flow-link" d="M390 90 H429" marker-end="url(#event-time-flow-arrow)"/><path class="flow-link" d="M590 90 H629" marker-end="url(#event-time-flow-arrow)"/><path class="flow-link" d="M790 90 H829" marker-end="url(#event-time-flow-arrow)"/><path class="flow-link dashed" d="M710 200 C760 175 900 190 925 120" marker-end="url(#event-time-flow-arrow)"/><g><rect class="flow-node " x="20" y="60" width="160" height="60" rx="9"/><text class="flow-label"><tspan x="100" y="95">Arriving events</tspan></text></g><g><rect class="flow-node process" x="220" y="60" width="170" height="60" rx="9"/><text class="flow-label"><tspan x="305" y="86">Read event</tspan><tspan x="305" y="105">timestamps</tspan></text></g><g><rect class="flow-node process" x="430" y="60" width="160" height="60" rx="9"/><text class="flow-label"><tspan x="510" y="95">Assign windows</tspan></text></g><g><rect class="flow-node process" x="630" y="60" width="160" height="60" rx="9"/><text class="flow-label"><tspan x="710" y="86">Update aggregate</tspan><tspan x="710" y="105">state</tspan></text></g><g><rect class="flow-node output" x="830" y="60" width="190" height="60" rx="9"/><text class="flow-label"><tspan x="925" y="95">Publish results</tspan></text></g><g><rect class="flow-node " x="630" y="200" width="160" height="60" rx="9"/><text class="flow-label"><tspan x="710" y="226">Watermark</tspan><tspan x="710" y="245">progress</tspan></text></g></svg></div></figure>
+<p>Read the upper path as the record flow and the lower arrow as the timing rule for publication. An event can arrive at processing time 10:07 even if its event time is 10:02; an event-time window for 10:00–10:05 should place it in the earlier interval. A watermark expresses an estimate, not proof that no earlier event will ever arrive. The system therefore needs a policy for late events, such as updating an earlier result, sending the event to a separate review path, or dropping it after a stated limit. Because failures can cause records or writes to be retried, an idempotent output keyed by event or window can prevent duplicate effects. A claim of exactly-once results must cover the complete path, including the output system, rather than only one processing stage.</p>
+<p>A longer wait for late events can make a first published result more complete, but it also delays publication and retains more state. An earlier result is more timely but may need revision. The choice should follow the reader's use: an operational dashboard may accept a provisional count that later changes, while a financial report may wait for reconciliation and a defined close. It helps to publish both the result and its status, such as provisional or final, so a reader can interpret a changing value.</p>
+<p>Backpressure matters when records arrive faster than a processor can update its state or write outputs. The input queue can absorb a short surge, but its backlog then increases data freshness delay. If the processor handles 8,000 records per second while 10,000 arrive continuously, 2,000 records are added to the backlog every second. Adding workers helps only if the work can be divided and the output store can accept the higher rate. Monitoring the age of the oldest waiting record reveals delay more directly than monitoring queue length alone when record sizes or rates vary.</p>
+<h3 class="worked"><span>Worked example</span>A late event</h3>
+<p>Consider five-minute windows and three events with event times 10:01, 10:04, and 10:02. Assume the first two arrive before 10:05 and the third arrives at processing time 10:07. All three belong to the event-time interval 10:00–10:05. Before the late arrival, the window count is 1 + 1 = 2; after accepting it, the count is 2 + 1 = 3. The check is that membership follows event time, so the processing time of 10:07 does not put the third event into the 10:05–10:10 window. Whether the published count changes from 2 to 3 depends on the late-event policy.</p>
+<h3 class="worked"><span>Worked example</span>Draining a short backlog</h3>
+<p>Consider a processor that handles 12,000 records per second. Assume a burst supplies 18,000 records per second for ten minutes, after which the arrival rate falls to 8,000 per second. During the burst, the backlog grows by 18,000 − 12,000 = 6,000 records per second. Ten minutes is 10 × 60 = 600 seconds, so the backlog reaches 6,000 × 600 = 3,600,000 records. After the burst, spare processing capacity is 12,000 − 8,000 = 4,000 records per second, so draining takes 3,600,000 ÷ 4,000 = 900 seconds, or 15 minutes. As a check, 4,000 × 900 = 3,600,000 records. This estimate assumes the processor maintains its stated rate and no further bursts occur.</p>
+</section><section class="sec" id="data-quality-and-governance"><p class="kicker">§6 · Study section</p><h2>Data quality and governance</h2>
+<p>A large data system can produce an answer quickly and still be wrong. Validation must account for missing, duplicated, malformed, or delayed records. Controls must also determine who may access sensitive fields and how long data is retained. These requirements apply at ingestion, storage, processing, and publication.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data quality</dfn> The degree to which data is accurate, complete, timely, consistent, and suitable for its intended use.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data governance</dfn> The policies and responsibilities that control how data is defined, accessed, retained, and used.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data pipeline</dfn> A sequence of steps that moves and transforms data from producers to a usable output.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Schema evolution</dfn> The controlled change of a dataset's fields or types while old and new records may coexist.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data lineage</dfn> A record of where data came from and which transformations produced a derived dataset.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Access control</dfn> Rules that determine which identities may read or change particular data or operations.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data contract</dfn> An agreement between a dataset producer and its consumers about fields, meanings, acceptable changes, and delivery expectations.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Deduplication</dfn> Detecting repeated representations of the same logical event and retaining or counting it only as intended.</p></aside>
+<p>Data quality checks should be tied to the meaning of the dataset. A nonempty order ID, a valid currency code, and a nonnegative quantity are useful field checks, but they do not prove that every accepted order arrived. Completeness needs a comparison against an expected count, sequence, source total, or known delivery interval. Timeliness needs a measured delay from event time to availability. Correctness may need reconciliation between independent systems. A check that records only whether a job ran successfully can miss all four kinds of problem.</p>
+<p>A data contract reduces ambiguity at the boundary between producers and consumers. It should say whether a new field is optional, what a missing value means, which timestamps use which time basis, and how changes are announced. When a producer renames a field without coordination, a consumer may silently interpret it as absent. When a producer changes a field from pounds to pence while keeping the name, a calculation may remain syntactically valid and become wrong by a factor of 100. Schema validation should therefore check meanings and units where possible, not just field names and types.</p>
+<p>The diagram shows where checks and controls attach to a typical data pipeline.</p>
+<figure class="diagram flow"><figcaption>Data quality and access</figcaption><div class="scroll"><svg viewBox="0 0 1100 300" style="min-width:900px" role="img" aria-labelledby="quality-flow-title quality-flow-desc" xmlns="http://www.w3.org/2000/svg"><title id="quality-flow-title">Data quality and access</title><desc id="quality-flow-desc">Producers send data through validation into raw storage. A transformation checks it and creates a published dataset. Access and retention rules govern raw storage and the published dataset.</desc><defs><marker id="quality-flow-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto"><path class="flow-arrowhead" d="M0 0L8 4L0 8Z"/></marker></defs><path class="flow-link" d="M160 90 H199" marker-end="url(#quality-flow-arrow)"/><path class="flow-link" d="M400 90 H439" marker-end="url(#quality-flow-arrow)"/><path class="flow-link" d="M590 90 H629" marker-end="url(#quality-flow-arrow)"/><path class="flow-link" d="M810 90 H849" marker-end="url(#quality-flow-arrow)"/><path class="flow-link dashed" d="M495 205 C495 170 515 155 515 121" marker-end="url(#quality-flow-arrow)"/><path class="flow-link dashed" d="M670 235 C760 235 885 190 950 121" marker-end="url(#quality-flow-arrow)"/><g><rect class="flow-node " x="20" y="60" width="140" height="60" rx="9"/><text class="flow-label"><tspan x="90" y="95">Producers</tspan></text></g><g><rect class="flow-node process" x="200" y="60" width="200" height="60" rx="9"/><text class="flow-label"><tspan x="300" y="86">Validate and record</tspan><tspan x="300" y="105">provenance</tspan></text></g><g><rect class="flow-node " x="440" y="60" width="150" height="60" rx="9"/><text class="flow-label"><tspan x="515" y="95">Raw storage</tspan></text></g><g><rect class="flow-node process" x="630" y="60" width="180" height="60" rx="9"/><text class="flow-label"><tspan x="720" y="86">Transform and</tspan><tspan x="720" y="105">check</tspan></text></g><g><rect class="flow-node output" x="850" y="60" width="200" height="60" rx="9"/><text class="flow-label"><tspan x="950" y="95">Published dataset</tspan></text></g><g><rect class="flow-node " x="420" y="205" width="250" height="60" rx="9"/><text class="flow-label"><tspan x="545" y="240">Access and retention rules</tspan></text></g></svg></div></figure>
+<p>The main path moves records toward a published dataset; the lower arrows show rules that govern both stored inputs and outputs. At ingestion, the system can reject malformed records and count rejections. During transformation, it can check uniqueness, expected value ranges, and whether counts reconcile with inputs. Schema evolution must account for readers of older records; for example, adding an optional field is usually easier to handle than changing the meaning of an existing field. Lineage lets a reader trace a surprising aggregate back through transformations to its inputs. Access control should limit raw sensitive fields even when a published aggregate is broadly available, and retention rules should remove data when it is no longer needed or permitted to be kept.</p>
+<p>Deduplication requires a stable way to recognize the same logical event. Two purchases by one customer at the same price are distinct purchases, while the same purchase delivered twice after a retry should count once. A producer-assigned event ID can distinguish those cases if the producer preserves it across retries. Without such an ID, a processor may infer duplicates from a combination of fields and time, but that can discard legitimate repeated events. The deduplication rule should be documented with the metric it affects, because removing a duplicate from a sales total is different from recording that a message was delivered twice.</p>
+<p>Privacy and access decisions also depend on the intended use. A raw event may contain an address needed for delivery, but a sales trend usually needs only a region and amount. Removing or generalizing unnecessary fields before publishing a dataset reduces the number of readers who can see sensitive information. Access rules should be tested at the dataset and field level, and they should follow derived copies rather than only the original input. Retention and deletion need similar attention: removing a record from the raw dataset while leaving it in a published copy may not meet the intended policy.</p>
+<h3 class="worked"><span>Worked example</span>Reconciling a daily count</h3>
+<p>Consider an input log that records 1,000 accepted orders for a day. Assume the processing job reads one message for each accepted order, plus 20 repeated deliveries of existing orders and 5 malformed messages that are distinct from the accepted orders. The number of read messages is 1,000 + 20 + 5 = 1,025. Removing the 20 repeated deliveries and 5 malformed messages leaves 1,025 − 20 − 5 = 1,000 valid unique orders. This matches the input log's accepted-order count. The check only supports completeness if both counts cover the same day, use the same order definition, and the input log itself is trusted.</p>
+</section><section class="sec" id="choosing-an-architecture"><p class="kicker">§7 · Study section</p><h2>Choosing an architecture</h2>
+<p>Architecture follows the questions a system must answer. A reporting team may need scanned historical data; an application may need fast lookups by key; an operations dashboard may need continuously refreshed counts. One storage or processing pattern rarely serves all three with the same cost and delay.</p>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Data warehouse</dfn> A system organized for analytical queries over structured, managed datasets.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Lakehouse</dfn> An architecture that adds managed tables and coordinated updates to datasets stored in a data lake.</p></aside>
+<aside class="def"><span class="def-tag">Definition</span><p><dfn>Serving store</dfn> A data system organized to answer application queries with a defined latency, often by key or a small set of lookup structures.</p></aside>
+<p>The table compares common patterns by the work they support and the limits to plan for.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Typical work</th>
+<th>Strength</th>
+<th>Main design pressure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data lake with batch jobs</td>
+<td>Retain raw inputs and process large historical slices.</td>
+<td>Flexible storage for varied data.</td>
+<td>Dataset structure, file layout, and quality need active management.</td>
+</tr>
+<tr>
+<td>Data warehouse</td>
+<td>Run repeated analytical queries on curated data.</td>
+<td>Query and governance features are integrated.</td>
+<td>Loading, transformation, and query costs need control.</td>
+</tr>
+<tr>
+<td>Lakehouse</td>
+<td>Query and update managed tables over lake storage.</td>
+<td>Shared files can support several analytical workflows.</td>
+<td>Table maintenance and competing workloads need coordination.</td>
+</tr>
+<tr>
+<td>Stream processor with serving store</td>
+<td>Refresh operational views as events arrive.</td>
+<td>Results can become available quickly.</td>
+<td>State, late data, retries, and serving capacity need explicit design.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The patterns can be combined: raw events can be retained in a lake, transformed into warehouse or lakehouse tables, and summarized into a serving store. Choose by writing down the required freshness, query shape, retention period, correctness rule, access boundary, and budget. Estimate data read and transferred as well as data stored; a design that saves storage but repeatedly scans every record may cost more and answer more slowly.</p>
+<p>The first choice is often whether a second system is justified at all. If a daily report can complete within its deadline on an existing database, copying all data into a new cluster introduces more storage, transformation work, and reconciliation. If analytical scans slow customer transactions, separating the reporting workload can protect the application. That separation creates a new freshness question: the reporting copy may lag behind the source, so its delay and reconciliation status should be visible. The system should be as distributed as the measured workload requires, with room to grow without making ordinary operations difficult to understand.</p>
+<p>Query shape matters as much as dataset size. A warehouse or lakehouse is well suited to grouping many rows, joining curated tables, and exploring historical trends. A serving store can answer a narrow lookup quickly but may require an upstream job to prepare exactly the fields the application will request. A stream processor can update those fields incrementally, while a batch job can periodically rebuild them to catch mistakes or incorporate corrected input. A design that uses both paths needs a clear rule for which result is authoritative and how they are reconciled.</p>
+<p>Cost should be decomposed rather than reduced to one storage price. Stored raw data, derived copies, network transfer, compute time, repeated scans, continuously running stream workers, and serving queries all consume resources. Operational work also matters: repairing failed jobs, handling schema changes, and checking results take time. A smaller storage bill may be offset by frequent full scans, and a low-latency dashboard may require processors and a serving store to run even when few people are viewing it. Estimate each major component from rates and query patterns, then measure actual use and revise the estimate.</p>
+<p>Architecture decisions should also state what happens when an input arrives late, a job fails halfway through, or a derived dataset is found to be wrong. Retaining raw input makes a corrected transformation possible, but only if the input's meaning and schema can still be interpreted. Keeping a published version until its replacement has passed checks can prevent readers from seeing a partly rebuilt result. The recovery plan needs a deadline: a daily report that can be rebuilt overnight has a different requirement from a dashboard that must recover in minutes. These operating rules are part of the architecture, because they determine storage retention, compute headroom, and which outputs can be safely replaced.</p>
+<h3 class="worked"><span>Worked example</span>Comparing repeated scans</h3>
+<p>Consider a daily report that reads 2 TB of stored data. Assume the report runs 20 times per day and a preparation step could create a 100 GB daily summary that each report would read instead. Repeated full scans read 2 × 20 = 40 TB per day. Preparing the summary once reads 2 TB, and the 20 later queries read 100 × 20 = 2,000 GB, or 2 TB, for a total of 4 TB per day. The difference is 40 − 4 = 36 TB of data read per day, a 90% reduction in this simplified comparison. The check is that preparing the summary alone already accounts for one full 2 TB scan; the estimate also assumes the summary contains everything those reports need and ignores its writing and storage costs.</p>
+</section><section class="sec" id="common-mistakes"><p class="kicker">· · Practice</p><h2>Common mistakes</h2>
+<div class="mistake"><p>The first mistake is choosing a cluster just because a dataset sounds large. This happens when byte count stands in for workload analysis. Estimate the actual storage, memory, throughput, and latency needs first; a single machine may satisfy them with less coordination.</p></div>
+<div class="mistake"><p>The second mistake is assuming partitions always speed up queries. This happens when partitioning is treated as a storage feature rather than a filter strategy. Partition on fields that common queries use, and avoid uneven partitions and excessive tiny files.</p></div>
+<div class="mistake"><p>The third mistake is treating an event's arrival time as its occurrence time. This happens because arrival order is easy to observe. Use event time when results must reflect when events happened, and define how late events change published results.</p></div>
+<div class="mistake"><p>The fourth mistake is equating task retries with exactly-once results. This happens because processing can appear successful even when an output write is repeated. Make output operations idempotent or coordinate the processing state and output commit across the complete path.</p></div>
+<div class="mistake"><p>The fifth mistake is measuring only whether a job finished. This happens when pipeline health is reduced to uptime. Check rejected records, duplicates, missing intervals, freshness, and reconciliation against expected totals.</p></div>
+</section><section class="sec" id="practice-questions"><p class="kicker">· · Practice</p><h2>Practice questions</h2>
+<p>These questions mix recall, calculation, and application across the whole guide; each answer is collapsed beneath its question to be opened once the reader has worked out an answer.</p>
+<article class="qa"><p class="qlabel">Question 1 · recall</p><p class="q">Why does the term Big Data have no fixed byte threshold, and which workload properties should be measured before choosing a distributed design?</p><details class="ans"><summary>Answer</summary><div class="ans-body">
+
+<p>The threshold depends on what one machine can do within the required cost and time. Measure stored volume, arrival rate, record shape, query patterns, throughput, latency, retention, and reliability needs. A workload may require distribution because of processing speed or availability even when its stored volume is modest.</p>
+</div></details></article>
+<article class="qa"><p class="qlabel">Question 2 · calculation</p><p class="q">A feed produces 2,000 records per second, averaging 1,000 bytes each. Assume a constant rate, compression to half the input bytes, and two full stored copies. How many decimal GB of physical storage does one day of input require before extra lookup data and temporary files?</p><details class="ans"><summary>Answer</summary><div class="ans-body">
+
+<p>One day has 24 × 60 × 60 = 86,400 seconds. Input is 2,000 × 1,000 × 86,400 = 172,800,000,000 bytes, or 172.8 GB. Compression gives 172.8 × 0.5 = 86.4 GB per copy. Two copies require 86.4 × 2 = 172.8 GB. As a check, halving the bytes and then doubling the copies returns the original input-byte total.</p>
+</div></details></article>
+<article class="qa"><p class="qlabel">Question 3 · application</p><p class="q">A query reads only the price and date fields of orders from one week. Explain how a date partition and a columnar file layout can reduce the work compared with scanning all fields of all orders.</p><details class="ans"><summary>Answer</summary><div class="ans-body">
+
+<p>The date partition lets the query skip files outside the requested week. Within the selected files, the columnar layout lets it read the date and price columns without loading unrelated fields. The gain depends on the partition matching the filter and on files being large enough that metadata and file-opening overhead do not dominate.</p>
+</div></details></article>
+<article class="qa"><p class="qlabel">Question 4 · calculation</p><p class="q">Two map workers process six records with keys A, A, B and A, B, B. Each record contributes one count. What values reach each reducer after a shuffle by key, and how can the result be checked?</p><details class="ans"><summary>Answer</summary><div class="ans-body">
+
+<p>The A reducer receives three values of 1, so A = 1 + 1 + 1 = 3. The B reducer also receives three values of 1, so B = 3. The counts sum to 3 + 3 = 6, matching the six input records. Each input contributed exactly once.</p>
+</div></details></article>
+<article class="qa"><p class="qlabel">Question 5 · misconception</p><p class="q">A stream job retries a failed task and reports that it processed each record exactly once. Why might its published results still contain duplicates?</p><details class="ans"><summary>Answer</summary><div class="ans-body">
+
+<p>The task may write a result and fail before recording that the write succeeded. On retry, it writes the same result again. Processing guarantees inside the job do not automatically cover the output store. An idempotent write keyed by event or window, or a coordinated output commit, is needed to prevent the duplicate effect.</p>
+</div></details></article>
+<article class="qa"><p class="qlabel">Question 6 · open-ended</p><p class="q">An online shop wants to retain raw events for a year, publish daily sales reports, and show a dashboard that updates within one minute. Propose a storage and processing path, and explain how it would handle late events, quality checks, access, and cost.</p><details class="ans"><summary>Answer</summary><div class="ans-body">
+
+<p>Retain raw events in partitioned object storage for the stated period. Validate fields and record rejection counts during ingestion, then run batch transformations for reconciled daily reports in a warehouse or managed lake tables. A stream processor can maintain one-minute aggregates in a serving store for the dashboard. Use event timestamps to assign windows, choose a stated late-event limit, and revise or flag dashboard results when accepted late events arrive. Use idempotent output keys so retries do not double-count sales. Restrict access to raw customer fields, publish only fields needed by each audience, and retain lineage from reports to raw inputs. Estimate a year's compressed storage and copies, the records read by daily jobs, stream state size, and serving queries before choosing capacity.</p>
+</div></details></article>
+</section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
+<p>Without consulting notes, the reader should be able to explain when distribution helps, describe how schema and workload shape storage choices, calculate input and replicated storage, trace a map–shuffle–reduce job, distinguish event time from processing time, explain a watermark and a late-event policy, identify checks for data quality and access, and choose a batch, warehouse, lakehouse, or streaming pattern for a stated workload. A reader who can do all of these has covered the material.</p>
+</section><nav class="guide-nav" aria-label="Study guide navigation"><a href="/study-guide/trade-offs/" rel="prev">← Previous: Trade-offs</a><a href="/study-guide/">All guides</a><a href="#top">↑ Back to top</a></nav></main></div><script>(function () {
+  var links = document.querySelectorAll('.rail a');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) links.forEach(function (l) {
+          l.classList.toggle('on', l.getAttribute('href') === '#' + en.target.id);
+        });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.sec').forEach(function (s) { io.observe(s); });
+  }
+  document.querySelectorAll('.mtoc a').forEach(function (a) {
+    a.addEventListener('click', function () { a.closest('details').open = false; });
+  });
+})();</script></body></html>
