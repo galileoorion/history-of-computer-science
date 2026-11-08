@@ -46,6 +46,13 @@ body {
 /* masthead */
 .mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
 .mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.mast .eyebrow a:hover { border-bottom-color: currentColor; }
+.mast .eyebrow a:focus-visible, .guide-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; margin: 52px 0 0; padding: 22px 0 0; border-top: 1px solid var(--rule); font: 500 13px/1.5 var(--font-mono); }
+.guide-nav a { color: var(--accent); text-decoration: none; }
+.guide-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 .mast h1 .verb { color: var(--accent); }
 .mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
@@ -144,7 +151,7 @@ tr:last-child td { border-bottom: 0; }
 .checklist li::before { content: ""; width: 16px; height: 16px; margin-top: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
 .checklist .area { display: block; font: 600 11px/1.6 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
 </style></head><body>
-<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">scalability</span></h1>
+<div class="shell"><header class="mast"><span class="eyebrow"><a href="/study-guide/">Study guide</a> · System design</span><h1>Study guide: <span class="verb">scalability</span></h1>
 <p class="lede">Estimate demand, find the limiting resource, scale reads and writes independently, and keep overload bounded.</p>
 <ul class="meta"><li><b>Updated</b> 7 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
 <details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#workload-and-capacity-estimates"><span class="tk">§2</span><span>Workload and capacity estimates</span></a></li><li><a href="#scaling-compute-and-routing-work"><span class="tk">§3</span><span>Scaling compute and routing work</span></a></li><li><a href="#scaling-reads-without-losing-control-of-misses"><span class="tk">§4</span><span>Scaling reads without losing control of misses</span></a></li><li><a href="#scaling-data-and-locating-hot-partitions"><span class="tk">§5</span><span>Scaling data and locating hot partitions</span></a></li><li><a href="#asynchronous-work-and-overload"><span class="tk">§6</span><span>Asynchronous work and overload</span></a></li><li><a href="#measuring-testing-and-evolving-the-design"><span class="tk">§7</span><span>Measuring, testing and evolving the design</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
@@ -395,6 +402,8 @@ tr:last-child td { border-bottom: 0; }
 <p>Define scalability against a stated workload, correctness condition and performance target. Calculate average and peak rates, storage growth, concurrency, failure headroom and queue growth with units and explicit assumptions. Distinguish scaling a stateless service from scaling a shared database, and check connection budgets when instance counts change. Explain when caching and read replicas reduce read pressure, what happens on misses and stale reads, and how cache lifetimes affect freshness. Choose between replication and partitioning, identify a hot key, and calculate its shard's load. Set a bounded overload response, make queued work safe to retry, and estimate backlog recovery time. Use representative measurements and load tests to identify the next bottleneck and confirm that a change improves completed work at the same target. A reader who can do all of these has covered the material.</p>
 
 </section>
+
+<nav class="guide-nav" aria-label="Study guide navigation"><a href="/study-guide/observability-and-operations/" rel="prev">← Previous: Observability and operations</a><a href="/study-guide/">All guides</a><a href="/study-guide/robustness-fault-tolerance-high-availability/" rel="next">Next: Reliability →</a></nav>
 </main></div><script>
 (function () {
   var links = document.querySelectorAll('.rail a');

@@ -47,6 +47,13 @@ body {
 /* masthead */
 .mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
 .mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.mast .eyebrow a:hover { border-bottom-color: currentColor; }
+.mast .eyebrow a:focus-visible, .guide-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; margin: 52px 0 0; padding: 22px 0 0; border-top: 1px solid var(--rule); font: 500 13px/1.5 var(--font-mono); }
+.guide-nav a { color: var(--accent); text-decoration: none; }
+.guide-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 .mast h1 .verb { color: var(--accent); }
 .mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
@@ -127,7 +134,7 @@ tr:last-child td { border-bottom: 0; }
 .ans-body p:last-child, .ans-body ul:last-child { margin-bottom: 0; }
 @media (max-width: 520px) { body { font-size: 16.5px; } .q { font-size: 18px; } }
 </style><meta content="A system design study guide on comparing architectural alternatives, quantifying trade-offs, failure behavior, operational cost, and revisiting decisions." name="description"/><link href="https://tech.attilakulik.com/study-guide/trade-offs/" rel="canonical"/><link href="/favicon.svg" rel="icon" type="image/svg+xml"/></head><body>
-<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">system design trade-offs</span></h1>
+<div class="shell"><header class="mast"><span class="eyebrow"><a href="/study-guide/">Study guide</a> · System design</span><h1>Study guide: <span class="verb">system design trade-offs</span></h1>
 <p class="lede">Map threats and trust boundaries, control access, protect data across its life cycle, and verify system design trade-offs decisions.</p>
 <ul class="meta"><li><b>Updated</b> 6 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
 <details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#frame-the-decision-before-choosing-components"><span class="tk">§2</span><span>Frame the decision before choosing components</span></a></li><li><a href="#compare-alternatives-on-the-same-dimensions"><span class="tk">§3</span><span>Compare alternatives on the same dimensions</span></a></li><li><a href="#quantify-the-consequence-of-an-assumption"><span class="tk">§4</span><span>Quantify the consequence of an assumption</span></a></li><li><a href="#follow-costs-across-component-boundaries"><span class="tk">§5</span><span>Follow costs across component boundaries</span></a></li><li><a href="#include-failure-security-operations-and-change-cost"><span class="tk">§6</span><span>Include failure, security, operations, and change cost</span></a></li><li><a href="#record-the-choice-and-define-a-revision-trigger"><span class="tk">§7</span><span>Record the choice and define a revision trigger</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
@@ -283,6 +290,8 @@ Asynchronous: client → API → durable job → response: accepted
 </section><section class="sec" id="review-checklist"><p class="kicker">· · Finish</p><h2>Review checklist</h2>
 <p>Without consulting notes, state the outcome, hard constraints, quality targets, workload, and assumptions for a choice; compare feasible alternatives on common dimensions; calculate where a capacity or reliability assumption changes the result; describe the costs introduced by copies, partitions, and queues; include failure, security, privacy, and operating consequences; and record the decision with evidence and a measurable revision trigger. A reader who can do all of these has covered the material.</p>
 </section>
+
+<nav class="guide-nav" aria-label="Study guide navigation"><a href="/study-guide/robustness-fault-tolerance-high-availability/" rel="prev">← Previous: Reliability</a><a href="/study-guide/">All guides</a></nav>
 </main></div><script>
 (function () {
   var links = document.querySelectorAll('.rail a');

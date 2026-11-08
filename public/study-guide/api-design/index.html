@@ -51,6 +51,13 @@ body {
 /* masthead */
 .mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
 .mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.mast .eyebrow a:hover { border-bottom-color: currentColor; }
+.mast .eyebrow a:focus-visible, .guide-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; margin: 52px 0 0; padding: 22px 0 0; border-top: 1px solid var(--rule); font: 500 13px/1.5 var(--font-mono); }
+.guide-nav a { color: var(--accent); text-decoration: none; }
+.guide-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 .mast h1 .verb { color: var(--accent); }
 .mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
@@ -145,7 +152,7 @@ tr:last-child td { border-bottom: 0; }
 
 <div class="shell">
   <header class="mast">
-    <span class="eyebrow">Study guide · System design</span>
+    <span class="eyebrow"><a href="/study-guide/">Study guide</a> · System design</span>
     <h1>API design: the <span class="verb">contract</span> behind the endpoints</h1>
     <p class="lede">HTTP semantics, resource design, retries and idempotency, concurrent updates, pagination, versioning and rate limits, with a definition at every new term and practice questions at the end.</p>
     <ul class="meta">
@@ -548,7 +555,9 @@ LIMIT 50;                                                <span class="c">-- page
 </ul></div></details></div></div>
 </section><section class="sec" id="review-checklist"><p class="kicker">Finish</p><h2>Review checklist</h2>
 <p>Without consulting notes, you should be able to define an API contract and explain why it costs more to change than the code behind it; say how much of the contract to specify at the HLD and LLD stages; list the safe and idempotent HTTP methods and explain why idempotency is defined by effect rather than by response; derive an API surface from core entities and explain why it comes before the data model; compare REST, gRPC, GraphQL and events and describe the <code>202 Accepted</code> long-running operation pattern; sort failures into permanent, transient and ambiguous groups and write a problem-details body; calculate retry amplification as n^k and explain how single-layer retries, retry budgets and deadline propagation bound it; state the rules for a correct idempotency key, draw its three states with the response for each, and size a dedup window; prevent lost updates with <code>ETag</code>, <code>If-Match</code> and <code>412</code>; calculate the rows read by offset and keyset pagination and show how offsets repeat or skip items when the list changes; classify a change as breaking or not and describe the deprecation and sunset lifecycle; and calculate what a token bucket admits over a period, including the effect of enforcing it per instance. A reader who can do all of these has covered the material.</p></section>
-  </main>
+
+<nav class="guide-nav" aria-label="Study guide navigation"><a href="/study-guide/functional-and-non-functional-requirements/" rel="prev">← Previous: Requirements</a><a href="/study-guide/">All guides</a><a href="/study-guide/data-design/" rel="next">Next: Data design →</a></nav>
+</main>
 </div>
 
 <script>

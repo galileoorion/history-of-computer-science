@@ -10,5 +10,6 @@ const { pathname } = Astro.url;
   </a>
   <nav aria-label="Main navigation">
     <a href={sitePath()} aria-current={pathname === sitePath() ? 'page' : undefined}>Posts</a>
+    <a href={sitePath('study-guide/')}>Study guides</a>
   </nav>
 </header>

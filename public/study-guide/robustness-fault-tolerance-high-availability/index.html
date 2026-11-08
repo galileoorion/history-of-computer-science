@@ -46,6 +46,13 @@ body {
 /* masthead */
 .mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
 .mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.mast .eyebrow a:hover { border-bottom-color: currentColor; }
+.mast .eyebrow a:focus-visible, .guide-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; margin: 52px 0 0; padding: 22px 0 0; border-top: 1px solid var(--rule); font: 500 13px/1.5 var(--font-mono); }
+.guide-nav a { color: var(--accent); text-decoration: none; }
+.guide-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 .mast h1 .verb { color: var(--accent); }
 .mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
@@ -142,7 +149,7 @@ tr:last-child td { border-bottom: 0; }
 .checklist li::before { content: ""; width: 16px; height: 16px; margin-top: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
 .checklist .sref { font: 500 12px/1 var(--font-mono); color: var(--ink-2); white-space: nowrap; }
 </style></head><body>
-<div class="shell"><header class="mast"><span class="eyebrow">Study guide · System design</span><h1>Study guide: <span class="verb">robustness, fault tolerance, and high availability</span></h1>
+<div class="shell"><header class="mast"><span class="eyebrow"><a href="/study-guide/">Study guide</a> · System design</span><h1>Study guide: <span class="verb">robustness, fault tolerance, and high availability</span></h1>
 <p class="lede">Define reliability targets, contain failures, preserve correctness across retries and failover, and prove recovery works.</p>
 <ul class="meta"><li><b>Updated</b> 7 Nov 2026</li><li><b>Sections</b> 7 + exercises</li></ul>
 <details class="mtoc"><summary>Contents</summary><ol><li><a href="#learning-objectives"><span class="tk">·</span><span>Learning objectives</span></a></li><li><a href="#core-concepts"><span class="tk">§1</span><span>Core concepts</span></a></li><li><a href="#set-reliability-targets-and-failure-boundaries"><span class="tk">§2</span><span>Set reliability targets and failure boundaries</span></a></li><li><a href="#preserve-correctness-at-request-boundaries"><span class="tk">§3</span><span>Preserve correctness at request boundaries</span></a></li><li><a href="#contain-slow-dependencies-and-overload"><span class="tk">§4</span><span>Contain slow dependencies and overload</span></a></li><li><a href="#retry-safely-after-uncertain-outcomes"><span class="tk">§5</span><span>Retry safely after uncertain outcomes</span></a></li><li><a href="#use-redundancy-and-failover-without-losing-data"><span class="tk">§6</span><span>Use redundancy and failover without losing data</span></a></li><li><a href="#restore-verify-and-improve-the-recovery-path"><span class="tk">§7</span><span>Restore, verify, and improve the recovery path</span></a></li><li><a href="#common-mistakes"><span class="tk">·</span><span>Common mistakes</span></a></li><li><a href="#practice-questions"><span class="tk">·</span><span>Practice questions</span></a></li><li><a href="#review-checklist"><span class="tk">·</span><span>Review checklist</span></a></li></ol></details></header>
@@ -420,6 +427,8 @@ A fails, B promoted → new history continues from w3; w4 and w5 are missing
 <p>Without consulting notes, distinguish faults from failures and explain robustness, fault tolerance, and high availability for a named operation. State a measurable success condition, calculate an availability budget, and set RTO and RPO for a specific disruption. Enforce invariants when requests race, and describe an uncertain remote outcome honestly. Bound waiting, concurrency, retries, and admitted load so a slow dependency cannot consume the whole service. Explain detection, promotion, durable replication, fencing, and routing during failover, including the potential data-loss window. Choose a recoverable point after logical corruption, verify the restored service and its external effects, and measure recovery with independent checks and a tested restore. A reader who can do all of these has covered the material.</p>
 
 </section>
+
+<nav class="guide-nav" aria-label="Study guide navigation"><a href="/study-guide/scalability/" rel="prev">← Previous: Scalability</a><a href="/study-guide/">All guides</a><a href="/study-guide/trade-offs/" rel="next">Next: Trade-offs →</a></nav>
 </main></div><script>
 (function () {
   var links = document.querySelectorAll('.rail a');

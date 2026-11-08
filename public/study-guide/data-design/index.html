@@ -51,6 +51,13 @@ body {
 /* masthead */
 .mast { grid-column: 1 / -1; padding-block: 48px 28px; border-bottom: 1px solid var(--rule); display: grid; gap: 14px; }
 .mast .eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.mast .eyebrow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.mast .eyebrow a:hover { border-bottom-color: currentColor; }
+.mast .eyebrow a:focus-visible, .guide-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.guide-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; margin: 52px 0 0; padding: 22px 0 0; border-top: 1px solid var(--rule); font: 500 13px/1.5 var(--font-mono); }
+.guide-nav a { color: var(--accent); text-decoration: none; }
+.guide-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
 .mast h1 { font: 700 clamp(34px, 6vw, 56px)/1.04 var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 .mast h1 .verb { color: var(--accent); }
 .mast .lede { font-size: 19px; color: var(--ink-2); max-width: 62ch; margin: 0; }
@@ -144,7 +151,7 @@ tr:last-child td { border-bottom: 0; }
 </head><body>
 <div class="shell">
   <header class="mast">
-    <span class="eyebrow">Study guide · System design</span>
+    <span class="eyebrow"><a href="/study-guide/">Study guide</a> · System design</span>
     <h1>Data design: from <span class="verb">entities</span> to storage</h1>
     <p class="lede">Entities and relationships, keys, normalisation, indexes, denormalisation, datastore families, partitioning and schema evolution, with a definition at every new term and practice questions at the end.</p>
     <ul class="meta">
@@ -397,7 +404,9 @@ ALTER TABLE app_user DROP COLUMN name;</code></pre></div></figure>
 </ul></div></details></div></div>
 </section><section class="sec" id="review-checklist"><p class="kicker">Finish</p><h2>Review checklist</h2>
 <p>After studying this guide, you should be able to explain what a data model contains beyond a list of tables and place each decision at the conceptual, logical or physical stage and at HLD or LLD; model a domain as entities, attributes and relationships with cardinality and participation at both ends, resolve a many-to-many relationship into an associative entity, and tell an entity from a value object; derive access patterns from an API surface and use them to justify each storage decision; choose primary and foreign keys and constraints, justify a primary key by its stability, and spot a schema that mixes relational constructs into a key-value design; write a table's functional dependencies, name the anomalies they cause, and decompose it losslessly into 3NF, recognising when BCNF differs; calculate B-tree depth and the pages a query reads with and without an index, including row fetches, and order a composite index's columns; justify a denormalisation or read model by its read and its consistency mechanism; choose a datastore family from its access patterns, consistency needs, access keys and operational costs; calculate the load on the hottest shard and the effect of salting; and plan a schema change with expand–migrate–contract in which only the final step is irreversible. A reader who can do all of these has covered the material.</p></section>
-  </main>
+
+<nav class="guide-nav" aria-label="Study guide navigation"><a href="/study-guide/api-design/" rel="prev">← Previous: API design</a><a href="/study-guide/">All guides</a><a href="/study-guide/security-and-privacy/" rel="next">Next: Security and privacy →</a></nav>
+</main>
 </div>
 
 <script>
