@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 294" width="600" height="294" role="img" aria-labelledby="title desc">
+  <title id="title">Daily weather transitions</title>
+  <desc id="desc">Dry stays dry with probability 80% and turns rainy with probability 20%. Rainy turns dry with probability 40% and stays rainy with probability 60%.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 Z" fill="#334b58"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="598" height="292" rx="22" fill="#f7faf9" stroke="#cdd9d5" stroke-width="2"/>
+  <g fill="none" stroke="#334b58" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)">
+    <path d="M 96 132 C 46 39 248 39 198 132"/>
+    <path d="M 402 132 C 352 39 554 39 504 132"/>
+    <path d="M 225 147 Q 300 101 375 147"/>
+    <path d="M 375 201 Q 300 247 225 201"/>
+  </g>
+  <rect x="70" y="136" width="154" height="76" rx="24" fill="#fff1d0" stroke="#a76920" stroke-width="2"/>
+  <rect x="376" y="136" width="154" height="76" rx="24" fill="#e1eef6" stroke="#3e6b86" stroke-width="2"/>
+  <g fill="#182e37" font-family="system-ui, sans-serif" font-size="27" font-weight="650" text-anchor="middle">
+    <text x="147" y="183">Dry</text>
+    <text x="453" y="183">Rainy</text>
+  </g>
+  <g fill="#233e4b" font-family="system-ui, sans-serif" font-size="24" font-weight="650" text-anchor="middle">
+    <text x="147" y="51">80%</text>
+    <text x="453" y="51">60%</text>
+    <text x="300" y="110">20%</text>
+    <text x="300" y="260">40%</text>
+  </g>
+</svg>
